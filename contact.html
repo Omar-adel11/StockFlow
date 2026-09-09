@@ -4,14 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact Us</title>
-  <link rel="stylesheet" href="./css/contactStyle.css" />
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/contactLayout.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <main class="contact-page">
-    <div class="contact-card">
+    <div class="card contact-card">
 
       <div class="contact-intro">
         <span class="badge">Get in Touch</span>
@@ -48,7 +51,7 @@
           <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
         </div>
 
-        <button type="submit" class="btn-submit">Send Message</button>
+        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
 
         <!--
           This box is empty on purpose. Later, our JavaScript will put
@@ -61,6 +64,6 @@
       </form>
     </div>
   </main>
-<script type="module" src="./src/app.js"></script>
+
 </body>
 </html>

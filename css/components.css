@@ -1,0 +1,166 @@
+/* ==========================================================
+   BASE ELEMENT DEFAULTS
+   Applies to every plain HTML tag, no class needed.
+   ========================================================== */
+
+body {
+  font-family: "Inter", sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.5;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1, h2, h3 {
+  color: var(--color-dark);
+  line-height: 1.2;
+}
+
+/* Centers content and gives consistent side margins. Reused on
+   every section of every page. */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================
+   BUTTONS
+   .btn is the shared base. Pair it with a modifier
+   (.btn-primary / .btn-secondary) and, optionally, .btn-block
+   to make it full-width - e.g. a login form's submit button.
+   ========================================================== */
+
+.btn {
+  display: inline-block;
+  padding: 14px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-dark);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.link-btn {
+  font-weight: 500;
+  padding: 10px 14px;
+}
+
+.badge {
+  display: inline-block;
+  background-color: #dcf0e4;
+  color: var(--color-primary-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+/* ==========================================================
+   FORM FIELDS
+   Reused by the contact form today, and by any login/signup
+   form later - same label/input look everywhere.
+   ========================================================== */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--color-white);
+}
+
+/* A single feedback slot pattern: JS adds .success or .error
+   alongside .form-status depending on the API response - reused
+   by the contact form and, later, login/signup error messages. */
+.form-status {
+  margin-top: 16px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.form-status:empty {
+  margin-top: 0;
+}
+
+.form-status.success {
+  padding: 12px;
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.form-status.error {
+  padding: 12px;
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+/* A generic card surface - used for the contact form container,
+   feature cards, and a future login/signup card. */
+.card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}

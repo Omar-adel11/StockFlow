@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StockFlow - Take Control of Your Inventory</title>
 
-  <link rel="stylesheet" href="./css/style.css" />
+  <!-- Order matters: reset first, then variables (colors used
+       everywhere after), then shared components, then this page's
+       own layout rules last so they can build on top of the rest. -->
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/indexLayout.css" />
 
- 
-  
+  <!-- Google Font: Inter looks clean and modern, similar to the design -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -16,22 +23,22 @@
   <header class="navbar">
     <div class="container navbar-inner">
 
-      
+      <!-- Logo on the left -->
       <a href="#" class="logo">
-        <img src="./images/logo.jpg" alt="StockFlow logo" class="logo-img" />
+        <img src="images/logo.jpg" alt="StockFlow logo" class="logo-img" />
       </a>
 
-     
+      <!-- Navigation links in the middle -->
       <nav class="nav-links">
         <a href="#" class="active">Home</a>
         <a href="#features">Features</a>
         <a href="#solutions">Solutions</a>
         <a href="#pricing">Pricing</a>
         <a href="#about">About</a>
-        <a href="contact.html">Contact Us</a>
+        <a href="./contact.html">Contact Us</a>
       </nav>
 
-     
+      <!-- Buttons on the right -->
       <div class="navbar-actions">
         <a href="#" class="link-btn">Log In</a>
         <a href="#" class="btn btn-primary">Start Free Trial</a>
@@ -44,7 +51,7 @@
   <section class="hero">
     <div class="container hero-grid">
 
-      
+      <!-- Left column: text content -->
       <div class="hero-text">
         <span class="badge">Inventory Management Platform</span>
 
@@ -75,9 +82,9 @@
         </div>
       </div>
 
-      
+      <!-- Right column: dashboard screenshot -->
       <div class="hero-image">
-        <img src="./images/dashboard.png" alt="StockFlow dashboard preview" />
+        <img src="images/dashboard.png" alt="StockFlow dashboard preview" />
       </div>
 
     </div>
@@ -121,7 +128,7 @@
   <section class="features" id="features">
     <div class="container features-grid">
 
-     
+      <!-- Left column: heading + description -->
       <div class="features-intro">
         <span class="badge">Powerful Features</span>
         <h2>Everything You Need to Manage Your Inventory</h2>
@@ -132,58 +139,58 @@
         <a href="#" class="btn btn-primary">Explore All Features &rarr;</a>
       </div>
 
-      
+      <!-- Right column: grid of feature cards -->
       <div class="features-list">
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-green">📦</span>
           <h3>Inventory Management</h3>
           <p>Track stock levels, monitor movements and avoid stockouts.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-blue">🏬</span>
           <h3>Multi-Warehouse</h3>
           <p>Manage multiple locations from a single dashboard.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-purple">🤝</span>
           <h3>Supplier Management</h3>
           <p>Build strong supplier relationships and streamline purchases.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-orange">🧾</span>
           <h3>Purchase Orders</h3>
           <p>Create and track purchase orders effortlessly.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-green">📈</span>
           <h3>Sales Tracking</h3>
           <p>Monitor sales, manage customers and grow your revenue.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-blue">📊</span>
           <h3>Analytics &amp; Reports</h3>
           <p>Get real-time insights with powerful reports and analytics.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-red">🔔</span>
           <h3>Smart Stock Alerts</h3>
           <p>Get notified about low stock and critical items.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-blue">👥</span>
           <h3>Team Management</h3>
           <p>Assign roles and manage permissions with ease.</p>
         </div>
 
-        <div class="feature-card">
+        <div class="card feature-card">
           <span class="feature-icon icon-green">🔒</span>
           <h3>Role-Based Access</h3>
           <p>Keep your data secure with custom access levels.</p>

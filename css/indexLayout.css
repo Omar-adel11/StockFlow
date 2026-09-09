@@ -1,103 +1,5 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box; 
-}
-
-:root {
-  --color-bg: #eaf3ee;         /* the pale mint page background */
-  --color-dark: #0e2a22;       /* near-black green used for the sidebar mockup + headings */
-  --color-primary: #1c7a4c;    /* main brand green, used for buttons and highlights */
-  --color-primary-dark: #16603c;
-  --color-text: #16241f;       /* main body text color */
-  --color-text-muted: #5b6b65; /* softer gray-green for descriptions */
-  --color-border: #d7e3dd;
-  --color-white: #ffffff;
-
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-
-  --container-width: 1180px;
-}
-
-body {
-  font-family: sans-serif;
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  line-height: 1.5;
-}
-
-img {
-  max-width: 100%;   
-  display: block;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-h1, h2, h3 {
-  color: var(--color-dark);
-  line-height: 1.2;
-}
-
-
-.container {
-  max-width: var(--container-width);
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-
-
-.btn {
-  display: inline-block;
-  padding: 14px 24px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-dark);
-  border: 1px solid var(--color-border);
-}
-
-.btn-secondary:hover {
-  border-color: var(--color-primary);
-}
-
-.link-btn {
-  font-weight: 500;
-  padding: 10px 14px;
-}
-
-.badge {
-  display: inline-block;
-  background-color: #dcf0e4;
-  color: var(--color-primary-dark);
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 999px; 
-  margin-bottom: 16px;
-}
-
 /* ==========================================================
-   3. NAVBAR
+   NAVBAR
    ========================================================== */
 
 .navbar {
@@ -137,7 +39,7 @@ h1, h2, h3 {
 }
 
 /* ==========================================================
-   4. HERO SECTION
+   HERO SECTION
    ========================================================== */
 
 .hero {
@@ -146,7 +48,7 @@ h1, h2, h3 {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1.15fr; 
+  grid-template-columns: 1fr 1.15fr;
   gap: 48px;
   align-items: center;
 }
@@ -210,6 +112,9 @@ h1, h2, h3 {
   box-shadow: 0 30px 60px -20px rgba(14, 42, 34, 0.25);
 }
 
+/* ==========================================================
+   STATS BAR
+   ========================================================== */
 
 .stats {
   background-color: var(--color-white);
@@ -253,6 +158,13 @@ h1, h2, h3 {
   color: var(--color-text-muted);
 }
 
+/* ==========================================================
+   FEATURES SECTION
+   Note: the white background / border / radius for each card
+   now comes from the shared .card class added in the HTML
+   (class="card feature-card"). This file only adds what's
+   specific to a feature card: its internal spacing.
+   ========================================================== */
 
 .features {
   padding: 100px 0;
@@ -283,9 +195,6 @@ h1, h2, h3 {
 }
 
 .feature-card {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   padding: 24px;
 }
 
@@ -316,7 +225,9 @@ h1, h2, h3 {
   font-size: 0.9rem;
 }
 
-
+/* ==========================================================
+   PROCESS / STEPS SECTION
+   ========================================================== */
 
 .process {
   padding: 0 0 100px;
@@ -380,7 +291,7 @@ h1, h2, h3 {
 }
 
 /* ==========================================================
-   8. FOOTER
+   FOOTER
    ========================================================== */
 
 .footer {
@@ -390,16 +301,18 @@ h1, h2, h3 {
   font-size: 0.85rem;
 }
 
-
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
 
 @media (max-width: 900px) {
   .hero-grid,
   .features-grid {
-    grid-template-columns: 1fr; /* stack into a single column */
+    grid-template-columns: 1fr;
   }
 
   .nav-links {
-    display: none; 
+    display: none;
   }
 
   .stats-grid {

@@ -1,0 +1,35 @@
+/* Centers the whole form vertically and horizontally on the page */
+.contact-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* Background/border/radius comes from the shared .card class
+   (class="card contact-card" in the HTML). This just adds the
+   sizing specific to this page. */
+.contact-card {
+  padding: 48px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.contact-intro h1 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--color-dark);
+  margin-bottom: 10px;
+}
+
+.contact-intro p {
+  color: var(--color-text-muted);
+  margin-bottom: 32px;
+}
+
+@media (max-width: 480px) {
+  .contact-card {
+    padding: 32px 24px;
+  }
+}
