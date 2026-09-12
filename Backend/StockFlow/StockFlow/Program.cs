@@ -1,4 +1,5 @@
 using Application;
+using Application.Interfaces;
 using Persistence;
 
 
@@ -19,6 +20,8 @@ namespace StockFlow
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+
+            
 
 
             const string FrontendCorsPolicy = "FrontendCorsPolicy";

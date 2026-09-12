@@ -24,6 +24,8 @@ namespace Persistence
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
+
+            services.AddScoped<IPlanRepository, PlanRepository>();
             services.AddScoped<IContactRepository, ContactRepository>();
             services.AddScoped<IEmailService, EmailService>();
 
