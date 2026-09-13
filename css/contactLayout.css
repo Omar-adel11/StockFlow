@@ -7,6 +7,15 @@
   padding: 40px 20px;
 }
 
+.back-link {
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}
+
 /* Background/border/radius comes from the shared .card class
    (class="card contact-card" in the HTML). This just adds the
    sizing specific to this page. */
@@ -27,6 +36,17 @@
   color: var(--color-text-muted);
   margin-bottom: 32px;
 }
+.contact-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.contact-topbar .back-link {
+  margin-right: auto; 
+}
+
 
 @media (max-width: 480px) {
   .contact-card {

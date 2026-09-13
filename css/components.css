@@ -71,6 +71,15 @@ h1, h2, h3 {
   border-color: var(--color-primary);
 }
 
+.btn-danger {
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.btn-danger:hover {
+  background-color: #a5311f;
+}
+
 .btn-block {
   display: block;
   width: 100%;

@@ -17,10 +17,13 @@
     <div class="card contact-card">
 
       <div class="contact-intro">
-        <span class="badge">Get in Touch</span>
-        <h1>Contact Us</h1>
-        <p>Have a question or an inquiry? Send us a message and we'll get back to you.</p>
-      </div>
+  <div class="contact-topbar">
+    <a href="./index.html" class="back-link">&larr; Back to Site</a>
+    <span class="badge">Get in Touch</span>
+  </div>
+  <h1>Contact Us</h1>
+  <p>Have a question or an inquiry? Send us a message and we'll get back to you.</p>
+</div>
 
       <!--
         id="contact-form" is how JavaScript will find and "listen" to this
@@ -51,7 +54,7 @@
           <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+        <button type="submit" class="btn-submit btn btn-primary btn-block">Send Message</button>
 
         <!--
           This box is empty on purpose. Later, our JavaScript will put
@@ -64,6 +67,6 @@
       </form>
     </div>
   </main>
-
+  <script type="module" src="./src/pages/Contactpage.js"></script>
 </body>
 </html>
