@@ -43,7 +43,7 @@ namespace Application.Services.Auth
             return new UserDTO
             {
                 email = user.Email,
-                name = user.UserName,
+                name = user.Name,
                 Token = accessToken,
                 ImgUrl = user.ImgUrl,
                 refreshToken = refreshToken
@@ -72,7 +72,7 @@ namespace Application.Services.Auth
             return new UserDTO
             {
                 email = user.Email,
-                name = user.UserName,
+                name = user.Name,
                 Token = newAccessToken,
                 ImgUrl = user.ImgUrl,
                 refreshToken = newRefreshToken
@@ -81,10 +81,12 @@ namespace Application.Services.Auth
 
         public async Task<UserDTO?> Signup(SignupDTO signupDTO)
         {
+            var randomNumber = Random.Shared.Next(1000, 10000);
             var user = new User
             {
                 Email = signupDTO.email,
-                UserName = signupDTO.username,
+                Name = signupDTO.name,
+                UserName = $"{signupDTO.name}{randomNumber}"
             };
             var EmailExistence = await _userManager.FindByEmailAsync(user.Email);
             if(EmailExistence is not null)
@@ -103,12 +105,14 @@ namespace Application.Services.Auth
                 user.ImgUrl = DocumentSettings.UploadFile(signupDTO.file, _env.WebRootPath, "images");
                 await _userManager.UpdateAsync(user);
             }
+            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
             return new UserDTO
             {
                 email = user.Email,
-                name = user.UserName,
+                name = user.Name,
                 Token = await _tokenService.GenerateToken(user),
-                ImgUrl = user.ImgUrl
+                ImgUrl = user.ImgUrl,
+                refreshToken = newRefreshToken
             };
         }
 

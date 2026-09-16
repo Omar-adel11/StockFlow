@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.DTOs.AuthDTOs;
 using Application.Interfaces.AuthInterfaces;
 using Domain.Entities;
+using Domain.Exceptions.Unauthorized;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Auth
@@ -37,7 +38,7 @@ namespace Application.Services.Auth
             }
             else
             {
-                return "Invalid OTP";
+                throw new InvalidOtpException();
             }
 
         }

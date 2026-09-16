@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - StockFlow</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/authLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <main class="auth-page">
+    <div class="card auth-card">
+
+      <a href="index.html" class="auth-back-link">&larr; Back to Site</a>
+
+      <div class="auth-header">
+        <span class="badge">Create Account</span>
+        <h1>Sign Up</h1>
+        <p>Create an account to access the admin panel.</p>
+      </div>
+
+      <!--
+        The backend expects multipart/form-data because of the file
+        field. When the JS layer sends this with fetch(), the body will
+        be a FormData object rather than JSON.stringify(...) - the
+        browser sets the multipart Content-Type header (including its
+        boundary) automatically, so JS must NOT set Content-Type itself
+        for this one request.
+      -->
+      <form id="signup-form" novalidate>
+
+        <div class="avatar-upload-row">
+          <div class="avatar-preview" id="avatar-preview">👤</div>
+          <div>
+            <label for="signup-file" class="btn btn-secondary avatar-upload-label">Choose Photo</label>
+            <input type="file" id="signup-file" name="file" accept="image/*" class="avatar-upload-input" />
+            <p class="field-hint">Optional. PNG or JPG.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-name">Name</label>
+          <input type="text" id="signup-name" name="name" placeholder="Your full name" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="email" placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="password" placeholder="At least 8 characters" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input type="password" id="signup-confirm-password" name="confirmPassword" placeholder="Re-enter your password" />
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-block">Create Account</button>
+
+        <p id="form-status" class="form-status" aria-live="polite"></p>
+      </form>
+
+      <p class="auth-switch">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+
+    </div>
+  </main>
+
+  <script type="module" src="./src/pages/SignupPage.js"></script>
+</body>
+</html>

@@ -76,7 +76,7 @@ namespace StockFlow
                     return RateLimitPartition.GetSlidingWindowLimiter(clientIp, _ =>
                         new SlidingWindowRateLimiterOptions
                         {
-                            PermitLimit = 5,                              // Max 5 requests
+                            PermitLimit = 10,                              // Max 5 requests
                             Window = TimeSpan.FromMinutes(1),             // Per 1 minute
                             SegmentsPerWindow = 6,
                             QueueLimit = 0                                // Reject immediately if limit is hit

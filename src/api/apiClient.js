@@ -9,12 +9,18 @@ async function handleResponse(response) {
         throw new Error(extractErrorMessage(errorData));
     }
 
-   
     if (response.status === 204) {
         return null;
     }
 
-    return response.json();
+    // Check if the response is JSON or plain text
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+        return response.json();
+    }
+
+    // If it's plain text (like success messages), return text
+    return response.text();
 }
 
 
@@ -22,11 +28,19 @@ function extractErrorMessage(errorData) {
     if (!errorData) {
         return 'An error occurred while making the request';
     }
-    if (errorData.errors) {
-        return Object.values(errorData.errors).flat().join(' ');
+
+    if (typeof errorData === 'string') {
+        return errorData;
     }
-    return errorData.message || 'An error occurred while making the request';
+
+    if (typeof errorData === 'object') {
+        // Look for your C# middleware's ErrorMessage or Message property first
+        return errorData.ErrorMessage || errorData.message || errorData.errorMessage || errorData.title || JSON.stringify(errorData);
+    }
+
+    return String(errorData);
 }
+
 
 export async function get(url) {
     const response = await fetch(url);
@@ -38,6 +52,19 @@ export async function post(url, data) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+}
+
+// Added to support authenticated requests (like change-password) cleanly
+export async function postWithAuth(url, data, token) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
     });

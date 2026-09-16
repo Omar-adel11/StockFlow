@@ -53,6 +53,8 @@ namespace StockFlow.Middlewares
                     StatusCodes.Status401Unauthorized,
                     InvalidOldPasswordException =>
                     StatusCodes.Status401Unauthorized,
+                    InvalidOtpException =>
+                    StatusCodes.Status401Unauthorized,
 
                     UserNotFoundException =>
                     StatusCodes.Status404NotFound,
@@ -60,6 +62,8 @@ namespace StockFlow.Middlewares
                     RegisterationBadRequestException =>
                     StatusCodes.Status400BadRequest,
                     ResetPasswordBadRequestException =>
+                    StatusCodes.Status400BadRequest,
+                    EmailExistsException => 
                     StatusCodes.Status400BadRequest,
 
                     _ =>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Code - StockFlow</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/authLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <main class="auth-page">
+    <div class="card auth-card">
+
+      <a href="forgot-password.html" class="auth-back-link">&larr; Wrong email? Go back</a>
+
+      <div class="auth-header">
+        <span class="badge">Verify Code</span>
+        <h1>Enter Verification Code</h1>
+        <p>We sent a 6-digit code to your email. Enter it below to continue.</p>
+      </div>
+
+      <!--
+        The email field here is prefilled by JS from what the person
+        entered on the forgot-password page (carried over via
+        sessionStorage, since these are separate static pages rather
+        than a single-page app). It's left as a normal editable input,
+        readonly is avoided so someone can still fix a typo without
+        starting the whole flow over.
+      -->
+      <form id="otp-form" novalidate>
+      
+        <div class="form-group">
+          <label for="otp-code">Verification Code</label>
+          <input
+            type="text"
+            id="otp-code"
+            name="otp"
+            class="otp-input"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="6"
+            placeholder="------"
+          />
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-block">Verify Code</button>
+
+        <p id="form-status" class="form-status" aria-live="polite"></p>
+      </form>
+
+      <div class="resend-row">
+        Didn't get a code?
+        <button type="button" id="resend-btn">Resend code</button>
+      </div>
+
+    </div>
+  </main>
+<script type="module" src="./src/pages/OtpPage.js"></script>
+</body>
+</html>
