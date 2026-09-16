@@ -9,8 +9,7 @@ async function handleResponse(response) {
         throw new Error(extractErrorMessage(errorData));
     }
 
-    // DELETE (and some updates) return 204 No Content - there's no
-    // body to parse, so trying response.json() here would throw.
+   
     if (response.status === 204) {
         return null;
     }
