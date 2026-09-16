@@ -8,6 +8,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using MimeKit.Text;
 
 namespace Persistence.Email
 {
@@ -50,6 +51,40 @@ namespace Persistence.Email
 
             await client.SendAsync(email);
             await client.DisconnectAsync(true);
+        }
+
+        public async Task SendEmailAsync(string To, string Subject, string Body)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+            emailMessage.To.Add(MailboxAddress.Parse(To));
+            emailMessage.Subject = Subject;
+
+            emailMessage.Body = new TextPart(TextFormat.Html)
+            {
+                Text = Body
+            };
+            try
+            {
+                using var smtp = new SmtpClient();
+                //connect
+                await smtp.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, SecureSocketOptions.StartTls);
+                //authenticate
+                await smtp.AuthenticateAsync(_settings.SenderEmail, _settings.Password);
+
+                //send email
+                await smtp.SendAsync(emailMessage);
+                //Disconnect
+                await smtp.DisconnectAsync(true);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Email sending failed. Please try again later.",
+                    ex
+                );
+            }
+
         }
     }
 }

@@ -10,5 +10,6 @@ namespace Application.Interfaces
     {
         
         Task SendContactConfirmationAsync(string toEmail, string name, string subject, string message);
+        Task SendEmailAsync(string To, string Subject, string Body);
     }
 }

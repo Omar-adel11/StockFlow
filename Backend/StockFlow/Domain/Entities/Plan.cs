@@ -19,5 +19,7 @@ namespace Domain.Entities
 
         public ICollection<PlanFeature> Features { get; set; } = new List<PlanFeature>();
 
+       
+
     }
 }
