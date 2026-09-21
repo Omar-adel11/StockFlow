@@ -1,0 +1,53 @@
+﻿using System.Threading.Tasks;
+using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using static Application.DTOs.SuppliersDtos;
+
+namespace WebAPI.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class SuppliersController(IServiceManager serviceManager) : ControllerBase
+    {
+        private readonly IServiceManager _serviceManager = serviceManager;
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var suppliers = await _serviceManager.SupplierService.GetAllSuppliersAsync();
+            return Ok(suppliers);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var supplier = await _serviceManager.SupplierService.GetSupplierAsync(id);
+            return Ok(supplier);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] SupplierCreateRequest dto)
+        {
+            var createdSupplier = await _serviceManager.SupplierService.CreateSupplierAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = createdSupplier.Id }, createdSupplier);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromBody] SupplierUpdateRequest dto)
+        {
+            var result = await _serviceManager.SupplierService.UpdateSupplierAsync(id, dto);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _serviceManager.SupplierService.DeleteSupplierAsync(id);
+            return result ? NoContent() : NotFound(new {message = $"Supplier with id {id} is not deleted."});
+        }
+    }
+}
+
+    

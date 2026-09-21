@@ -8,8 +8,11 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
 
+        public string PONumber { get; set; } = string.Empty;
         public int SupplierId { get; set; }
         public Supplier Supplier { get; set; } = null!;
+        public int WarehouseId { get; set; }
+        public Warehouse Warehouse { get; set; } = null!;
 
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 

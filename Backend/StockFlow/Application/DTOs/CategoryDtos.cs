@@ -1,14 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs.Categorydtos
+namespace Application.DTOs
 {
-    public class CategoryRequestdto
+    public static class CategoryDtos
     {
-        public string Name {  get; set; } = string.Empty;
-        public string? Description {  get; set; } = string.Empty;
+        public record CreateRequest(
+            [property: Required, MaxLength(100)] string Name,
+            [property: MaxLength(500)] string? Description
+        );
+
+        public record UpdateRequest(
+            [property: Required, MaxLength(100)] string Name,
+            [property: MaxLength(500)] string? Description
+        );
+
+        public record Response(int Id, string Name, string? Description);
     }
+
 }

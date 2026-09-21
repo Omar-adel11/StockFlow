@@ -21,6 +21,10 @@ namespace Persistence.Configurations
                   .HasMaxLength(20)
                   .IsRequired();
 
+            entity.HasOne(po => po.Warehouse)
+                  .WithMany()
+                  .HasForeignKey(po => po.WarehouseId)
+                  .OnDelete(DeleteBehavior.Restrict);
             // Restrict: a supplier with purchase order history can't be
             // hard-deleted - soft-delete it (IsActive = false) instead,
             // so historical orders keep resolving to a real supplier row.

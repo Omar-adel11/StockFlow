@@ -1,18 +1,19 @@
-﻿using Domain.Entities;
+﻿using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>, IAppDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
         public DbSet<Plan> Plans => Set<Plan>();
         public DbSet<PlanFeature> PlanFeatures => Set<PlanFeature>();
-
+        public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Warehouse> Warehouses => Set<Warehouse>();
         public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -24,6 +25,7 @@ namespace Persistence
         public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
         public DbSet<SalesOrderItem> SalesOrderItems => Set<SalesOrderItem>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

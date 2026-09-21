@@ -49,22 +49,12 @@ namespace StockFlow.Middlewares
             {
                 StatusCode = exception switch
                 {
-                    InvalidCredentialsException =>
-                    StatusCodes.Status401Unauthorized,
-                    InvalidOldPasswordException =>
-                    StatusCodes.Status401Unauthorized,
-                    InvalidOtpException =>
-                    StatusCodes.Status401Unauthorized,
+                    UnauthorizedException => StatusCodes.Status401Unauthorized,
+                    NotFoundException => StatusCodes.Status404NotFound,
+                    BadRequestException => StatusCodes.Status400BadRequest,
 
-                    UserNotFoundException =>
-                    StatusCodes.Status404NotFound,
 
-                    RegisterationBadRequestException =>
-                    StatusCodes.Status400BadRequest,
-                    ResetPasswordBadRequestException =>
-                    StatusCodes.Status400BadRequest,
-                    EmailExistsException => 
-                    StatusCodes.Status400BadRequest,
+                    InvalidOperationException => StatusCodes.Status400BadRequest,
 
                     _ =>
                     StatusCodes.Status500InternalServerError

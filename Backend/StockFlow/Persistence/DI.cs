@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.AuthInterfaces;
-using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +7,6 @@ using Persistence.Email;
 using Persistence.Repositories;
 using Persistence.Repository;
 using StackExchange.Redis;
-
 namespace Persistence
 {
     // Keeps Program.cs clean - as the project grows, every layer can
@@ -24,11 +16,12 @@ namespace Persistence
         public static IServiceCollection AddInfrastructureServices(
             this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+                     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 
             var redisConnectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";

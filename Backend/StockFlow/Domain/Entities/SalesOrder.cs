@@ -21,6 +21,7 @@ namespace Domain.Entities
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         public int CreatedByUserId { get; set; }
+        public string InvoiceNumber { get; set; }
 
         public decimal TotalAmount { get; set; }
 

@@ -13,5 +13,7 @@ namespace Domain.Entities
         public string Phone { get; set; } = string.Empty;
 
         public ICollection<SalesOrder> SalesOrders { get; set; } = new List<SalesOrder>();
+
+        public ICollection<CustomerAddress> Addresses { get; set; } = new List<CustomerAddress>();
     }
 }

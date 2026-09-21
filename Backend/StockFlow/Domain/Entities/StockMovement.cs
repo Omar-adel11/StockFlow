@@ -26,5 +26,8 @@ namespace Domain.Entities
         public int? ReferenceId { get; set; }
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+        public string ExecutedByUserId {  get; set; }
+        public string ExecutedByUserName { get; set; }
     }
 }

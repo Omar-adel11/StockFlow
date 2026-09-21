@@ -6,7 +6,28 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs
 {
-    internal interface IInventoryDtos
+    public class InventoryDtos
     {
-    }
+        public record InventoryResponse(
+        int ProductId,
+        string ProductName,
+        string SKU,
+        int WarehouseId,
+        string WarehouseName,
+        int QuantityOnHand,
+        int ReorderLevel,
+        bool IsLowStock
+    );
+
+        public record LowStockResponse(
+            int ProductId,
+            string ProductName,
+            string SKU,
+            int WarehouseId,
+            string WarehouseName,
+            int QuantityOnHand,
+            int ReorderLevel
+        );
+    
+}
 }

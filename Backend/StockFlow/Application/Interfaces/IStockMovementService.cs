@@ -16,7 +16,7 @@ namespace Application.Interfaces
         Task<IReadOnlyCollection<StockMovementResponse>> GetRecentMovementsAsync(int count = 20);
 
         // Manual stock adjustment (e.g., damaged stock, audit correction)
-        Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request, int userId);
+        Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request);
     }
 
 }
