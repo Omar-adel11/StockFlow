@@ -1,0 +1,169 @@
+/* ==========================================================
+   ENTITY CRUD PATTERN
+   The "one form (create+edit) above a card grid" layout used by
+   every simple admin list page. Plans, Categories, Warehouses,
+   Suppliers, Customers, and Products all use these same class
+   names - a page only adds its own CSS for whatever is genuinely
+   unique to it (Plans' feature checklist, for example).
+   ========================================================== */
+
+.entity-form-card {
+  padding: 32px;
+  margin-bottom: 40px;
+  max-width: 640px;
+}
+
+.entity-form-card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Two fields side by side, e.g. Price + Reorder Level */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.form-checkbox input {
+  width: auto; /* override .form-group input { width: 100% } for a checkbox */
+}
+
+/* Groups a cluster of fields within a longer form - e.g. "Address"
+   under a Customer form, or "Line Items" under an order form later. */
+.form-section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 24px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.form-section-label:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* ==========================================================
+   DATA TABLE
+   Generic tabular list - used where rows are naturally flat data
+   (Inventory levels, Stock Movements) rather than the card-grid
+   pattern used for Categories/Warehouses/etc. Reusable for Reports
+   later too.
+   ========================================================== */
+
+.data-table-wrapper {
+  overflow-x: auto; /* wide tables scroll horizontally instead of
+                        breaking the page layout on narrow screens */
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.data-table th {
+  background-color: var(--color-bg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table td {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.entity-list-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.entity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.entity-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.entity-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.entity-card-header h3 {
+  font-size: 1.1rem;
+}
+
+.entity-card-detail {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+
+.entity-card-detail strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.entity-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.entity-card-actions .btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .entity-form-card {
+    padding: 24px;
+  }
+}

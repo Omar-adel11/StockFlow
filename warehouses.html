@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouses - StockFlow Admin</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/adminShell.css" />
+  <link rel="stylesheet" href="css/entityCrud.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="categories.html" data-min-role="Manager"><span class="nav-icon">📁</span> Categories</a></li>
+        <li><a href="products.html" data-min-role="Manager"><span class="nav-icon">📦</span> Products</a></li>
+        <li><a href="inventory.html" data-min-role="Staff"><span class="nav-icon">🏷️</span> Inventory</a></li>
+        <li><a href="warehouses.html" class="active" data-min-role="Manager"><span class="nav-icon">🏬</span> Warehouses</a></li>
+        <li><a href="suppliers.html" data-min-role="Manager"><span class="nav-icon">🤝</span> Suppliers</a></li>
+        <li><a href="customers.html" data-min-role="Staff"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="purchase-orders.html" data-min-role="Manager"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+        <li><a href="sales-orders.html" data-min-role="Staff"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="change-password.html">Change Password</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <h1>Warehouses</h1>
+          <p>Manage the physical locations stock is tracked across.</p>
+        </div>
+        <a href="index.html" class="link-btn">&larr; Back to Site</a>
+      </header>
+
+      <main class="admin-main">
+
+        <section class="card entity-form-card">
+          <h2 id="form-title">Add New Warehouse</h2>
+
+          <form id="warehouse-form" novalidate>
+
+            <div class="form-group">
+              <label for="warehouse-name">Name</label>
+              <input type="text" id="warehouse-name" name="name" placeholder="e.g. Main Warehouse" />
+            </div>
+
+            <div class="form-group">
+              <label for="warehouse-location">Location</label>
+              <input type="text" id="warehouse-location" name="location" placeholder="e.g. 12 Industrial Rd, Cairo" />
+            </div>
+
+            <div class="form-group form-checkbox">
+              <label>
+                <input type="checkbox" id="warehouse-is-active" name="isActive" hidden />
+                Active (available when receiving or fulfilling orders)
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="submit-btn" class="btn btn-primary">Save Warehouse</button>
+              <button type="button" id="cancel-btn" class="btn btn-secondary" hidden>Cancel</button>
+            </div>
+
+            <p id="form-status" class="form-status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="entity-list-section">
+          <h2>Existing Warehouses</h2>
+          <div id="warehouses-list" class="entity-grid"></div>
+          <p id="warehouses-empty" class="empty-state" hidden>No warehouses yet. Add your first one above.</p>
+          <p id="warehouses-loading" class="empty-state">Loading warehouses...</p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/pages/WarehousePage.js"></script>
+</body>
+</html>

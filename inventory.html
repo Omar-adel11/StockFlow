@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory - StockFlow Admin</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/adminShell.css" />
+  <link rel="stylesheet" href="css/entityCrud.css" />
+  <link rel="stylesheet" href="css/inventoryLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="categories.html" data-min-role="Manager"><span class="nav-icon">📁</span> Categories</a></li>
+        <li><a href="products.html" data-min-role="Manager"><span class="nav-icon">📦</span> Products</a></li>
+        <li><a href="inventory.html" class="active" data-min-role="Staff"><span class="nav-icon">🏷️</span> Inventory</a></li>
+        <li><a href="warehouses.html" data-min-role="Manager"><span class="nav-icon">🏬</span> Warehouses</a></li>
+        <li><a href="suppliers.html" data-min-role="Manager"><span class="nav-icon">🤝</span> Suppliers</a></li>
+        <li><a href="customers.html" data-min-role="Staff"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="purchase-orders.html" data-min-role="Manager"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+        <li><a href="sales-orders.html" data-min-role="Staff"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="change-password.html">Change Password</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <h1>Inventory</h1>
+          <p>Current stock levels across every warehouse, and a log of recent activity.</p>
+        </div>
+        <a href="index.html" class="link-btn">&larr; Back to Site</a>
+      </header>
+
+      <main class="admin-main">
+
+        <!-- Filters -->
+        <div class="card filters-bar">
+          <div class="form-group">
+            <label for="filter-product">Product</label>
+            <select id="filter-product">
+              <option value="">All Products</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="filter-warehouse">Warehouse</label>
+            <select id="filter-warehouse">
+              <option value="">All Warehouses</option>
+            </select>
+          </div>
+
+          <div class="form-checkbox">
+            <label>
+              <input type="checkbox" id="filter-low-stock-only" />
+              Low stock only
+            </label>
+          </div>
+        </div>
+
+        <!-- Adjust Stock Form -->
+        <section class="card adjust-stock-card">
+          <h2>Adjust Stock</h2>
+          <p>For manual corrections only - purchases and sales update stock automatically.</p>
+
+          <form id="adjust-stock-form" novalidate>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="adjust-product">Product</label>
+                <select id="adjust-product" name="productId">
+                  <option value="">Loading products...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="adjust-warehouse">Warehouse</label>
+                <select id="adjust-warehouse" name="warehouseId">
+                  <option value="">Loading warehouses...</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="adjust-quantity">Quantity Change</label>
+                <input type="number" id="adjust-quantity" name="quantityChanged" step="1" placeholder="e.g. 10 or -5" />
+                <p class="field-hint">Positive to add stock, negative to remove it.</p>
+              </div>
+
+              <div class="form-group">
+                <label for="adjust-reason">Movement Reason</label>
+                <select id="adjust-reason" name="reason">
+                  <option value="2" selected>Adjustment</option>
+                  <option value="0">Purchase</option>
+                  <option value="1">Sale</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="adjust-submit-btn" class="btn btn-primary">Record Adjustment</button>
+            </div>
+
+            <p id="adjust-form-status" class="form-status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <!-- Current Stock Table -->
+        <section class="inventory-section">
+          <h2>Current Stock</h2>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Warehouse</th>
+                  <th>Quantity On Hand</th>
+                  <th>Reorder Level</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body"></tbody>
+            </table>
+          </div>
+          <p id="inventory-empty" class="empty-state" hidden>No stock records match these filters.</p>
+          <p id="inventory-loading" class="empty-state">Loading inventory...</p>
+        </section>
+
+        <!-- Recent Stock Movements Table -->
+        <section class="inventory-section">
+          <h2>Recent Stock Movements</h2>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Product</th>
+                  <th>Warehouse</th>
+                  <th>Change</th>
+                  <th>Reason</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody id="movements-table-body"></tbody>
+            </table>
+          </div>
+          <p id="movements-empty" class="empty-state" hidden>No stock movements yet.</p>
+          <p id="movements-loading" class="empty-state">Loading recent activity...</p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/pages/InventoryPage.js"></script>
+</body>
+</html>

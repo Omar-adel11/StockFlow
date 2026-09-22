@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purchase Orders - StockFlow Admin</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/adminShell.css" />
+  <link rel="stylesheet" href="css/entityCrud.css" />
+  <link rel="stylesheet" href="css/ordersLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="categories.html" data-min-role="Manager"><span class="nav-icon">📁</span> Categories</a></li>
+        <li><a href="products.html" data-min-role="Manager"><span class="nav-icon">📦</span> Products</a></li>
+        <li><a href="inventory.html" data-min-role="Staff"><span class="nav-icon">🏷️</span> Inventory</a></li>
+        <li><a href="warehouses.html" data-min-role="Manager"><span class="nav-icon">🏬</span> Warehouses</a></li>
+        <li><a href="suppliers.html" data-min-role="Manager"><span class="nav-icon">🤝</span> Suppliers</a></li>
+        <li><a href="customers.html" data-min-role="Staff"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="purchase-orders.html" class="active" data-min-role="Manager"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+        <li><a href="sales-orders.html" data-min-role="Staff"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="change-password.html">Change Password</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <h1>Purchase Orders</h1>
+          <p>Order stock from suppliers, then receive it into a warehouse once it arrives.</p>
+        </div>
+        <a href="index.html" class="link-btn">&larr; Back to Site</a>
+      </header>
+
+      <main class="admin-main">
+
+        <!-- Create Purchase Order Form -->
+        <section class="card order-form-card">
+          <h2>Create Purchase Order</h2>
+
+          <form id="purchase-order-form" novalidate>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="po-supplier">Supplier</label>
+                <select id="po-supplier" name="supplierId">
+                  <option value="">Loading suppliers...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="po-warehouse">Destination Warehouse</label>
+                <select id="po-warehouse" name="warehouseId">
+                  <option value="">Loading warehouses...</option>
+                </select>
+              </div>
+            </div>
+
+            <p class="form-section-label">Line Items</p>
+
+            <div class="data-table-wrapper">
+              <table class="data-table line-items-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Cost</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="po-items-body">
+                  <tr>
+                    <td colspan="5" class="empty-state">No items added yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="add-item-row">
+              <button type="button" id="add-po-item-btn" class="btn btn-secondary">+ Add Item</button>
+            </div>
+
+            <div class="order-total-row">
+              <span>Total</span>
+              <span id="po-total-display">$0.00</span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="submit-btn" class="btn btn-primary">Create Purchase Order</button>
+            </div>
+
+            <p id="form-status" class="form-status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <!-- Purchase Orders List -->
+        <section class="entity-list-section">
+          <h2>Purchase Orders</h2>
+          <div id="purchase-orders-list" class="order-list"></div>
+          <p id="purchase-orders-empty" class="empty-state" hidden>No purchase orders yet. Create one above.</p>
+          <p id="purchase-orders-loading" class="empty-state">Loading purchase orders...</p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/pages/PurchaseOrderPage.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
-import { get, post, put, del, baseUrl } from '../api/apiClient.js';
+import { get, postWithAuth, putWithAuth, delWithAuth, baseUrl } from '../api/apiClient.js';
+import * as session from '../sessions/session.js';
 
 const plansEndpoint = `${baseUrl}/api/Plans`;
 
@@ -8,13 +9,13 @@ export async function fetchPlans() {
 }
 
 export async function createPlan(data) {
-    return await post(plansEndpoint, data);
+    return await postWithAuth(plansEndpoint, data);
 }
 
 export async function updatePlan(id, data) {
-    return await put(`${plansEndpoint}/${id}`, data);
+    return await putWithAuth(`${plansEndpoint}/${id}`, data);
 }
 
 export async function deletePlan(id) {
-    return await del(`${plansEndpoint}/${id}`);
+    return await delWithAuth(`${plansEndpoint}/${id}`);
 }
