@@ -10,9 +10,9 @@ namespace Application.DTOs
     public class SalesOrderDtos
     {
         public record SalesItemRequest(
-        [property: Required] int ProductId,
-        [property: Range(1, int.MaxValue)] int QuantitySold,
-        [property: Range(0.01, double.MaxValue)] decimal BilledUnitPrice
+        [Required] int ProductId,
+        [Range(1, int.MaxValue)] int QuantitySold,
+        [Range(0.01, double.MaxValue)] decimal BilledUnitPrice
     );
 
         public record SalesItemResponse(
@@ -25,9 +25,9 @@ namespace Application.DTOs
         );
 
         public record SalesCreateRequest(
-            [property: Required] int CustomerId,
-            [property: Required] int WarehouseId,
-            [property: Required, MinLength(1)] IReadOnlyCollection<SalesItemRequest> Items
+            [Required] int CustomerId,
+            [Required] int WarehouseId,
+            [Required][MinLength(1)] IReadOnlyCollection<SalesItemRequest> Items
         );
 
         public record SalesResponse(

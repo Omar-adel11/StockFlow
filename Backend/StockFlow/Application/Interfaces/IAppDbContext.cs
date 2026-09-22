@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Application.Interfaces
 {
@@ -20,7 +21,7 @@ namespace Application.Interfaces
         DbSet<PurchaseOrder> PurchaseOrders { get; }
         DbSet<SalesOrder> SalesOrders { get; }
         DbSet<Customer> Customers { get; }
-
+        DatabaseFacade Database { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

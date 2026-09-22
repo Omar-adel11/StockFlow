@@ -16,19 +16,63 @@ namespace Application.Services
         private DbSet<StockMovement> stockMovements => _context.StockMovements;
         public async Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request)
         {
-            var movement = new StockMovement()
+            using var transaction = await _context.Database.BeginTransactionAsync(CancellationToken.None);
+
+            try
             {
-                ProductId = request.ProductId,
-                WarehouseId = request.WarehouseId,
-                ChangeQuantity = request.QuantityChanged,
-                Reason = request.Reason,
-                ExecutedByUserId = currentUserService.UserId,
-                ExecutedByUserName = currentUserService.UserName,
-                ReferenceId = request.ReferenceId,
-                CreatedAtUtc = DateTime.UtcNow
-            };
-            await stockMovements.AddAsync(movement);
-            return await _context.SaveChangesAsync() > 0;
+                // 1. Fetch or create the inventory item for this product/warehouse combination
+                var inventoryItem = await _context.InventoryItems
+                    .FirstOrDefaultAsync(i => i.ProductId == request.ProductId && i.WarehouseId == request.WarehouseId);
+
+                if (inventoryItem == null)
+                {
+                    // If stock entry doesn't exist yet, create a new record
+                    inventoryItem = new InventoryItem
+                    {
+                        ProductId = request.ProductId,
+                        WarehouseId = request.WarehouseId,
+                        QuantityOnHand = 0
+                    };
+                    await _context.InventoryItems.AddAsync(inventoryItem);
+                }
+
+                // Prevent stock from going negative if reducing inventory
+                if (inventoryItem.QuantityOnHand + request.QuantityChanged < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot reduce stock by {Math.Abs(request.QuantityChanged)}. Current stock is {inventoryItem.QuantityOnHand}."
+                    );
+                }
+
+                // 2. Adjust current stock quantity
+                inventoryItem.QuantityOnHand += request.QuantityChanged;
+
+                // 3. Create stock movement audit log
+                var movement = new StockMovement
+                {
+                    ProductId = request.ProductId,
+                    WarehouseId = request.WarehouseId,
+                    ChangeQuantity = request.QuantityChanged,
+                    Reason = request.Reason,
+                    ExecutedByUserId = currentUserService.UserId,
+                    ExecutedByUserName = currentUserService.UserName,
+                    ReferenceId = request.ReferenceId,
+                    CreatedAtUtc = DateTime.UtcNow
+                };
+
+                await _context.StockMovements.AddAsync(movement);
+
+                // 4. Save changes and commit transaction
+                await _context.SaveChangesAsync(CancellationToken.None);
+                await transaction.CommitAsync(CancellationToken.None);
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                throw;
+            }
         }
 
 

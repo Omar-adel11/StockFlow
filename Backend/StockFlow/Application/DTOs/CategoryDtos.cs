@@ -10,16 +10,20 @@ namespace Application.DTOs
     public static class CategoryDtos
     {
         public record CreateRequest(
-            [property: Required, MaxLength(100)] string Name,
-            [property: MaxLength(500)] string? Description
+            [Required][MaxLength(100)] string Name,
+            [MaxLength(500)] string? Description
         );
 
         public record UpdateRequest(
-            [property: Required, MaxLength(100)] string Name,
-            [property: MaxLength(500)] string? Description
+            [Required][MaxLength(100)] string Name,
+            [MaxLength(500)] string? Description
         );
 
-        public record Response(int Id, string Name, string? Description);
+        public record Response(
+            int Id,
+            string Name,
+            string? Description
+        );
     }
 
 }

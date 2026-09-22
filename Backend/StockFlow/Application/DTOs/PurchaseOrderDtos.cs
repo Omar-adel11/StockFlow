@@ -10,9 +10,9 @@ namespace Application.DTOs
     public class PurchaseOrderDtos
     {
         public record PurchaseItemRequest(
-        [property: Required] int ProductId,
-        [property: Range(1, int.MaxValue)] int QuantityOrdered,
-        [property: Range(0.01, double.MaxValue)] decimal AgreedUnitPrice
+        [Required] int ProductId,
+        [Range(1, int.MaxValue)] int QuantityOrdered,
+        [Range(0.01, double.MaxValue)] decimal AgreedUnitPrice
     );
 
         public record PurchaseItemResponse(
@@ -25,9 +25,9 @@ namespace Application.DTOs
         );
 
         public record PurchaseCreateRequest(
-            [property: Required] int SupplierId,
-            [property: Required] int WarehouseId,
-            [property: Required, MinLength(1)] IReadOnlyCollection<PurchaseItemRequest> Items
+            [Required] int SupplierId,
+            [Required] int WarehouseId,
+            [Required][MinLength(1)] IReadOnlyCollection<PurchaseItemRequest> Items
         );
 
         public record PurchaseResponse(

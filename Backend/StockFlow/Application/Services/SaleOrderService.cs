@@ -101,6 +101,7 @@ namespace Application.Services
         {
             var order = await SalesOrders
                 .Include(so => so.Items)
+                .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(so => so.Id == id);
 
             if (order == null || order.Status != OrderStatus.Pending)

@@ -10,19 +10,19 @@ namespace Application.DTOs
     public static class ProductDtos
     {
         public record ProductCreateRequest(
-            [property: Required, MaxLength(100)] string ItemSKU,
-            [property: Required, MaxLength(200)] string Name,
-            [property: Range(0, double.MaxValue)] decimal UnitSellingPrice,
-            [property: Range(0, int.MaxValue)] int ReorderLevel,
-            [property: Required] int CategoryId,
+            [Required][MaxLength(100)] string ItemSKU,
+            [Required][MaxLength(200)] string Name,
+            [Range(0, double.MaxValue)] decimal UnitSellingPrice,
+            [Range(0, int.MaxValue)] int ReorderLevel,
+            [Required] int CategoryId,
             int? PreferredSupplierId
         );
 
         public record ProductUpdateRequest(
-            [property: Required, MaxLength(200)] string Name,
-            [property: Range(0, double.MaxValue)] decimal UnitSellingPrice,
-            [property: Range(0, int.MaxValue)] int ReorderLevel,
-            [property: Required] int CategoryId,
+            [Required][MaxLength(200)] string Name,
+            [Range(0, double.MaxValue)] decimal UnitSellingPrice,
+            [Range(0, int.MaxValue)] int ReorderLevel,
+            [Required] int CategoryId,
             int? PreferredSupplierId,
             bool IsActive
         );

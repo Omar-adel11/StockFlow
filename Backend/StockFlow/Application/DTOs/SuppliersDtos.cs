@@ -10,17 +10,17 @@ namespace Application.DTOs
     public class SuppliersDtos
     {
         public record SupplierCreateRequest(
-        [property: Required, MaxLength(150)] string Name,
-        [property: Required, EmailAddress, MaxLength(150)] string ContactEmail,
-        [property: Required, Phone, MaxLength(30)] string ContactPhone,
-        [property: Required, MaxLength(150)] string Address
+        [Required][MaxLength(150)] string Name,
+        [Required][EmailAddress][MaxLength(150)] string ContactEmail,
+        [Required][Phone][MaxLength(30)] string ContactPhone,
+        [Required][MaxLength(150)] string Address
     );
 
         public record SupplierUpdateRequest(
-            [property: Required, MaxLength(150)] string Name,
-            [property: Required, EmailAddress, MaxLength(150)] string ContactEmail,
-            [property: Required, Phone, MaxLength(30)] string ContactPhone,
-            [property: Required, MaxLength(150)] string Address,
+            [Required][MaxLength(150)] string Name,
+            [Required][EmailAddress][MaxLength(150)] string ContactEmail,
+            [Required][Phone][MaxLength(30)] string ContactPhone,
+            [Required][MaxLength(150)] string Address,
             bool IsActive
         );
 
