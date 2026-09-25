@@ -25,28 +25,13 @@
       </div>
 
       <ul class="sidebar-nav">
-        <li>
-          <a href="#overview" class="active">
-            <span class="nav-icon">▦</span>
-            Overview
-          </a>
-        </li>
-        <li>
-          <a href="#business-owners">
-            <span class="nav-icon">♙</span>
-            Business Owners
-          </a>
-        </li>
-        <li>
-          <a href="#plans">
-            <span class="nav-icon">◆</span>
-            Plans
-          </a>
-        </li>
+        <li><a href="#overview" class="active"><span class="nav-icon">▦</span> Overview</a></li>
+        <li><a href="#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
+        <li><a href="#plans"><span class="nav-icon">◆</span> Plans</a></li>
       </ul>
 
       <div class="sidebar-footer">
-        <a href="index.html">Back to Site</a>
+        <a href="profile.html">Profile</a>
         <button type="button" id="logout-btn">Log Out</button>
       </div>
     </aside>
@@ -60,13 +45,12 @@
           <p>Manage StockFlow businesses, subscriptions, and platform plans.</p>
         </div>
 
-        <a href="addPlan.html" class="btn btn-primary">+ Add Plan</a>
+        <a href="index.html" class="btn btn-secondary">Back to Site</a>
       </header>
 
       <main class="admin-main">
 
-        <!-- ==================== OVERVIEW ==================== -->
-        <section id="overview" class="saas-section">
+        <section id="overview" class="saas-section overview-section">
           <div class="section-heading">
             <div>
               <span class="section-label">Overview</span>
@@ -110,22 +94,16 @@
           </div>
         </section>
 
-        <!-- ==================== TABS ==================== -->
         <nav class="admin-tabs" aria-label="SaaS administration sections">
-          <a href="#plans" class="admin-tab active">Plans</a>
+          <a href="#plans" class="admin-tab">Plans</a>
           <a href="#business-owners" class="admin-tab">Business Owners</a>
         </nav>
 
-        <!-- ==================== PLANS ==================== -->
-        <section id="plans" class="saas-section">
-          <div class="section-heading section-heading-row">
-            <div>
-              <span class="section-label">Subscriptions</span>
-              <h2>Plans</h2>
-              <p>Create and manage the plans available to StockFlow businesses.</p>
-            </div>
-
-            <a href="addPlan.html" class="btn btn-primary">+ Add Plan</a>
+        <section id="plans" class="saas-section tab-section">
+          <div class="section-heading">
+            <span class="section-label">Subscriptions</span>
+            <h2>Plans</h2>
+            <p>Create and manage the plans available to StockFlow businesses.</p>
           </div>
 
           <div id="plans-list" class="plans-grid">
@@ -187,14 +165,11 @@
           <p id="plans-loading" class="empty-state" hidden>Loading plans...</p>
         </section>
 
-        <!-- ==================== BUSINESS OWNERS ==================== -->
-        <section id="business-owners" class="saas-section">
-          <div class="section-heading section-heading-row">
-            <div>
-              <span class="section-label">Tenants</span>
-              <h2>Business Owners</h2>
-              <p>Manage business access and assign subscription plans.</p>
-            </div>
+        <section id="business-owners" class="saas-section tab-section">
+          <div class="section-heading">
+            <span class="section-label">Tenants</span>
+            <h2>Business Owners</h2>
+            <p>Manage business access and assign subscription plans.</p>
           </div>
 
           <div class="card table-card">
@@ -224,7 +199,6 @@
 
                 <tbody id="business-owners-list">
                   <!-- Future SaaSAdminPage.js will populate this table. -->
-
                   <tr>
                     <td>
                       <div class="person-cell">
@@ -272,7 +246,6 @@
                       <button type="button" class="btn btn-secondary btn-small">Assign Plan</button>
                     </td>
                   </tr>
-
                 </tbody>
               </table>
             </div>
@@ -286,9 +259,6 @@
     </div>
   </div>
 
-  <!-- ==================== ASSIGN PLAN MODAL ==================== -->
-  <!-- HTML structure only for now. The future SaaSAdminPage.js will
-       populate the owner name, plans, and submit the PUT request. -->
   <dialog id="assign-plan-modal" class="modal">
     <div class="modal-card">
       <div class="modal-header">
