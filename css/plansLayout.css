@@ -1,0 +1,95 @@
+.plans-page {
+  min-height: calc(100vh - 80px);
+}
+
+.plans-hero {
+  padding: 72px 0 52px;
+  text-align: center;
+  background-color: var(--color-bg);
+}
+
+.plans-hero h1 {
+  max-width: 720px;
+  margin: 12px auto 10px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+}
+
+.plans-hero p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.plans-section {
+  padding: 56px 0 80px;
+}
+
+.public-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+  justify-content: center;
+  gap: 24px;
+}
+
+.public-plan-card {
+  padding: 30px;
+  min-height: 290px;
+  display: flex;
+  flex-direction: column;
+}
+
+.public-plan-card h2 {
+  font-size: 1.35rem;
+  margin-bottom: 12px;
+}
+
+.plan-kicker {
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.public-plan-description {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.public-plan-price {
+  color: var(--color-dark);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 24px 0 20px;
+}
+
+.public-plan-price span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.subscribe-btn {
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .plans-hero {
+    padding: 52px 0 40px;
+  }
+
+  .plans-section {
+    padding: 40px 0 60px;
+  }
+
+  .public-plans-grid {
+    grid-template-columns: 1fr;
+  }
+}
