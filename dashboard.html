@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard | StockFlow</title>
+<link rel="stylesheet" href="css/reset.css"><link rel="stylesheet" href="css/variables.css"><link rel="stylesheet" href="css/dashboardLayout.css">
+</head>
+<body>
+<div class="dashboard-shell">
+<aside class="sidebar">
+  <a href="dashboard.html" class="side-brand">Stock<span>Flow</span></a>
+  <nav class="side-nav">
+    <a class="active" href="dashboard.html">▦ <span>Dashboard</span></a>
+    <a href="categories.html">◈ <span>Categories</span></a><a href="products.html">□ <span>Products</span></a><a href="inventory.html">▤ <span>Inventory</span></a><a href="warehouses.html">⌂ <span>Warehouses</span></a><a href="suppliers.html">♧ <span>Suppliers</span></a><a href="customers.html">♙ <span>Customers</span></a><a href="purchase-orders.html">↗ <span>Purchase Orders</span></a><a href="sales-orders.html">↘ <span>Sales Orders</span></a><a href="team.html">♟ <span>Team Members</span></a>
+  </nav>
+  <div class="side-footer"><a href="profile.html">⚙ <span>Profile</span></a><a href="Login.html">↪ <span>Log Out</span></a></div>
+</aside>
+<main class="dashboard-main">
+<header class="topbar"><div><span class="muted">Overview</span><h1>Dashboard</h1></div><div class="user-chip"><span class="avatar">OA</span><div><strong>Omar Adel</strong><small>Business Owner</small></div></div></header>
+<section class="welcome"><div><span class="eyebrow">BUSINESS OVERVIEW</span><h2>Good morning, Omar.</h2><p>Here is what's happening with your inventory today.</p></div><a href="products.html" class="primary-btn">+ Add Product</a></section>
+<section class="stats-grid">
+<article class="stat-card"><span>Total Products</span><strong>1,248</strong><small class="positive">↑ 8.2% <em>vs last month</em></small></article>
+<article class="stat-card"><span>Low Stock Items</span><strong>32</strong><small class="warning">Needs attention</small></article>
+<article class="stat-card"><span>Total Orders</span><strong>842</strong><small class="positive">↑ 12.5% <em>vs last month</em></small></article>
+<article class="stat-card"><span>Total Revenue</span><strong>$125,430</strong><small class="positive">↑ 9.4% <em>vs last month</em></small></article>
+</section>
+<section class="content-grid">
+<article class="panel sales-panel"><div class="panel-head"><div><h3>Sales Overview</h3><p>Monthly sales performance</p></div><select><option>Last 6 months</option></select></div><div class="chart"><div class="chart-line"><i style="height:35%"></i><i style="height:48%"></i><i style="height:42%"></i><i style="height:63%"></i><i style="height:57%"></i><i style="height:78%"></i><i style="height:70%"></i><i style="height:91%"></i></div><div class="chart-labels"><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span></div></div></article>
+<article class="panel"><div class="panel-head"><div><h3>Low Stock Alerts</h3><p>Products below minimum level</p></div><a href="inventory.html">View all</a></div><div class="alert-list"><div><b>Wireless Mouse</b><span>8 left</span></div><div><b>USB-C Cable</b><span>12 left</span></div><div><b>Mechanical Keyboard</b><span>5 left</span></div><div><b>HDMI Adapter</b><span>7 left</span></div></div></article>
+</section>
+<section class="content-grid lower"><article class="panel"><div class="panel-head"><div><h3>Recent Activity</h3><p>Latest inventory operations</p></div></div><div class="activity"><div><span class="activity-icon">+</span><div><b>New purchase order received</b><small>PO-1048 · 15 minutes ago</small></div></div><div><span class="activity-icon">↗</span><div><b>Sales order completed</b><small>SO-2391 · 42 minutes ago</small></div></div><div><span class="activity-icon">▤</span><div><b>Inventory adjusted</b><small>Warehouse A · 1 hour ago</small></div></div></div></article>
+<article class="panel"><div class="panel-head"><div><h3>Inventory by Category</h3><p>Current stock distribution</p></div></div><div class="category-list"><div><span><i></i> Electronics</span><b>42%</b></div><div><span><i></i> Accessories</span><b>27%</b></div><div><span><i></i> Office Supplies</span><b>18%</b></div><div><span><i></i> Other</span><b>13%</b></div></div></article></section>
+</main></div>
+</body></html>
