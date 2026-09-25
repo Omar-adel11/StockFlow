@@ -34,6 +34,7 @@ export function ValidateRegisterForm(formData) {
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
     const file = formData.get('file');
+    const BusinessName = formData.get('BusinessName');
 
     const errors = {};
 

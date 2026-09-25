@@ -38,10 +38,7 @@ namespace Application.Services.Auth
             await cacheService.RemoveAsync(BuildKey(refreshToken));
         }
 
-        public async Task RevokeAsyncByValue(string UserId)
-        {
-            await cacheService.RemoveAsync(UserId);
-        }
+      
 
         private static string GenerateSecureToken()
         {
