@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - StockFlow</title>
+
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/adminShell.css" />
+  <link rel="stylesheet" href="./css/profileLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="adminPanel.html"><span class="nav-icon">▦</span> Overview</a></li>
+        <li><a href="adminPanel.html#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
+        <li><a href="adminPanel.html#plans"><span class="nav-icon">◆</span> Plans</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="profile.html" class="active">Profile</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <p class="topbar-eyebrow">Account</p>
+          <h1>Profile</h1>
+          <p>View and manage your StockFlow account information.</p>
+        </div>
+
+        <a href="index.html" class="btn btn-secondary">Back to Site</a>
+      </header>
+
+      <main class="admin-main">
+
+        <section class="profile-grid">
+
+          <article class="card profile-card">
+            <div class="profile-card-heading">
+              <span class="profile-avatar">OA</span>
+              <div>
+                <span class="section-label">Account Profile</span>
+                <h2>Personal Information</h2>
+                <p>Your account details.</p>
+              </div>
+            </div>
+
+            <div class="profile-details">
+              <div class="profile-field">
+                <span>Full Name</span>
+                <strong>Omar Adel</strong>
+              </div>
+
+              <div class="profile-field">
+                <span>Email</span>
+                <strong>omar@example.com</strong>
+              </div>
+
+              <div class="profile-field">
+                <span>Role</span>
+                <strong>SaaS Admin</strong>
+              </div>
+
+              <div class="profile-field">
+                <span>Account Status</span>
+                <strong class="status-text">Active</strong>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary profile-action">Edit Profile</button>
+          </article>
+
+          <article class="card profile-card">
+            <div class="profile-card-heading">
+              <div>
+                <span class="section-label">Security</span>
+                <h2>Password & Security</h2>
+                <p>Keep your account secure.</p>
+              </div>
+            </div>
+
+            <div class="security-row">
+              <div>
+                <strong>Password</strong>
+                <p>Change your account password regularly.</p>
+              </div>
+              <a href="change-password.html" class="btn btn-secondary">Change Password</a>
+            </div>
+
+            <div class="security-row">
+              <div>
+                <strong>Session</strong>
+                <p>Sign out from the current StockFlow session.</p>
+              </div>
+              <button type="button" class="btn btn-danger" id="profile-logout">Log Out</button>
+            </div>
+          </article>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+</body>
+</html>
