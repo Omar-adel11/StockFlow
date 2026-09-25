@@ -181,6 +181,10 @@ h1, h2, h3 {
   background-color: var(--color-error-bg);
   color: var(--color-error);
 }
+.logo-img {
+    height: 26px;
+    width: auto;
+}
 
 /* A generic card surface - used for the contact form container,
    feature cards, and a future login/signup card. */

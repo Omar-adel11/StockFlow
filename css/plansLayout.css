@@ -1,3 +1,56 @@
+/* ---------- NAVBAR / LOGO ---------- */
+
+.navbar {
+  padding: 14px 0;          /* tighten the navbar height */
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-img {
+  height: 80px;             /* 👈 controls navbar height */
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-links a {
+  color: var(--color-text);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--color-primary);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+
 .plans-page {
   min-height: calc(100vh - 80px);
 }

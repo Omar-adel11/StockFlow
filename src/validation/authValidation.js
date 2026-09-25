@@ -35,6 +35,7 @@ export function ValidateRegisterForm(formData) {
     const confirmPassword = formData.get('confirmPassword');
     const file = formData.get('file');
     const BusinessName = formData.get('BusinessName');
+    const PhoneNumber = formData.get('PhoneNumber');
 
     const errors = {};
 
@@ -42,7 +43,9 @@ export function ValidateRegisterForm(formData) {
         ['name', name, 100],
         ['email', email, 200],
         ['password', password, 100],
-        ['confirmPassword', confirmPassword, 100]
+        ['confirmPassword', confirmPassword, 100],
+        ['PhoneNumber', phoneNumber, 20],
+        ['BusinessName', businessName, 200]
     ];
 
     fields.forEach(([field, value, maxLength]) => {
