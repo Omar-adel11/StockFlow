@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plans - StockFlow</title>
+
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/plansLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+
+      <a href="index.html" class="logo">
+        <img src="images/logo.jpg" alt="StockFlow logo" class="logo-img" />
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="plans.html" class="active">Pricing</a>
+        <a href="index.html#about">About</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+
+      <div class="navbar-actions">
+        <a href="Login.html" class="link-btn">Log In</a>
+        <a href="Login.html" class="btn btn-primary">Start Free Trial</a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="plans-page">
+    <section class="plans-hero">
+      <div class="container">
+        <span class="badge">Simple Pricing</span>
+        <h1>Choose the right plan for your business</h1>
+        <p>Get the tools you need to manage inventory, warehouses, purchases, and sales.</p>
+      </div>
+    </section>
+
+    <section class="plans-section">
+      <div class="container">
+        <div id="plans-list" class="public-plans-grid">
+
+          <!-- Future plansPage.js will replace these cards with API data. -->
+          <article class="card public-plan-card">
+            <span class="plan-kicker">StockFlow Plan</span>
+            <h2>Starter</h2>
+            <p class="public-plan-description">
+              For small businesses getting started with inventory management.
+            </p>
+            <p class="public-plan-price">$19 <span>/ Monthly</span></p>
+            <button type="button" class="btn btn-primary subscribe-btn">Subscribe</button>
+          </article>
+
+          <article class="card public-plan-card">
+            <span class="plan-kicker">StockFlow Plan</span>
+            <h2>Business</h2>
+            <p class="public-plan-description">
+              For growing businesses that need more users and warehouses.
+            </p>
+            <p class="public-plan-price">$49 <span>/ Monthly</span></p>
+            <button type="button" class="btn btn-primary subscribe-btn">Subscribe</button>
+          </article>
+
+        </div>
+
+        <p id="plans-empty" class="empty-state" hidden>No plans are currently available.</p>
+        <p id="plans-loading" class="empty-state" hidden>Loading plans...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 StockFlow. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
