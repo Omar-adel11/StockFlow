@@ -102,8 +102,41 @@
   border-bottom: 2px solid transparent;
 }
 
-.admin-tab:hover,
-.admin-tab.active {
+.admin-tab:hover {
+  color: var(--color-primary);
+}
+
+.tab-section {
+  display: none;
+}
+
+#plans {
+  display: block;
+}
+
+main:has(#business-owners:target) #plans {
+  display: none;
+}
+
+main:has(#business-owners:target) #business-owners {
+  display: block;
+}
+
+main:has(#plans:target) #plans {
+  display: block;
+}
+
+main:has(#plans:target) #business-owners {
+  display: none;
+}
+
+main:has(#plans:target) .admin-tab[href="#plans"],
+main:not(:has(.tab-section:target)) .admin-tab[href="#plans"] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+main:has(#business-owners:target) .admin-tab[href="#business-owners"] {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
 }
