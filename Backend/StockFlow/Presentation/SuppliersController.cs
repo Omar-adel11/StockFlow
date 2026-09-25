@@ -1,14 +1,18 @@
 ﻿using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.SuppliersDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class SuppliersController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
@@ -30,7 +34,9 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SupplierCreateRequest dto)
         {
-            var createdSupplier = await _serviceManager.SupplierService.CreateSupplierAsync(dto);
+            var businessId = User.GetBusinessId();
+           
+            var createdSupplier = await _serviceManager.SupplierService.CreateSupplierAsync(dto,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdSupplier.Id }, createdSupplier);
         }
 

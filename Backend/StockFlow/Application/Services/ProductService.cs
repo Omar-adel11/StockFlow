@@ -16,7 +16,7 @@ namespace Application.Services
     public class ProductService(IAppDbContext _context) : IProductService
     {
         private  DbSet<Product> _productSet => _context.Products;
-        public async Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest)
+        public async Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest, int businessId)
         {
             var product = new Product()
             {
@@ -26,7 +26,8 @@ namespace Application.Services
                 PreferredSupplierId = createRequest?.PreferredSupplierId,
                 UnitPrice = createRequest.UnitSellingPrice,
                 ReorderLevel = createRequest.ReorderLevel,
-                IsActive = true
+                IsActive = true,
+                BusinessId = businessId,
             };
             await _productSet.AddAsync(product);
             await _context.SaveChangesAsync();
@@ -37,15 +38,12 @@ namespace Application.Services
         public async Task<bool> DeleteProductAsync(int id)
         {
             var product = await GetProductEntityAsync(id);
-            if(!product.IsActive)
-            {
-                return true;
-            }
+           
             if(product.InventoryItems.Any(i=>i.QuantityOnHand > 0))
             {
                 throw new InvalidOperationException($"Cannot delete Product '{product.Name}' because it currently holds active stock.");
             }
-            product.IsActive = false;
+            _context.Products.Remove(product);
             return await _context.SaveChangesAsync() > 0;
         }
 

@@ -5,14 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
+using Domain.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation
 {
     [ApiController]
     [Route("api/[controller]")]
-    
-        public class PlansController : ControllerBase
+    [Authorize(Roles = $"{Roles.SaasAdmin}")]
+
+    public class PlansController : ControllerBase
         {
             private readonly IPlanService _planService;
 
@@ -22,6 +25,7 @@ namespace Presentation
             }
 
             [HttpGet]
+            [AllowAnonymous]
             public async Task<ActionResult<List<PlanResponseDto>>> GetAll()
             {
                 var plans = await _planService.GetAllPlansAsync();

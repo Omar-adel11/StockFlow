@@ -14,7 +14,7 @@ namespace Application.Services
     {
         private DbSet<Supplier> SupplierSet => _context.Suppliers;
 
-        public async Task<SuppliersDtos.SupplierResponse> CreateSupplierAsync(SuppliersDtos.SupplierCreateRequest createRequest)
+        public async Task<SuppliersDtos.SupplierResponse> CreateSupplierAsync(SuppliersDtos.SupplierCreateRequest createRequest,int businessId)
         {
             var supplier = new Supplier
             {
@@ -22,7 +22,8 @@ namespace Application.Services
                 ContactEmail = createRequest.ContactEmail,
                 ContactPhone = createRequest.ContactPhone,
                 Address = createRequest.Address,
-                IsActive = true
+                IsActive = true,
+                BusinessId = businessId
             };
 
             await SupplierSet.AddAsync(supplier);
@@ -34,14 +35,11 @@ namespace Application.Services
         public async Task<bool> DeleteSupplierAsync(int id)
         {
             var supplier = await GetSupplierEntityAsync(id);
-            if (!supplier.IsActive)
-            {
-                return true; // Already deactivated
-            }
+            
 
             await ValidateNoAssociatedActiveProductsAsync(supplier.Id, supplier.Name);
 
-            supplier.IsActive = false;
+            _context.Suppliers.Remove(supplier);
             return await _context.SaveChangesAsync() > 0;
         }
 

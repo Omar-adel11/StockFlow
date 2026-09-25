@@ -1,14 +1,18 @@
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.StockMovementDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class StockMovementsController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
@@ -37,7 +41,9 @@ namespace WebAPI.Controllers
         [HttpPost("adjust")]
         public async Task<IActionResult> CreateManualAdjustment([FromBody] ManualAdjustmentRequest request)
         {
-            var result = await _serviceManager.StockMovementService.CreateManualAdjustmentAsync(request);
+            var businessId = User.GetBusinessId();
+            
+            var result = await _serviceManager.StockMovementService.CreateManualAdjustmentAsync(request,businessId);
             return result
                 ? Ok(new { Message = "Stock adjustment executed successfully." })
                 : BadRequest(new { Message = "Failed to record stock adjustment." });

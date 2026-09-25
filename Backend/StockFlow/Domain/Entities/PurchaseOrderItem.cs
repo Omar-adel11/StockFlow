@@ -16,5 +16,7 @@ namespace Domain.Entities
         // Product.UnitPrice (the sale price) since purchase cost can
         // vary order to order.
         public decimal UnitCost { get; set; }
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

@@ -19,7 +19,8 @@ namespace Persistence.Configurations
                   .HasConversion<string>()
                   .HasMaxLength(20)
                   .IsRequired();
-
+            entity.Property(s => s.Reason)
+                  .HasConversion<string>();
             entity.HasOne(m => m.Product)
                   .WithMany(p => p.StockMovements)
                   .HasForeignKey(m => m.ProductId)
@@ -29,6 +30,10 @@ namespace Persistence.Configurations
                   .WithMany()
                   .HasForeignKey(m => m.WarehouseId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.BusinessId);
         }
     }
 }

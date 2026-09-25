@@ -28,6 +28,10 @@ namespace Persistence.Configurations
                   .WithMany(w => w.InventoryItems)
                   .HasForeignKey(i => i.WarehouseId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.BusinessId);
         }
     }
 }

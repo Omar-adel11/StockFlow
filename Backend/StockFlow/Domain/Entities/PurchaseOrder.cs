@@ -31,5 +31,7 @@ namespace Domain.Entities
         public decimal TotalAmount { get; set; }
 
         public ICollection<PurchaseOrderItem> Items { get; set; } = new List<PurchaseOrderItem>();
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

@@ -12,6 +12,12 @@ namespace Persistence.Configurations
 
             entity.HasKey(p => p.Id);
 
+            entity.Property(p => p.BillingCycle)
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
+            entity.Property(p => p.Price)
+    .HasPrecision(18, 2);
             entity.Property(p => p.Name).IsRequired().HasMaxLength(100);
             entity.Property(p => p.Price).HasColumnType("decimal(10,2)");
             entity.Property(p => p.Description).HasMaxLength(500);

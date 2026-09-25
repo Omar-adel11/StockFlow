@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces;
 using Domain.Entities;
-
 namespace Persistence.Repositories
 {
     public class ContactRepository : IContactRepository

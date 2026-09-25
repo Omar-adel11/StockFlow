@@ -11,7 +11,7 @@ namespace Application.Interfaces
     {
         Task<IReadOnlyCollection<Response>> GetAllCategoriesAsync();
         Task<Response?> GetCategoryAsync(int id);
-        Task<Response> CreateCategoryAsync(CreateRequest createRequest);
+        Task<Response> CreateCategoryAsync(CreateRequest createRequest, int BusinessId);
         Task<Response?> UpdateCategoryAsync(int Id, UpdateRequest updateRequest);
         Task<bool> DeleteCategoryAsync(int id);
     }

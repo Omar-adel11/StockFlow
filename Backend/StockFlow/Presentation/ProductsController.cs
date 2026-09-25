@@ -1,19 +1,24 @@
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.ProductDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class ProductsController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
 
         [HttpGet]
+        [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll()
         {
             var products = await _serviceManager.ProductService.GetAllProductsAsync();
@@ -37,7 +42,9 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductCreateRequest createRequest)
         {
-            var createdProduct = await _serviceManager.ProductService.CreateProductAsync(createRequest);
+            var businessId = User.GetBusinessId();
+            
+            var createdProduct = await _serviceManager.ProductService.CreateProductAsync(createRequest,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
         }
 

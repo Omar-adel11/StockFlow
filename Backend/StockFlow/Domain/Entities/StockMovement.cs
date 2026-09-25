@@ -29,5 +29,7 @@ namespace Domain.Entities
 
         public string ExecutedByUserId {  get; set; }
         public string ExecutedByUserName { get; set; }
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

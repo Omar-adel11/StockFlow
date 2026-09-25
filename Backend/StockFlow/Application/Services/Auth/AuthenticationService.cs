@@ -12,8 +12,10 @@ using Domain.Entities;
 using Domain.Exceptions.BadRequest;
 using Domain.Exceptions.NotFound;
 using Domain.Exceptions.Unauthorized;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Application.Services.Auth
@@ -24,12 +26,32 @@ namespace Application.Services.Auth
         IRefreshTokenService _refreshTokenService,
         IOTPService _oTPService,
         IEmailService _emailService,
-        IHostingEnvironment _env) : IAuthenticationService
+        IHostingEnvironment _env,
+        IAppDbContext _dbContext) : IAuthenticationService
     {
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
-        public async Task<UserDTO?> Login(LoginDTO loginDTO)
+        public async Task<UserDTO?> LoginAsync(LoginDTO loginDTO)
         {
-            var user = await CheckEmailExistence(loginDTO.email);
+            var user = await _userManager.Users
+                .IgnoreQueryFilters()
+                .Include(u => u.Business)
+                .FirstOrDefaultAsync(u => u.Email == loginDTO.email);
+
+            if (user == null)
+            {
+                throw new InvalidCredentialsException();
+            }
+
+            if (!user.IsActive)
+            {
+                throw new UnauthorizedAccessException("Your account has been deactivated. Please contact your business owner or administrator.");
+            }
+
+            if (user.Business != null && !user.Business.IsActive)
+            {
+                throw new UnauthorizedAccessException("Your business subscription has been deactivated. Please contact your administrator.");
+            }
+
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDTO.password);
             if (!isPasswordValid)
             {
@@ -39,6 +61,7 @@ namespace Application.Services.Auth
             var accessToken = await _tokenService.GenerateToken(user);
             var refreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
 
+            var roles = await _userManager.GetRolesAsync(user);
 
             return new UserDTO
             {
@@ -46,7 +69,8 @@ namespace Application.Services.Auth
                 name = user.Name,
                 Token = accessToken,
                 ImgUrl = user.ImgUrl,
-                refreshToken = refreshToken
+                refreshToken = refreshToken,
+                Role = roles.FirstOrDefault(),
             };
         }
         public async Task<UserDTO?> refresh(RefreshRequestDto refreshRequestDto)
@@ -81,39 +105,86 @@ namespace Application.Services.Auth
 
         public async Task<UserDTO?> Signup(SignupDTO signupDTO)
         {
-            var randomNumber = Random.Shared.Next(1000, 10000);
-            var user = new User
-            {
-                Email = signupDTO.email,
-                Name = signupDTO.name,
-                UserName = $"{signupDTO.name}{randomNumber}"
-            };
-            var EmailExistence = await _userManager.FindByEmailAsync(user.Email);
-            if(EmailExistence is not null)
+
+            var EmailExistence = await _userManager.FindByEmailAsync(signupDTO.email);
+            if (EmailExistence is not null)
             {
                 throw new EmailExistsException();
             }
 
-            var result = await _userManager.CreateAsync(user, signupDTO.password);
-            if (!result.Succeeded)
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            try
             {
-                throw new RegisterationBadRequestException(result.Errors.Select(e => e.Description));
+                // Create Business first (PlanId defaults to null)
+                var business = new Business
+                {
+                    Name = signupDTO.BusinessName,
+                    IsActive = true,
+                    CreatedAtUtc = DateTime.UtcNow
+                };
+
+                _dbContext.Business.Add(business);
+                await _dbContext.SaveChangesAsync();
+
+                var randomNumber = Random.Shared.Next(1000, 10000);
+                // Create User linked to the new Business
+                var user = new User
+                {
+                    Email = signupDTO.email,
+                    Name = signupDTO.name,
+                    UserName = $"{signupDTO.name}{randomNumber}",
+                    PhoneNumber = signupDTO.PhoneNumber,
+                    BusinessId = business.Id,
+                    EmailConfirmed = true
+                };
+
+                var result = await _userManager.CreateAsync(user, signupDTO.password);
+                if (!result.Succeeded)
+                {
+
+                    await transaction.RollbackAsync();
+                    throw new RegisterationBadRequestException(result.Errors.Select(e => e.Description));
+                }
+                //add photo if provided
+                if (signupDTO.file != null)
+                {
+                    user.ImgUrl = DocumentSettings.UploadFile(signupDTO.file, _env.WebRootPath, "images");
+                    await _userManager.UpdateAsync(user);
+                }
+               
+               
+                // Assign "BusinessOwner" role
+                var roleResult = await _userManager.AddToRoleAsync(user, Roles.BusinessOwner);
+                if (!roleResult.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException("Failed to assign BusinessOwner role.");
+                }
+
+                // Commit transaction
+                await transaction.CommitAsync();
+
+                // 3. Generate JWT Token
+                var roles = await _userManager.GetRolesAsync(user);
+                var token = await _tokenService.GenerateToken(user);
+                var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+
+                return new UserDTO
+                {
+                    Token = token,
+                    email = user.Email,
+                    name = user.Name,
+                    Role = Roles.BusinessOwner,
+                    refreshToken = newRefreshToken,
+                    ImgUrl = user.ImgUrl
+                };
             }
-            //add photo if provided
-            if (signupDTO.file != null)
+            catch
             {
-                user.ImgUrl = DocumentSettings.UploadFile(signupDTO.file, _env.WebRootPath, "images");
-                await _userManager.UpdateAsync(user);
+                await transaction.RollbackAsync();
+                throw;
             }
-            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
-            return new UserDTO
-            {
-                email = user.Email,
-                name = user.Name,
-                Token = await _tokenService.GenerateToken(user),
-                ImgUrl = user.ImgUrl,
-                refreshToken = newRefreshToken
-            };
         }
 
         public async Task<string> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO, string email)

@@ -12,8 +12,8 @@ namespace Application.Interfaces
     {
         Task<IReadOnlyCollection<PurchaseResponse>> GetAllOrdersAsync(int count);
         Task<PurchaseResponse?> GetOrderByIdAsync(int id);
-        Task<PurchaseResponse> CreatePurchaseOrderAsync(PurchaseCreateRequest createRequest, int currentUserId);
-        Task<bool> ReceivePurchaseOrderAsync(int id);
+        Task<PurchaseResponse> CreatePurchaseOrderAsync(PurchaseCreateRequest createRequest, int currentUserId, int businessId);
+        Task<bool> ReceivePurchaseOrderAsync(int id, int businessId);
         Task<bool> CancelPurchaseOrderAsync(int id);
     }
 }

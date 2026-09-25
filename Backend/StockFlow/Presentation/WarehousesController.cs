@@ -1,19 +1,24 @@
 ﻿using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.WarehouseDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class WarehousesController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
 
         [HttpGet]
+        [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll()
         {
             var warehouses = await _serviceManager.WarehouseService.GetAllWarehousesAsync();
@@ -30,7 +35,9 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] WarehouseCreateRequest dto)
         {
-            var createdWarehouse = await _serviceManager.WarehouseService.CreateWarehouseAsync(dto);
+            var businessId = User.GetBusinessId();
+           
+            var createdWarehouse = await _serviceManager.WarehouseService.CreateWarehouseAsync(dto,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdWarehouse.Id }, createdWarehouse);
         }
 

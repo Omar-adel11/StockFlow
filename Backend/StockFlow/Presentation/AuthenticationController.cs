@@ -30,7 +30,7 @@ namespace Presentation
         {
 
 
-            var result = await serviceManager.AuthService.Login(loginDTO);
+            var result = await serviceManager.AuthService.LoginAsync(loginDTO);
             return Ok(result);
         }
 

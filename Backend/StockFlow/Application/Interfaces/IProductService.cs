@@ -12,7 +12,7 @@ namespace Application.Interfaces
         Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync();
         Task<ProductResponse?> GetProductByIdAsync(int id);
         Task<ProductResponse?> GetProductBySkuAsync(string sku);
-        Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest);
+        Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest,int businessId);
         Task<ProductResponse?> UpdateProductAsync(int id, ProductUpdateRequest updateRequest);
         Task<bool> DeleteProductAsync(int id);
     }

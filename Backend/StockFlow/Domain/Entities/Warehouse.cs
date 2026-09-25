@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Domain.common;
 
 namespace Domain.Entities
 {
-    public class Warehouse
+    public class Warehouse : ISoftDelete
     {
         public int Id { get; set; }
 
@@ -16,5 +17,7 @@ namespace Domain.Entities
         public bool IsActive { get; set; } = true;
 
         public ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

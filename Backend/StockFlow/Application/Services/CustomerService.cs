@@ -14,13 +14,15 @@ namespace Application.Services
         private DbSet<Customer> CustomerSet => _context.Customers;
         private DbSet<CustomerAddress> AddressSet => _context.CustomerAddresses;
 
-        public async Task<CustomerDtos.CustomerResponse> CreateCustomerAsync(CustomerDtos.CustomerCreateRequest createRequest)
+        public async Task<CustomerDtos.CustomerResponse> CreateCustomerAsync(CustomerDtos.CustomerCreateRequest createRequest,int businessId)
         {
             var customer = new Customer
             {
                 Name = createRequest.Name,
                 Email = createRequest.Email,
                 Phone = createRequest.Phone,
+                BusinessId = businessId,
+                IsActive = true,
                 Addresses = createRequest.Addresses.Select(a => new CustomerAddress
                 {
                     Street = a.Street,

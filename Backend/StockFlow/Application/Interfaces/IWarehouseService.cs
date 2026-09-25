@@ -12,7 +12,7 @@ namespace Application.Interfaces
     {
         Task<IReadOnlyCollection<WarehouseResponse>> GetAllWarehousesAsync();
         Task<WarehouseResponse?> GetWarehouseAsync(int id);
-        Task<WarehouseResponse> CreateWarehouseAsync(WarehouseCreateRequest createRequest);
+        Task<WarehouseResponse> CreateWarehouseAsync(WarehouseCreateRequest createRequest, int businessId);
         Task<WarehouseResponse?> UpdateWarehouseAsync(int id, WarehouseUpdateRequest updateRequest);
         Task<bool> DeleteWarehouseAsync(int id);
     }

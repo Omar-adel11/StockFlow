@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Domain.common;
 
 namespace Domain.Entities
 {
-    public class Supplier
+    public class Supplier : ISoftDelete
     {
         public int Id { get; set; }
 
@@ -21,5 +22,7 @@ namespace Domain.Entities
         public ICollection<Product> PreferredByProducts { get; set; } = new List<Product>();
 
         public ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

@@ -4,11 +4,12 @@ using System.Linq;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.common;
 using Domain.Entities.Enum;
 
 namespace Domain.Entities
 {
-    public class Plan
+    public class Plan : ISoftDelete
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

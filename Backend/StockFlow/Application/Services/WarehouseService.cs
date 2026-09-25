@@ -38,13 +38,14 @@ namespace Application.Services
             return MapToResponse(warehouse);
         }
 
-        public async Task<WarehouseDtos.WarehouseResponse> CreateWarehouseAsync(WarehouseDtos.WarehouseCreateRequest createRequest)
+        public async Task<WarehouseDtos.WarehouseResponse> CreateWarehouseAsync(WarehouseDtos.WarehouseCreateRequest createRequest, int businessId)
         {
             var warehouse = new Warehouse
             {
                 Name = createRequest.WarehouseName,
                 Location = createRequest.LocationAddress,
-                IsActive = true
+                IsActive = true,
+                BusinessId = businessId
             };
 
             await WarehouseSet.AddAsync(warehouse);
@@ -75,14 +76,11 @@ namespace Application.Services
         public async Task<bool> DeleteWarehouseAsync(int id)
         {
             var warehouse = await GetWarehouseEntityAsync(id);
-            if (!warehouse.IsActive)
-            {
-                return true; // Already deactivated
-            }
+           
 
             await ValidateNoActiveStockAsync(warehouse.Id, warehouse.Name);
 
-            warehouse.IsActive = false;
+            _context.Warehouses.Remove(warehouse);
             return await _context.SaveChangesAsync() > 0;
         }
 

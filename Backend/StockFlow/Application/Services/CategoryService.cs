@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Services.Helper;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,13 @@ namespace Application.Services
     public class CategoryService(IAppDbContext _context) : ICategoryService
     {
         private DbSet<Category> CategorySet => _context.Categories;
-        public async Task<CategoryDtos.Response> CreateCategoryAsync(CategoryDtos.CreateRequest createRequest)
+        public async Task<CategoryDtos.Response> CreateCategoryAsync(CategoryDtos.CreateRequest createRequest,int BusinessId)
         {
             var category = new Category
             {
                 Name = createRequest.Name,
-                Description = createRequest.Description
+                Description = createRequest.Description,
+                IsActive = true
             };
             await CategorySet.AddAsync(category);
             await _context.SaveChangesAsync();

@@ -12,7 +12,7 @@ namespace Application.Interfaces
     {
         Task<IReadOnlyCollection<SupplierResponse>> GetAllSuppliersAsync();
         Task<SupplierResponse?> GetSupplierAsync(int id);
-        Task<SupplierResponse> CreateSupplierAsync(SupplierCreateRequest createRequest);
+        Task<SupplierResponse> CreateSupplierAsync(SupplierCreateRequest createRequest,int businessId);
         Task<SupplierResponse?> UpdateSupplierAsync(int id, SupplierUpdateRequest updateRequest);
         Task<bool> DeleteSupplierAsync(int id);
     }

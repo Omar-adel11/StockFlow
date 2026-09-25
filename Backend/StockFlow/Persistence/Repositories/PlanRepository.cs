@@ -5,7 +5,6 @@ using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-
 namespace Persistence.Repositories
 {
     public class PlanRepository : IPlanRepository

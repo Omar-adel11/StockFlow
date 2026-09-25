@@ -18,16 +18,21 @@ namespace Persistence.Repository
             var value = await _database.StringGetAsync(Key);
             return value.HasValue ? value.ToString() : null;
         }
-
-        public async Task RemoveAsync(string key)
-        {
-            await _database.KeyDeleteAsync(key);
-        }
-
         public async Task SetAsync(string Key, object Value, TimeSpan? duration)
         {
             var RedisValue = JsonSerializer.Serialize(Value);
             await _database.StringSetAsync(Key, RedisValue, duration);
         }
+        public async Task RemoveAsync(string key)
+        {
+            await _database.KeyDeleteAsync(key);
+        }
+
+        public Task RemoveAsyncByValue(string value)
+        {
+            throw new NotImplementedException();
+        }
+
+       
     }
 }

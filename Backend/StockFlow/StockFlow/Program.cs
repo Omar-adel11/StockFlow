@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
+using Persistence.Interceptors;
+using Persistence.Seed;
 using StockFlow.Middlewares;
 
 
@@ -16,7 +18,7 @@ namespace StockFlow
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,9 @@ namespace StockFlow
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+            // 3. Register ApplicationDbContext with Interceptors
+           
+
             builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
             {
 
@@ -116,6 +121,12 @@ namespace StockFlow
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                await DbSeeder.SeedAsync(services);
+            }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

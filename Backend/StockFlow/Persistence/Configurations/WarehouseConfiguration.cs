@@ -15,6 +15,10 @@ namespace Persistence.Configurations
             entity.Property(w => w.Name).IsRequired().HasMaxLength(150);
             entity.Property(w => w.Location).HasMaxLength(300);
             entity.Property(w => w.IsActive).IsRequired();
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.BusinessId, e.IsActive });
         }
     }
 }

@@ -1,19 +1,25 @@
 ﻿using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Entities;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.CategoryDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class CategoriesController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
 
         [HttpGet]
+        [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll()
         {
             var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync();
@@ -30,7 +36,8 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRequest dto)
         {
-            var createdCategory = await _serviceManager.CategoryService.CreateCategoryAsync(dto);
+            var businessId = User.GetBusinessId();
+            var createdCategory = await _serviceManager.CategoryService.CreateCategoryAsync(dto, businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdCategory.Id }, createdCategory);
         }
 

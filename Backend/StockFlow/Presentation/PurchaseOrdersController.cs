@@ -1,15 +1,19 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.PurchaseOrderDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
+    [RequireTenant]
     public class PurchaseOrdersController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
@@ -32,14 +36,17 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Create([FromBody] PurchaseCreateRequest createRequest)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var createdOrder = await _serviceManager.PurchaseOrderService.CreatePurchaseOrderAsync(createRequest, userId);
+            var businessId = User.GetBusinessId();
+            
+            var createdOrder = await _serviceManager.PurchaseOrderService.CreatePurchaseOrderAsync(createRequest, userId,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdOrder.Id }, createdOrder);
         }
 
         [HttpPut("{id:int}/receive")]
         public async Task<IActionResult> Receive(int id)
         {
-            var result = await _serviceManager.PurchaseOrderService.ReceivePurchaseOrderAsync(id);
+            var businessId = User.GetBusinessId();
+            var result = await _serviceManager.PurchaseOrderService.ReceivePurchaseOrderAsync(id, businessId);
             return result ? Ok(new { Message = "Purchase order received and inventory updated." }) : BadRequest("Order cannot be received.");
         }
 

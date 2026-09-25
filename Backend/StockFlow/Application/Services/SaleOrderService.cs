@@ -14,7 +14,7 @@ using static Application.DTOs.SalesOrderDtos;
 
 namespace Application.Services
 {
-    public class SaleOrderService(IAppDbContext _context) : ISalesOrderService
+    public class SaleOrderService(IAppDbContext _context,ICurrentUserService _currentUserService) : ISalesOrderService
     {
         private readonly IAppDbContext _context = _context;
 
@@ -65,7 +65,7 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<SalesResponse> CreateSalesOrderAsync(SalesCreateRequest createRequest, int currentUserId)
+        public async Task<SalesResponse> CreateSalesOrderAsync(SalesCreateRequest createRequest, int currentUserId, int businessId)
         {
             string invoiceNumber = $"INV-{DateTime.UtcNow:yyyyMM}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
@@ -73,7 +73,8 @@ namespace Application.Services
             {
                 ProductId = i.ProductId,
                 Quantity = i.QuantitySold,
-                UnitPrice = i.BilledUnitPrice
+                UnitPrice = i.BilledUnitPrice,
+                BusinessId = businessId
             }).ToList();
 
             decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
@@ -87,7 +88,8 @@ namespace Application.Services
                 Status = OrderStatus.Pending,
                 OrderDate = DateTime.UtcNow,
                 TotalAmount = totalAmount,
-                Items = orderItems
+                Items = orderItems,
+                BusinessId = businessId
             };
 
             SalesOrders.Add(salesOrder);
@@ -97,7 +99,7 @@ namespace Application.Services
             return createdOrder ?? throw new InvalidOperationException("Failed to retrieve created sales order.");
         }
 
-        public async Task<bool> FulfillSalesOrderAsync(int id)
+        public async Task<bool> FulfillSalesOrderAsync(int id, int businessId)
         {
             var order = await SalesOrders
                 .Include(so => so.Items)
@@ -128,6 +130,22 @@ namespace Application.Services
             foreach (var item in order.Items)
             {
                 existingInventory[item.ProductId].QuantityOnHand -= item.Quantity;
+
+                var movement = new StockMovement
+                {
+                    ProductId = item.ProductId,
+                    WarehouseId = order.WarehouseId,
+                    ChangeQuantity = item.Quantity, // Positive for inflow/restock
+                    Reason = StockMovementReason.Sale,
+                    ReferenceId = order.Id,
+                    ExecutedByUserId = _currentUserService.UserId,
+                    ExecutedByUserName = _currentUserService.UserName,
+                    CreatedAtUtc = DateTime.UtcNow,
+                    BusinessId = order.BusinessId // Inherited from parent Purchase Order
+                };
+
+                _context.StockMovements.Add(movement);
+
             }
 
             order.Status = OrderStatus.Completed;

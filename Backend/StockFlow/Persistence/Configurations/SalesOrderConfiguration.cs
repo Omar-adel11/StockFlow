@@ -30,6 +30,13 @@ namespace Persistence.Configurations
                   .WithMany()
                   .HasForeignKey(s => s.WarehouseId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.BusinessId);
+
+            entity.Property(p => p.TotalAmount)
+   .HasPrecision(18, 2);
         }
     }
 }

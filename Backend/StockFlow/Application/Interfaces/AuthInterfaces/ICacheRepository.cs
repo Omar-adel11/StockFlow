@@ -11,5 +11,6 @@ namespace Application.Interfaces.AuthInterfaces
         Task<string?> GetAsync(string Key);
         Task SetAsync(string Key, object Value, TimeSpan? duration);
         Task RemoveAsync(string key);
+        Task RemoveAsyncByValue(string value);
     }
 }

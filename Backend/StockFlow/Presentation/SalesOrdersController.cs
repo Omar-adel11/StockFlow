@@ -1,15 +1,19 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.SalesOrderDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
+    [RequireTenant]
     public class SalesOrdersController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
@@ -32,14 +36,17 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Create([FromBody] SalesCreateRequest createRequest)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var createdOrder = await _serviceManager.SalesOrderService.CreateSalesOrderAsync(createRequest, userId);
+            var businessId = User.GetBusinessId();
+
+            var createdOrder = await _serviceManager.SalesOrderService.CreateSalesOrderAsync(createRequest, userId,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdOrder.Id }, createdOrder);
         }
 
         [HttpPut("{id:int}/fulfill")]
         public async Task<IActionResult> Fulfill(int id)
         {
-            var result = await _serviceManager.SalesOrderService.FulfillSalesOrderAsync(id);
+            var businessId = User.GetBusinessId();
+            var result = await _serviceManager.SalesOrderService.FulfillSalesOrderAsync(id, businessId);
             return Ok(new { Message = "Sales order fulfilled and inventory deducted." });
         }
 

@@ -40,6 +40,12 @@ namespace Application.Services.Auth
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
+            // Add BusinessId claim (null/omitted for SaasAdmin)
+            if (user.BusinessId.HasValue && !roles.Contains("SaasAdmin"))
+            {
+                claims.Add(new Claim(CustomClaimTypes.BusinessId, user.BusinessId.Value.ToString()));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.key));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

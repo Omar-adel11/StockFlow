@@ -24,6 +24,12 @@ namespace Persistence.Configurations
                   .WithMany(p => p.SalesOrderItems)
                   .HasForeignKey(i => i.ProductId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.BusinessId);
+            entity.Property(p => p.UnitPrice)
+   .HasPrecision(18, 2);
         }
     }
 }

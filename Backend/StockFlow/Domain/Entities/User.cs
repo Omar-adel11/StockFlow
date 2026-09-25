@@ -14,8 +14,10 @@ namespace Domain.Entities
         public string? ImgUrl { get; set; }
 
         //nav properties
-        public Plan? Plan { get; set; }
-        public int? PlanId { get; set; }
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
+
+        public bool IsActive { get; set; } = true;
       
     }
 }

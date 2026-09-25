@@ -8,6 +8,7 @@ using Application.Interfaces;
 using Application.Interfaces.AuthInterfaces;
 using Application.Services;
 using Application.Services.Auth;
+using Application.Services.Helper;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,10 @@ namespace Application
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IStockMovementService, StockMovementService>();
             services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<ISaaSAdminService, SaaSAdminService>();
+
+            services.AddHttpContextAccessor();
 
             // Auth & Auxiliary Services
             services.AddScoped<IPlanService, PlanService>();

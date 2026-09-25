@@ -13,5 +13,7 @@ namespace Domain.Entities
         public Warehouse Warehouse { get; set; } = null!;
 
         public int QuantityOnHand { get; set; }
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

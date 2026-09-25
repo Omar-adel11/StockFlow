@@ -15,5 +15,7 @@ namespace Domain.Entities
         // The price charged to the customer at the time of sale - kept
         // separate from Product.UnitPrice in case that price changes later.
         public decimal UnitPrice { get; set; }
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

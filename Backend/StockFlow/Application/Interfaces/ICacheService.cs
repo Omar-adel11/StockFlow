@@ -11,6 +11,7 @@ namespace Application.Interfaces
         Task<string?> GetAsync(string Key);
         Task SetCacheValueAsync(string Key, object Value, TimeSpan? duration);
         Task RemoveAsync(string key);
+        Task RemoveAsyncByValue(string value);
         Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? duration = null);
     }
 }

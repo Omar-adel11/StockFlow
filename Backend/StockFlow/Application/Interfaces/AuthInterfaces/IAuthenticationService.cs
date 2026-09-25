@@ -10,7 +10,7 @@ namespace Application.Interfaces.AuthInterfaces
 {
     public interface IAuthenticationService
     {
-        Task<UserDTO?> Login(LoginDTO loginDTO);
+        Task<UserDTO?> LoginAsync(LoginDTO loginDTO);
 
         //Signup
 

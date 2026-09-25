@@ -13,7 +13,7 @@ using static Application.DTOs.PurchaseOrderDtos;
 
 namespace Application.Services
 {
-    public class PurchaseOrderService(IAppDbContext _context) : IPurchaseOrderService
+    public class PurchaseOrderService(IAppDbContext _context, ICurrentUserService _currentUserService) : IPurchaseOrderService
     {
         private readonly IAppDbContext _context = _context;
 
@@ -65,7 +65,7 @@ namespace Application.Services
             return result;
         }
 
-        public async Task<PurchaseResponse> CreatePurchaseOrderAsync(PurchaseCreateRequest createRequest, int currentUserId)
+        public async Task<PurchaseResponse> CreatePurchaseOrderAsync(PurchaseCreateRequest createRequest, int currentUserId, int businessId)
         {
             string poNumber = $"PO-{DateTime.UtcNow:yyyyMM}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
@@ -73,7 +73,8 @@ namespace Application.Services
             {
                 ProductId = i.ProductId,
                 Quantity = i.QuantityOrdered,
-                UnitCost = i.AgreedUnitPrice
+                UnitCost = i.AgreedUnitPrice,
+                BusinessId = businessId
             }).ToList();
 
             decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitCost);
@@ -87,7 +88,9 @@ namespace Application.Services
                 Status = OrderStatus.Pending,
                 OrderDate = DateTime.UtcNow,
                 TotalAmount = totalAmount,
-                Items = orderItems
+                Items = orderItems,
+                BusinessId = businessId,
+                
             };
 
             PurchaseOrders.Add(purchaseOrder);
@@ -97,7 +100,7 @@ namespace Application.Services
             return createdOrder ?? throw new InvalidOperationException("Failed to retrieve created purchase order.");
         }
 
-        public async Task<bool> ReceivePurchaseOrderAsync(int id)
+        public async Task<bool> ReceivePurchaseOrderAsync(int id,int businessId)
         {
             var order = await PurchaseOrders
                 .Include(po => po.Items)
@@ -126,10 +129,27 @@ namespace Application.Services
                     {
                         WarehouseId = order.WarehouseId,
                         ProductId = item.ProductId,
-                        QuantityOnHand = item.Quantity
+                        QuantityOnHand = item.Quantity,
+                        BusinessId = businessId
                     };
                     InventoryItems.Add(newStockItem);
                 }
+
+                var movement = new StockMovement
+                {
+                    ProductId = item.ProductId,
+                    WarehouseId = order.WarehouseId,
+                    ChangeQuantity = item.Quantity, // Positive for inflow/restock
+                    Reason = StockMovementReason.Purchase,
+                    ReferenceId = order.Id,
+                    ExecutedByUserId = _currentUserService.UserId,
+                    ExecutedByUserName = _currentUserService.UserName,
+                    CreatedAtUtc = DateTime.UtcNow,
+                    BusinessId = order.BusinessId // Inherited from parent Purchase Order
+                };
+
+                _context.StockMovements.Add(movement);
+
             }
 
             order.Status = OrderStatus.Completed;

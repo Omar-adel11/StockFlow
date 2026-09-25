@@ -20,6 +20,10 @@ namespace Persistence.Configurations
         builder.Property(a => a.State).HasMaxLength(100);
         builder.Property(a => a.ZipCode).HasMaxLength(20);
         builder.Property(a => a.Country).IsRequired().HasMaxLength(100);
+
+        builder.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(e => e.BusinessId);
         }
     }
 

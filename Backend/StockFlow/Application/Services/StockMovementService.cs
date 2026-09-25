@@ -14,7 +14,7 @@ namespace Application.Services
     public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService) : IStockMovementService
     {
         private DbSet<StockMovement> stockMovements => _context.StockMovements;
-        public async Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request)
+        public async Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request,int businessId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync(CancellationToken.None);
 
@@ -31,7 +31,8 @@ namespace Application.Services
                     {
                         ProductId = request.ProductId,
                         WarehouseId = request.WarehouseId,
-                        QuantityOnHand = 0
+                        QuantityOnHand = 0,
+                        BusinessId = businessId
                     };
                     await _context.InventoryItems.AddAsync(inventoryItem);
                 }
@@ -57,7 +58,8 @@ namespace Application.Services
                     ExecutedByUserId = currentUserService.UserId,
                     ExecutedByUserName = currentUserService.UserName,
                     ReferenceId = request.ReferenceId,
-                    CreatedAtUtc = DateTime.UtcNow
+                    CreatedAtUtc = DateTime.UtcNow,
+                    BusinessId = businessId
                 };
 
                 await _context.StockMovements.AddAsync(movement);

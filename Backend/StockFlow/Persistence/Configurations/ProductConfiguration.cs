@@ -37,6 +37,14 @@ namespace Persistence.Configurations
                   .WithMany(s => s.PreferredByProducts)
                   .HasForeignKey(p => p.PreferredSupplierId)
                   .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(p => new { p.BusinessId, p.SKU }).IsUnique();
+            entity.HasIndex(p => new { p.BusinessId, p.IsActive }).IsUnique();
+
+            entity.Property(p => p.UnitPrice)
+   .HasPrecision(18, 2);
         }
     }
 }

@@ -79,7 +79,7 @@ namespace Application.Services
             var plan = await _planRepository.GetByIdAsync(id);
             if (plan is null)
             {
-                return false;
+                throw new Exception("Plan is not exists");
             }
 
             _planRepository.Delete(plan);

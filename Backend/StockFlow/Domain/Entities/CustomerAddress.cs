@@ -21,5 +21,7 @@ namespace Domain.Entities
 
         // Navigation property back to parent
         public Customer Customer { get; set; } = null!;
+        public int? BusinessId { get; set; }
+        public Business? Business { get; set; }
     }
 }

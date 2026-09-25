@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Email;
+using Persistence.Interceptors;
 using Persistence.Repositories;
 using Persistence.Repository;
 using StackExchange.Redis;
@@ -16,8 +17,16 @@ namespace Persistence
         public static IServiceCollection AddInfrastructureServices(
             this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
-                     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddHttpContextAccessor();
+            services.AddScoped<SoftDeleteInterceptor>();
+            services.AddDbContext<IAppDbContext, AppDbContext>((sp, options) =>
+            {
+                var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+                       .AddInterceptors(softDeleteInterceptor);
+            });
+
 
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddHttpContextAccessor();
@@ -31,6 +40,12 @@ namespace Persistence
             services.AddScoped<IContactRepository, ContactRepository>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
+
+
+            
+
+            
+
 
             return services;
         }

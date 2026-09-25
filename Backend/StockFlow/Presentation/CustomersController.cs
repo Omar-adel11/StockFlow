@@ -1,14 +1,18 @@
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Services.Helper;
+using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using static Application.DTOs.CustomerDtos;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
+    [RequireTenant]
     public class CustomersController(IServiceManager serviceManager) : ControllerBase
     {
         private readonly IServiceManager _serviceManager = serviceManager;
@@ -30,11 +34,14 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CustomerCreateRequest dto)
         {
-            var createdCustomer = await _serviceManager.CustomerService.CreateCustomerAsync(dto);
+            var businessId = User.GetBusinessId();
+
+            var createdCustomer = await _serviceManager.CustomerService.CreateCustomerAsync(dto,businessId);
             return CreatedAtAction(nameof(GetById), new { id = createdCustomer.Id }, createdCustomer);
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> Update(int id, [FromBody] CustomerUpdateRequest dto)
         {
             var result = await _serviceManager.CustomerService.UpdateCustomerAsync(id, dto);
@@ -42,6 +49,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _serviceManager.CustomerService.DeleteCustomerAsync(id);
