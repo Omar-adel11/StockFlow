@@ -50,56 +50,11 @@
         <div>
           <h1>Suppliers</h1>
           <p>Manage the vendors products are purchased from.</p>
-        </div>
-        
-      </header>
+        </div><div><a href="addSupplier.html" class="btn btn-primary">+ Add Supplier</a></div></header>
 
       <main class="admin-main">
 
-        <section class="card entity-form-card">
-          <h2 id="form-title">Add New Supplier</h2>
-
-          <form id="supplier-form" novalidate>
-
-            <div class="form-group">
-              <label for="supplier-name">Name</label>
-              <input type="text" id="supplier-name" name="name" placeholder="e.g. Acme Supplies Co." />
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="supplier-email">Contact Email</label>
-                <input type="email" id="supplier-email" name="contactEmail" placeholder="contact@supplier.com" />
-              </div>
-
-              <div class="form-group">
-                <label for="supplier-phone">Contact Phone</label>
-                <input type="text" id="supplier-phone" name="contactPhone" placeholder="+20 100 000 0000" />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="supplier-address">Address</label>
-              <textarea id="supplier-address" name="address" rows="2" placeholder="Street, city, country"></textarea>
-            </div>
-
-            <div class="form-group form-checkbox">
-              <label>
-                <input type="checkbox" id="supplier-is-active" name="isActive" checked />
-                Active (available when creating a new purchase order)
-              </label>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" id="submit-btn" class="btn btn-primary">Save Supplier</button>
-              <button type="button" id="cancel-btn" class="btn btn-secondary" hidden>Cancel</button>
-            </div>
-
-            <p id="form-status" class="form-status" aria-live="polite"></p>
-          </form>
-        </section>
-
-        <section class="entity-list-section">
+        <section class="entity-list-section"><div class="list-toolbar"><div><h2>Existing Suppliers</h2><p>Search suppliers.</p></div></div>
           <div class="list-toolbar"><div><h2>Existing Suppliers</h2><p>Search suppliers by name or contact email.</p></div><input id="supplier-search" type="search" placeholder="Search..." /></div>
           <div id="suppliers-list" class="entity-grid"></div>
           <p id="suppliers-empty" class="empty-state" hidden>No suppliers yet. Add your first one above.</p>
