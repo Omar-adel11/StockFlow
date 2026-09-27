@@ -22,13 +22,11 @@ function currentRole() { try { const token=getAccessToken(); if(!token) return '
 
 async function init() {
   document.getElementById('logout-btn')?.addEventListener('click', () => authService.logout());
-  document.querySelectorAll('[data-open-invite]').forEach(btn => btn.addEventListener('click', () => inviteModal?.showModal()));
   document.querySelectorAll('.modal-close, .modal .btn-secondary').forEach(btn => btn.addEventListener('click', () => btn.closest('dialog')?.close()));
   searchInput?.addEventListener('input', () => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadMembers(searchInput.value), 300);
   });
-  inviteForm?.addEventListener('submit', handleInvite);
   document.getElementById('role-form')?.addEventListener('submit', handleRole);
   await Promise.all([loadMembers(), loadInvites()]);
 }
@@ -122,40 +120,6 @@ async function loadInvites() {
     invitesEmpty.hidden = false;
   } finally {
     invitesLoading.hidden = true;
-  }
-}
-
-async function handleInvite(event) {
-  event.preventDefault();
-  const email = document.getElementById('invite-email').value.trim();
-  const role = document.getElementById('invite-role').value;
-  if (!email) return;
-  try {
-    await teamService.invite({ email, role });
-    inviteForm.reset();
-    inviteModal?.close();
-    showNotice('Invitation sent successfully.');
-    await loadInvites();
-  } catch (error) {
-    showNotice(error.message || 'Failed to send invitation.', 'error');
-  }
-}
-
-async function handleRole(event) {
-  event.preventDefault();
-  if (!editingMemberId) return;
-  const role = document.getElementById('member-role').value;
-  try {
-    if (currentRole() !== 'BusinessOwner') {
-      showNotice('Only a Business Owner can change team member roles.', 'error');
-      return;
-    }
-    await teamService.updateRole(editingMemberId, role);
-    roleModal?.close();
-    showNotice('Team member role updated successfully.');
-    await loadMembers(searchInput?.value || null);
-  } catch (error) {
-    showNotice(error.message || 'Failed to update team member role.', 'error');
   }
 }
 
