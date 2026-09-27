@@ -146,6 +146,10 @@ async function handleRole(event) {
   if (!editingMemberId) return;
   const role = document.getElementById('member-role').value;
   try {
+    if (currentRole() !== 'BusinessOwner') {
+      showNotice('Only a Business Owner can change team member roles.', 'error');
+      return;
+    }
     await teamService.updateRole(editingMemberId, role);
     roleModal?.close();
     showNotice('Team member role updated successfully.');
