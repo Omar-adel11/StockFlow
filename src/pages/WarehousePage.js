@@ -117,7 +117,7 @@ class WarehousesPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(warehouse));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addWarehouse.html?id=${warehouse.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteWarehouse(warehouse.id));
 
       this.warehousesList.appendChild(card);
