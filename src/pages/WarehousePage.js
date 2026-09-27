@@ -35,6 +35,8 @@ class WarehousesPage {
     this.warehousesList = document.getElementById('warehouses-list');
     this.warehousesEmpty = document.getElementById('warehouses-empty');
     this.warehousesLoading = document.getElementById('warehouses-loading');
+    this.searchInput = document.getElementById('warehouse-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -61,13 +63,14 @@ class WarehousesPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadWarehouses(this.searchInput.value || null),300); });
     await this.loadWarehouses();
   }
 
-  async loadWarehouses() {
+  async loadWarehouses(search = null) {
     this.showLoading(true);
     try {
-      const warehouses = await warehouseService.getAll();
+      const warehouses = await warehouseService.getAll(search);
       setWarehouses(warehouses);
       this.renderWarehouses();
     } catch (error) {
