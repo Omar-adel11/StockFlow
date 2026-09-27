@@ -8,6 +8,6 @@ export async function getBusinessOwners(search = null) {
   return getWithAuth(url.toString());
 }
 
-export async function updateBusinessOwnerStatus(id, isActive) {
-  return putWithAuth(`${endpoint}/${id}/status`, { isActive });
+export async function updateBusinessOwnerStatus(id, isActive, planId = null) {
+  return putWithAuth(`${endpoint}/${id}/status`, { isActive, planId });
 }
