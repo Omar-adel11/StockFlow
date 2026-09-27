@@ -1,5 +1,6 @@
 import { purchaseOrderService } from '../services/purchaseOrderService.js';
-import { makeSearchableSelect, refreshSearchableSelect } from '../utils/searchableSelect.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { productService } from '../services/ProductService.js';
 import { supplierService } from '../services/SupplierService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -94,6 +95,7 @@ export class PurchaseOrdersPage {
 
       this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...');
       this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...');
+      makeSearchableSelect(this.supplierSelect); makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -186,10 +188,7 @@ export class PurchaseOrdersPage {
     if (target.classList.contains('po-item-qty')) {
       updateLineItem(id, { quantityOrdered: target.value });
       this.updateRowSubtotal(target);
-    } else if (target.classList.contains('po-item-price')) { return;
-      updateLineItem(id, { agreedUnitPrice: target.value });
-      this.updateRowSubtotal(target);
-    }
+    
   }
 
   updateRowSubtotal(target) {
@@ -320,24 +319,24 @@ export class PurchaseOrdersPage {
 
     if (receiveBtn) {
       const id = receiveBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`)) {
+      if (await showConfirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`, {confirmText:'Receive Order'})) {
         try {
           receiveBtn.disabled = true;
           await purchaseOrderService.receiveOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to receive order.');
+          showNotice(err.message || 'Failed to receive order.', 'error');
         }
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to cancel Purchase Order #${id}?`)) {
+      if (await showConfirm(`Are you sure you want to cancel Purchase Order #${id}?`, {confirmText:'Cancel Order'})) {
         try {
           cancelBtn.disabled = true;
           await purchaseOrderService.cancelOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to cancel order.');
+          showNotice(err.message || 'Failed to cancel order.', 'error');
         }
       }
     }
