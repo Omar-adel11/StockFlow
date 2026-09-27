@@ -26,7 +26,7 @@ async function init() {
   });
   document.querySelectorAll('#role-modal .modal-close, #role-modal .btn-secondary').forEach(btn => btn.addEventListener('click', () => roleModal?.close()));
   document.getElementById('role-form')?.addEventListener('submit', handleRole);
-  await Promise.all([loadMembers(), loadInvites()]);
+  await loadMembers();
 }
 
 async function loadMembers(search = null) {
