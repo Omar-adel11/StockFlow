@@ -24,7 +24,9 @@ async function init() {
   document.querySelector('.plan-editor-heading h2').textContent = 'Edit plan details';
   field('name').value = plan.name || '';
   field('price').value = plan.price ?? '';
-  field('billingCycle').value = String(plan.billingCycle ?? 'Monthly');
+  const cycle = plan.billingCycle;
+  field('billingCycle').value =
+    cycle === 1 || String(cycle).toLowerCase() === 'yearly' ? '1' : '0';
   field('description').value = plan.description || '';
   field('features').value = Array.isArray(plan.features) ? plan.features.join('\n') : '';
   field('isActive').checked = plan.isActive !== false;
@@ -37,7 +39,7 @@ form?.addEventListener('submit', async e => {
   const data = {
     name: field('name').value.trim(),
     price: Number(field('price').value),
-    billingCycle: field('billingCycle').value,
+    billingCycle: Number(field('billingCycle').value),
     description: field('description').value.trim(),
     isActive: field('isActive').checked,
     features: field('features').value.split('\n').map(x => x.trim()).filter(Boolean)
