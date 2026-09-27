@@ -104,10 +104,24 @@ class CustomersPage {
             card.className = 'card entity-card';
             
             // Extract primary/first address from the addresses array
-            const addr = (customer.addresses || []).find(a => a.isDefault) || (customer.addresses || [])[0] || customer.address || customer.defaultAddress || {};
+            const addresses = customer.addresses || customer.Addresses || [];
+const addr = addresses.find(a => a.isDefault ?? a.IsDefault) ||
+    addresses.find(a => a.IsDefault) ||
+    addresses[0] ||
+    customer.address ||
+    customer.Address ||
+    customer.defaultAddress ||
+    customer.DefaultAddress ||
+    {};
 
-            const zip = addr.zipCode || addr.postalCode || '';
-            const addressString = [addr.street, addr.city, addr.state, zip, addr.country]
+            const zip = addr.zipCode || addr.ZipCode || addr.postalCode || addr.PostalCode || '';
+            const addressString = [
+    addr.street || addr.Street,
+    addr.city || addr.City,
+    addr.state || addr.State,
+    zip,
+    addr.country || addr.Country
+]
                 .filter(Boolean)
                 .join(', ') || 'No address specified';
 
