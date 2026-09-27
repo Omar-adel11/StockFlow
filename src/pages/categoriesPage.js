@@ -80,7 +80,7 @@ function renderCategories() {
             </div>
         `;
 
-        card.querySelector('.edit-btn').addEventListener('click', () => startEdit(category.id));
+        card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addCategory.html?id=${category.id}`; });
         card.querySelector('.delete-btn').addEventListener('click', () => handleDelete(category.id));
 
         categoriesList.appendChild(card);
