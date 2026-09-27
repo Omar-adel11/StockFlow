@@ -128,7 +128,7 @@ class CustomersPage {
                 </div>
             `;
 
-            card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(customer));
+            card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addCustomer.html?id=${customer.id}`; });
             card.querySelector('.delete-btn').addEventListener('click', () => this.deleteCustomer(customer.id));
 
             this.customersList.appendChild(card);
