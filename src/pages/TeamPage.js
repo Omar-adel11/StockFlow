@@ -1,6 +1,7 @@
 import { teamService } from '../services/teamService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import * as authService from '../services/authService.js';
+import { getAccessToken } from '../sessions/session.js';
 
 const membersList = document.getElementById('team-members-list');
 const membersEmpty = document.getElementById('team-empty');
@@ -16,6 +17,8 @@ let searchTimer;
 let editingMemberId = null;
 
 document.addEventListener('DOMContentLoaded', init);
+
+function currentRole() { try { const token=getAccessToken(); if(!token) return ''; const p=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return p.role || p['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || ''; } catch { return ''; } }
 
 async function init() {
   document.getElementById('logout-btn')?.addEventListener('click', () => authService.logout());
@@ -114,7 +117,8 @@ async function loadInvites() {
     });
     document.getElementById('pending-invite-count').textContent = invites.length;
   } catch (error) {
-    invitesEmpty.textContent = error.message || 'Failed to load invitations.';
+    invitesList.innerHTML = '';
+    invitesEmpty.textContent = error.message || 'Failed to load invitations from the server.';
     invitesEmpty.hidden = false;
   } finally {
     invitesLoading.hidden = true;
