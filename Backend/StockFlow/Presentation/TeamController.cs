@@ -61,7 +61,7 @@ namespace WebApi.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> GetPendingInvites()
         {
-            var businessId = int.Parse(User.FindFirstValue("business_id")!);
+            var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
             var invites = await _teamService.GetPendingInvitesAsync(businessId);
             return Ok(invites);
         }
