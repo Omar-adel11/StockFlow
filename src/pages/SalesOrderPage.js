@@ -22,6 +22,7 @@ export class SalesOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadOrders(this.searchInput.value || null),300); });
     this.init();
   }
 
@@ -38,6 +39,8 @@ export class SalesOrdersPage {
     this.ordersList = document.getElementById('sales-orders-list');
     this.ordersEmpty = document.getElementById('sales-orders-empty');
     this.ordersLoading = document.getElementById('sales-orders-loading');
+    this.searchInput = document.getElementById('sales-order-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -216,12 +219,12 @@ export class SalesOrdersPage {
     }
   }
 
-  async loadOrders() {
+  async loadOrders(search = null) {
     if (this.ordersLoading) this.ordersLoading.hidden = false;
     if (this.ordersEmpty) this.ordersEmpty.hidden = true;
 
     try {
-      const data = await salesOrderService.getAll();
+      const data = await salesOrderService.getAll(search);
       setOrders(Array.isArray(data) ? data : (data.items || []));
       this.renderOrdersList();
     } catch (err) {
