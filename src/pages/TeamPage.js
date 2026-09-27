@@ -124,12 +124,17 @@ async function handleRole(event) {
   const newRole = document.getElementById('member-role')?.value;
   if (!editingMemberId || !newRole) return;
 
+  roleModal?.close();
+
   const confirmed = await showConfirm(`Change this member's role to ${newRole}?`, {
     confirmText: 'Update Role',
     danger: false
   });
 
-  if (!confirmed) return;
+  if (!confirmed) {
+    roleModal?.showModal();
+    return;
+  }
 
   try {
     const submit = document.querySelector('#role-form button[type="submit"]');
