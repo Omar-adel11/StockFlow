@@ -56,7 +56,7 @@ class CustomersPage {
         }
 
         if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
         }
 
         if (this.cancelBtn) {
