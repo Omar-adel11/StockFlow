@@ -104,9 +104,7 @@ class CustomersPage {
             card.className = 'card entity-card';
             
             // Extract primary/first address from the addresses array
-            const addr = (customer.addresses && customer.addresses.length > 0) 
-                ? customer.addresses[0] 
-                : (customer.address || {});
+            const addr = (customer.addresses || []).find(a => a.isDefault) || (customer.addresses || [])[0] || customer.address || customer.defaultAddress || {};
 
             const zip = addr.zipCode || addr.postalCode || '';
             const addressString = [addr.street, addr.city, addr.state, zip, addr.country]
