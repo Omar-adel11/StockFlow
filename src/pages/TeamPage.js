@@ -10,8 +10,6 @@ const invitesList = document.getElementById('pending-invites-list');
 const invitesEmpty = document.getElementById('invites-empty');
 const invitesLoading = document.getElementById('invites-loading');
 const searchInput = document.getElementById('team-search');
-const inviteForm = document.getElementById('invite-form');
-const inviteModal = document.getElementById('invite-modal');
 const roleModal = document.getElementById('role-modal');
 let searchTimer;
 let editingMemberId = null;
@@ -22,8 +20,7 @@ function currentRole() { try { const token=getAccessToken(); if(!token) return '
 
 async function init() {
   document.getElementById('logout-btn')?.addEventListener('click', () => authService.logout());
-  document.querySelectorAll('.modal-close, .modal .btn-secondary').forEach(btn => btn.addEventListener('click', () => btn.closest('dialog')?.close()));
-  searchInput?.addEventListener('input', () => {
+    searchInput?.addEventListener('input', () => {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadMembers(searchInput.value), 300);
   });
