@@ -22,6 +22,7 @@ export class PurchaseOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadOrders(this.searchInput.value || null),300); });
     this.init();
   }
 
@@ -38,6 +39,8 @@ export class PurchaseOrdersPage {
     this.ordersList = document.getElementById('purchase-orders-list');
     this.ordersEmpty = document.getElementById('purchase-orders-empty');
     this.ordersLoading = document.getElementById('purchase-orders-loading');
+    this.searchInput = document.getElementById('purchase-order-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -216,12 +219,12 @@ export class PurchaseOrdersPage {
     }
   }
 
-  async loadOrders() {
+  async loadOrders(search = null) {
     if (this.ordersLoading) this.ordersLoading.hidden = false;
     if (this.ordersEmpty) this.ordersEmpty.hidden = true;
 
     try {
-      const data = await purchaseOrderService.getAll();
+      const data = await purchaseOrderService.getAll(search);
       setOrders(Array.isArray(data) ? data : (data.items || []));
       this.renderOrdersList();
     } catch (err) {
