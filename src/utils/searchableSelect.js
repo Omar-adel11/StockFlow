@@ -53,10 +53,13 @@ export function makeSearchableSelect(select) {
 
   const sync = () => {
     const option = [...select.options].find(o => o.value === select.value);
+    if (!select.value) { input.value = ''; input.placeholder = select.dataset.searchPlaceholder || 'Search or select...'; return; }
     input.value = option?.textContent || '';
+    input.placeholder = '';
   };
 
   input.addEventListener('focus', () => {
+    if (!select.value) input.value = '';
     render(input.value);
     menu.classList.add('open');
   });
