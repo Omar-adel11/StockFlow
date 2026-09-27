@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { supplierService } from '../services/SupplierService.js';
 import { validateSupplierForm, buildSupplierPayload } from '../validation/supplierValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -74,7 +75,7 @@ class SuppliersPage {
       setSuppliers(suppliers);
       this.renderSuppliers();
     } catch (error) {
-      this.setStatus('Failed to load suppliers: ' + error.message, 'error');
+      showNotice('Failed to load suppliers: ' + error.message, 'error', 'error');
     } finally {
       this.showLoading(false);
     }
@@ -138,7 +139,7 @@ class SuppliersPage {
 
     const validation = validateSupplierForm(rawFormData);
     if (!validation.isValid) {
-      this.setStatus(validation.errors.join(' '), 'error');
+      showNotice(validation.errors.join(' '), 'error', 'error');
       return;
     }
 
@@ -161,7 +162,7 @@ class SuppliersPage {
       await this.loadSuppliers();
     } catch (error) {
       console.error('API Error details:', error);
-      this.setStatus(error.message || 'An error occurred while saving supplier.', 'error');
+      showNotice(error.message || 'An error occurred while saving supplier.', 'error', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -183,15 +184,15 @@ class SuppliersPage {
   }
 
   async deleteSupplier(id) {
-    if (!confirm('Are you sure you want to delete this supplier?')) return;
+    if (!await showConfirm('Are you sure you want to delete this supplier?')) return;
 
     try {
       await supplierService.delete(id);
       removeSupplierFromState(id);
-      this.setStatus('Supplier deleted successfully.', 'success');
+      showNotice('Supplier deleted successfully.');
       this.renderSuppliers();
     } catch (error) {
-      this.setStatus('Failed to delete supplier: ' + error.message, 'error');
+      showNotice('Failed to delete supplier: ' + error.message, 'error', 'error');
     }
   }
 
