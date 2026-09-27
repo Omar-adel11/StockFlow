@@ -74,10 +74,8 @@ export class PurchaseOrdersPage {
   }
 
   async init() {
-    await Promise.all([
-      this.loadDropdownData(),
-      this.loadOrders()
-    ]);
+    await this.loadDropdownData();
+    if (this.ordersList) await this.loadOrders();
   }
 
   async loadDropdownData() {
@@ -242,6 +240,7 @@ export class PurchaseOrdersPage {
   }
 
   renderOrdersList() {
+    if (!this.ordersList) return;
     this.ordersList.innerHTML = '';
 
     if (!purchaseOrderState.orders || purchaseOrderState.orders.length === 0) {
