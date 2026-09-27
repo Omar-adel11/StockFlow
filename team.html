@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/adminShell.css" />
   <link rel="stylesheet" href="./css/teamLayout.css" />
+  <link rel="stylesheet" href="./css/uiEnhancements.css" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,7 +53,7 @@
           <p>Invite teammates and manage their roles within your business.</p>
         </div>
 
-        <button type="button" class="btn btn-primary">+ Invite Member</button>
+        <button type="button" class="btn btn-primary" data-open-invite>+ Invite Member</button>
       </header>
 
       <main class="admin-main">
@@ -119,44 +120,7 @@
                   </tr>
                 </thead>
 
-                <tbody id="team-members-list">
-                  <!-- Future TeamPage.js will populate this table. -->
-                  <tr>
-                    <td>
-                      <div class="person-cell">
-                        <span class="avatar">MA</span>
-                        <div>
-                          <strong>Mohamed Ali</strong>
-                          <span>Member #12</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>mohamed@example.com</td>
-                    <td><span class="role-badge role-manager">Manager</span></td>
-                    <td class="table-actions">
-                      <button type="button" class="btn btn-secondary btn-small">Change Role</button>
-                      <button type="button" class="btn btn-danger btn-small">Remove</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="person-cell">
-                        <span class="avatar avatar-alt">SA</span>
-                        <div>
-                          <strong>Sarah Ahmed</strong>
-                          <span>Member #15</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>sarah@example.com</td>
-                    <td><span class="role-badge role-staff">Staff</span></td>
-                    <td class="table-actions">
-                      <button type="button" class="btn btn-secondary btn-small">Change Role</button>
-                      <button type="button" class="btn btn-danger btn-small">Remove</button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="team-members-list"></tbody>
               </table>
             </div>
 
@@ -186,18 +150,7 @@
                   </tr>
                 </thead>
 
-                <tbody id="pending-invites-list">
-                  <!-- Future TeamPage.js will populate this table. -->
-                  <tr>
-                    <td>new.member@example.com</td>
-                    <td><span class="role-badge role-staff">Staff</span></td>
-                    <td>Today</td>
-                    <td>In 6 days</td>
-                    <td class="table-actions">
-                      <button type="button" class="btn btn-danger btn-small">Revoke</button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="pending-invites-list"></tbody>
               </table>
             </div>
 
