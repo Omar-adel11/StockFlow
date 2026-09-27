@@ -24,6 +24,7 @@ async function init() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadMembers(searchInput.value), 300);
   });
+  document.querySelectorAll('#role-modal .modal-close, #role-modal .btn-secondary').forEach(btn => btn.addEventListener('click', () => roleModal?.close()));
   document.getElementById('role-form')?.addEventListener('submit', handleRole);
   await Promise.all([loadMembers(), loadInvites()]);
 }
