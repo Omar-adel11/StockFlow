@@ -63,13 +63,24 @@ function renderMembers(members) {
       <td><span class="role-badge role-${String(member.role || '').toLowerCase()}">${escapeHtml(member.role)}</span></td>
       <td class="table-actions"><button type="button" class="btn btn-secondary btn-small change-role-btn">Change Role</button><button type="button" class="btn btn-danger btn-small remove-member-btn">Remove</button></td>
     `;
-    row.querySelector('.change-role-btn').addEventListener('click', () => {
+    const canManageMembers = currentRole() === 'BusinessOwner';
+    const roleButton = row.querySelector('.change-role-btn');
+    const removeButton = row.querySelector('.remove-member-btn');
+
+    if (!canManageMembers) {
+      roleButton.disabled = true;
+      removeButton.disabled = true;
+      roleButton.title = 'Only the Business Owner can change roles.';
+      removeButton.title = 'Only the Business Owner can remove members.';
+    }
+
+    roleButton.addEventListener('click', () => {
       editingMemberId = member.id;
       document.getElementById('role-member-name').textContent = `Update ${member.name}'s role.`;
       document.getElementById('member-role').value = member.role;
       roleModal?.showModal();
     });
-    row.querySelector('.remove-member-btn').addEventListener('click', async () => {
+    removeButton.addEventListener('click', async () => {
       const confirmed = await showConfirm(`Remove ${member.name} from the team?`, { confirmText: 'Remove Member' });
       if (!confirmed) return;
       try {
