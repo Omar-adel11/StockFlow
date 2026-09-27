@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { warehouseService } from '../services/WarehouseService.js';
 import { validateWarehouseForm, buildWarehousePayload } from '../validation/warehouseValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -74,7 +75,7 @@ class WarehousesPage {
       setWarehouses(warehouses);
       this.renderWarehouses();
     } catch (error) {
-      this.setStatus('Failed to load warehouses: ' + error.message, 'error');
+      showNotice('Failed to load warehouses: ' + error.message, 'error', 'error');
     } finally {
       this.showLoading(false);
     }
@@ -135,7 +136,7 @@ class WarehousesPage {
 
     const validation = validateWarehouseForm(rawFormData);
     if (!validation.isValid) {
-      this.setStatus(validation.errors.join(' '), 'error');
+      showNotice(validation.errors.join(' '), 'error', 'error');
       return;
     }
 
@@ -159,7 +160,7 @@ class WarehousesPage {
       await this.loadWarehouses();
     } catch (error) {
       console.error('API Error details:', error);
-      this.setStatus(error.message || 'An error occurred while saving warehouse.', 'error');
+      showNotice(error.message || 'An error occurred while saving warehouse.', 'error', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -184,15 +185,15 @@ class WarehousesPage {
   }
 
   async deleteWarehouse(id) {
-    if (!confirm('Are you sure you want to delete this warehouse?')) return;
+    if (!await showConfirm('Are you sure you want to delete this warehouse?')) return;
 
     try {
       await warehouseService.delete(id);
       removeWarehouseFromState(id);
-      this.setStatus('Warehouse deleted successfully.', 'success');
+      showNotice('Warehouse deleted successfully.');
       this.renderWarehouses();
     } catch (error) {
-      this.setStatus('Failed to delete warehouse: ' + error.message, 'error');
+      showNotice('Failed to delete warehouse: ' + error.message, 'error', 'error');
     }
   }
 
