@@ -27,7 +27,14 @@ export function makeSearchableSelect(select) {
     menu.style.left = `${rect.left}px`;
     menu.style.width = `${rect.width}px`;
     menu.style.maxWidth = `${rect.width}px`;
-    menu.style.top = `${rect.bottom + 4}px`;
+    const estimatedHeight = Math.min(240, Math.max(48, menu.scrollHeight || 240));
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    if (spaceBelow < estimatedHeight && spaceAbove > spaceBelow) {
+      menu.style.top = `${Math.max(4, rect.top - estimatedHeight - 4)}px`;
+    } else {
+      menu.style.top = `${rect.bottom + 4}px`;
+    }
     menu.style.zIndex = '100000';
   };
 
