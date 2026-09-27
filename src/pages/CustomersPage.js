@@ -82,7 +82,7 @@ class CustomersPage {
             setCustomers(customersData || []);
             this.renderCustomers();
         } catch (error) {
-            showNotice('Failed to load customers: ' + error.message, 'error', 'error');
+            showNotice('Failed to load customers: ' + error.message, 'error');
         } finally {
             this.showLoading(false);
         }
@@ -152,7 +152,7 @@ class CustomersPage {
 
     const validation = validateCustomerForm(rawFormData);
     if (!validation.isValid) {
-        showNotice(validation.errors.join(' '), 'error', 'error');
+        showNotice(validation.errors.join(' '), 'error');
         return;
     }
 
@@ -183,15 +183,15 @@ class CustomersPage {
                 const cleanField = field.replace(/^addresses\[\d+\]\./i, '').replace(/^addresses\./i, '');
                 messages.push(`${cleanField}: ${Array.isArray(errList) ? errList.join(', ') : errList}`);
             }
-            showNotice(`Validation Failed: ${messages.join(' | ')}`, 'error', 'error');
+            showNotice(`Validation Failed: ${messages.join(' | ')}`, 'error');
         } 
         // 2. Check for detail string in ProblemDetails
         else if (error.data && error.data.detail) {
-            showNotice(`Error: ${error.data.detail}`, 'error', 'error');
+            showNotice(`Error: ${error.data.detail}`, 'error');
         } 
         // 3. Fallback to error message
         else {
-            showNotice(error.message || 'Validation Error occurred on server.', 'error', 'error');
+            showNotice(error.message || 'Validation Error occurred on server.', 'error');
         }
     } finally {
         this.submitBtn.disabled = false;
@@ -230,7 +230,7 @@ class CustomersPage {
             showNotice('Customer deleted successfully.');
             this.renderCustomers();
         } catch (error) {
-            showNotice('Failed to delete customer: ' + error.message, 'error', 'error');
+            showNotice('Failed to delete customer: ' + error.message, 'error');
         }
     }
 
