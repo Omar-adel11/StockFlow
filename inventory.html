@@ -54,7 +54,7 @@
           <p>Current stock levels across every warehouse, and a log of recent activity.</p>
         </div>
         
-      </header>
+      <div><a href="addInventoryAdjustment.html" class="btn btn-primary">+ Adjust Stock</a></div></header>
 
       <main class="admin-main">
 
@@ -83,52 +83,7 @@
         </div>
 
         <!-- Adjust Stock Form -->
-        <section class="card adjust-stock-card">
-          <h2>Adjust Stock</h2>
-          <p>For manual corrections only - purchases and sales update stock automatically.</p>
-
-          <form id="adjust-stock-form" novalidate>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="adjust-product">Product</label>
-                <select id="adjust-product" name="productId">
-                  <option value="">Loading products...</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="adjust-warehouse">Warehouse</label>
-                <select id="adjust-warehouse" name="warehouseId">
-                  <option value="">Loading warehouses...</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="adjust-quantity">Quantity Change</label>
-                <input type="number" id="adjust-quantity" name="quantityChanged" step="1" placeholder="e.g. 10 or -5" />
-                <p class="field-hint">Positive to add stock, negative to remove it.</p>
-              </div>
-
-              <div class="form-group">
-                <label for="adjust-reason">Movement Reason</label>
-                <select id="adjust-reason" name="reason">
-                  <option value="2" selected>Adjustment</option>
-                  <option value="0">Purchase</option>
-                  <option value="1">Sale</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" id="adjust-submit-btn" class="btn btn-primary">Record Adjustment</button>
-            </div>
-
-            <p id="adjust-form-status" class="form-status" aria-live="polite"></p>
-          </form>
-        </section>
+        
 
         <!-- Current Stock Table -->
         <section class="inventory-section">
