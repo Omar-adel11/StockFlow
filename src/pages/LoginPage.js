@@ -27,7 +27,23 @@ form.addEventListener('submit', async (event) => {
     try {
         const result = await authService.login(data);
         session.setSession(result);
-        window.location.href = 'categories.html';
+
+        const token = result?.token || session.getAccessToken();
+        let role = '';
+        try {
+            const payload = JSON.parse(
+                atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+            );
+            role =
+                payload.role ||
+                payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+                '';
+        } catch {
+            // If the token cannot be decoded, keep the normal application route.
+        }
+
+        window.location.href =
+            role === 'SaasAdmin' ? 'adminPanel.html' : 'dashboard.html';
     } catch (error) {
         console.error(error);
         formStatus.textContent = error.message;
