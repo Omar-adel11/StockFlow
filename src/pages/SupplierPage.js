@@ -118,7 +118,7 @@ class SuppliersPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(supplier));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addSupplier.html?id=${supplier.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteSupplier(supplier.id));
 
       this.suppliersList.appendChild(card);
