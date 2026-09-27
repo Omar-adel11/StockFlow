@@ -22,7 +22,7 @@ export class PurchaseOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
-    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadOrders(this.searchInput.value || null),300); });
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => this.loadOrders(this.searchInput.value || null), 300); });
     this.init();
   }
 
@@ -98,7 +98,8 @@ export class PurchaseOrdersPage {
 
       this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...');
       this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...');
-      makeSearchableSelect(this.supplierSelect); makeSearchableSelect(this.warehouseSelect);
+      makeSearchableSelect(this.supplierSelect);
+      makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -164,7 +165,6 @@ export class PurchaseOrdersPage {
     });
 
     this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
-
     this.updateTotalDisplay();
   }
 
@@ -191,7 +191,10 @@ export class PurchaseOrdersPage {
     if (target.classList.contains('po-item-qty')) {
       updateLineItem(id, { quantityOrdered: target.value });
       this.updateRowSubtotal(target);
-    
+    } else if (target.classList.contains('po-item-price')) {
+      updateLineItem(id, { agreedUnitPrice: target.value });
+      this.updateRowSubtotal(target);
+    }
   }
 
   updateRowSubtotal(target) {
@@ -322,7 +325,7 @@ export class PurchaseOrdersPage {
 
     if (receiveBtn) {
       const id = receiveBtn.getAttribute('data-id');
-      if (await showConfirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`, {confirmText:'Receive Order'})) {
+      if (await showConfirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`, { confirmText: 'Receive Order', danger: false })) {
         try {
           receiveBtn.disabled = true;
           await purchaseOrderService.receiveOrder(id);
@@ -333,7 +336,7 @@ export class PurchaseOrdersPage {
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (await showConfirm(`Are you sure you want to cancel Purchase Order #${id}?`, {confirmText:'Cancel Order'})) {
+      if (await showConfirm(`Are you sure you want to cancel Purchase Order #${id}?`, { confirmText: 'Cancel Order' })) {
         try {
           cancelBtn.disabled = true;
           await purchaseOrderService.cancelOrder(id);
