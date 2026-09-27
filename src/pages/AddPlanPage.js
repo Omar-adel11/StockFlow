@@ -39,7 +39,7 @@ form?.addEventListener('submit', async e => {
   const data = {
     name: field('name').value.trim(),
     price: Number(field('price').value),
-    billingCycle: Number(field('billingCycle').value),
+    billingCycle: field('billingCycle').value === '1' ? 1 : 0,
     description: field('description').value.trim(),
     isActive: field('isActive').checked,
     features: field('features').value.split('\n').map(x => x.trim()).filter(Boolean)
