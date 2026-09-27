@@ -27,6 +27,8 @@ async function init() {
   document.querySelectorAll('#role-modal .modal-close, #role-modal .btn-secondary').forEach(btn => btn.addEventListener('click', () => roleModal?.close()));
   document.getElementById('role-form')?.addEventListener('submit', handleRole);
   await loadMembers();
+  const role = currentRole();
+  if (role === 'BusinessOwner' || role === 'Manager') await loadInvites();
 }
 
 async function loadMembers(search = null) {
@@ -83,6 +85,40 @@ function renderMembers(members) {
   document.getElementById('team-member-count').textContent = members.length;
   document.getElementById('manager-count').textContent = managers;
   document.getElementById('staff-count').textContent = staff;
+}
+
+async function handleRole(event) {
+  event.preventDefault();
+
+  if (currentRole() !== 'BusinessOwner') {
+    showNotice('Only the Business Owner can change team member roles.', 'error');
+    return;
+  }
+
+  const newRole = document.getElementById('member-role')?.value;
+  if (!editingMemberId || !newRole) return;
+
+  const confirmed = await showConfirm(`Change this member's role to ${newRole}?`, {
+    confirmText: 'Update Role',
+    danger: false
+  });
+
+  if (!confirmed) return;
+
+  try {
+    const submit = document.querySelector('#role-form button[type="submit"]');
+    if (submit) submit.disabled = true;
+
+    await teamService.updateRole(editingMemberId, newRole);
+    roleModal?.close();
+    showNotice('Team member role updated successfully.');
+    await loadMembers(searchInput?.value || null);
+  } catch (error) {
+    showNotice(error.message || 'Failed to update team member role.', 'error');
+  } finally {
+    const submit = document.querySelector('#role-form button[type="submit"]');
+    if (submit) submit.disabled = false;
+  }
 }
 
 async function loadInvites() {
