@@ -367,7 +367,13 @@ export class SalesOrdersPage {
 
     try {
       if (this.submitBtn) this.submitBtn.disabled = true;
-      await salesOrderService.create(payload);
+      if (this.editingId) {
+        const confirmed = await showConfirm(`Update order #${this.editingId}?`, { confirmText: 'Update Order', danger: false });
+        if (!confirmed) return;
+        await salesOrderService.update(this.editingId, payload);
+      } else {
+        await salesOrderService.create(payload);
+      }
       this.setStatus('Sales order created successfully.', 'success');
 
       this.form.reset();
