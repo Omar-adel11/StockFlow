@@ -16,7 +16,22 @@ let editingMemberId = null;
 
 document.addEventListener('DOMContentLoaded', init);
 
-function currentRole() { try { const token=getAccessToken(); if(!token) return ''; const p=JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return p.role || p['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || ''; } catch { return ''; } }
+function currentRole() {
+  try {
+    const token = getAccessToken();
+    if (!token) return '';
+    const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = part + '='.repeat((4 - part.length % 4) % 4);
+    const payload = JSON.parse(atob(padded));
+    const value = payload.role ||
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      payload['ClaimTypes.Role'] ||
+      '';
+    return Array.isArray(value) ? value[0] : value;
+  } catch {
+    return '';
+  }
+}
 
 async function init() {
   document.getElementById('logout-btn')?.addEventListener('click', () => authService.logout());
