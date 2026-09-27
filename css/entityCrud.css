@@ -253,3 +253,11 @@
 @media(max-width:520px){
  .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr!important}
 }
+
+/* Entity cards use the same two-column proportions as Categories. */
+.entity-list-section .entity-grid:not(#categories-list){
+  grid-template-columns:repeat(2,minmax(320px,1fr))!important;
+}
+@media(max-width:800px){
+  .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr!important}
+}
