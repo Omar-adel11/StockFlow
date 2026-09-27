@@ -174,7 +174,7 @@ class ProductsPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(product));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addProduct.html?id=${product.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteProduct(product.id));
 
       this.productsList.appendChild(card);
