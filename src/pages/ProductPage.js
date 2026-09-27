@@ -1,4 +1,5 @@
 import { showConfirm, showNotice } from '../utils/ui.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
 import { productService } from '../services/ProductService.js';
 import { getAllCategories } from '../services/categoryService.js';
 import { supplierService } from '../services/SupplierService.js';
@@ -84,6 +85,7 @@ class ProductsPage {
       const categories = await getAllCategories();
       setCategories(categories);
       this.populateSelect(this.categorySelect, categories, 'Select Category', false);
+      makeSearchableSelect(this.categorySelect);
     } catch (error) {
       console.error('Failed to load categories:', error);
       this.categorySelect.innerHTML = '<option value="">Failed to load categories</option>';
@@ -95,6 +97,7 @@ class ProductsPage {
       const suppliers = await supplierService.getAll();
       setSuppliers(suppliers);
       this.populateSelect(this.supplierSelect, suppliers, 'None', true);
+      makeSearchableSelect(this.supplierSelect);
     } catch (error) {
       console.error('Failed to load suppliers:', error);
       this.supplierSelect.innerHTML = '<option value="">None</option>';
@@ -122,7 +125,7 @@ class ProductsPage {
       setProducts(products);
       this.renderProducts();
     } catch (error) {
-      showNotice('Failed to load products: ' + error.message, 'error', 'error');
+      showNotice('Failed to load products: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -195,7 +198,7 @@ class ProductsPage {
 
   const validation = validateProductForm(rawFormData);
   if (!validation.isValid) {
-    showNotice(validation.errors.join(' '), 'error', 'error');
+    showNotice(validation.errors.join(' '), 'error');
     return;
   }
 
@@ -219,7 +222,7 @@ class ProductsPage {
     await this.loadProducts();
   } catch (error) {
     console.error('API Error details:', error);
-    showNotice(error.message || 'An error occurred while saving product.', 'error', 'error');
+    showNotice(error.message || 'An error occurred while saving product.', 'error');
   } finally {
     this.submitBtn.disabled = false;
   }
@@ -253,7 +256,7 @@ class ProductsPage {
       showNotice('Product deleted successfully.');
       this.renderProducts();
     } catch (error) {
-      showNotice('Failed to delete product: ' + error.message, 'error', 'error');
+      showNotice('Failed to delete product: ' + error.message, 'error');
     }
   }
 
