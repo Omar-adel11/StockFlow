@@ -70,7 +70,7 @@ namespace WebApi.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> CancelInvite(int id)
         {
-            var businessId = int.Parse(User.FindFirstValue("business_id")!);
+            var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
             await _teamService.CancelInviteAsync(id, businessId);
             return Ok(new { message = "Invitation revoked successfully." });
         }
