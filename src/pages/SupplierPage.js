@@ -35,6 +35,8 @@ class SuppliersPage {
     this.suppliersList = document.getElementById('suppliers-list');
     this.suppliersEmpty = document.getElementById('suppliers-empty');
     this.suppliersLoading = document.getElementById('suppliers-loading');
+    this.searchInput = document.getElementById('supplier-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -61,13 +63,14 @@ class SuppliersPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadSuppliers(this.searchInput.value || null),300); });
     await this.loadSuppliers();
   }
 
-  async loadSuppliers() {
+  async loadSuppliers(search = null) {
     this.showLoading(true);
     try {
-      const suppliers = await supplierService.getAll();
+      const suppliers = await supplierService.getAll(search);
       setSuppliers(suppliers);
       this.renderSuppliers();
     } catch (error) {
