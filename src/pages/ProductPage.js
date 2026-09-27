@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { productService } from '../services/ProductService.js';
 import { getAllCategories } from '../services/categoryService.js';
 import { supplierService } from '../services/SupplierService.js';
@@ -121,7 +122,7 @@ class ProductsPage {
       setProducts(products);
       this.renderProducts();
     } catch (error) {
-      this.setStatus('Failed to load products: ' + error.message, 'error');
+      showNotice('Failed to load products: ' + error.message, 'error', 'error');
     } finally {
       this.showLoading(false);
     }
@@ -194,7 +195,7 @@ class ProductsPage {
 
   const validation = validateProductForm(rawFormData);
   if (!validation.isValid) {
-    this.setStatus(validation.errors.join(' '), 'error');
+    showNotice(validation.errors.join(' '), 'error', 'error');
     return;
   }
 
@@ -218,7 +219,7 @@ class ProductsPage {
     await this.loadProducts();
   } catch (error) {
     console.error('API Error details:', error);
-    this.setStatus(error.message || 'An error occurred while saving product.', 'error');
+    showNotice(error.message || 'An error occurred while saving product.', 'error', 'error');
   } finally {
     this.submitBtn.disabled = false;
   }
@@ -244,15 +245,15 @@ class ProductsPage {
   }
 
   async deleteProduct(id) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!await showConfirm('Are you sure you want to delete this product?')) return;
 
     try {
       await productService.delete(id);
       removeProductFromState(id);
-      this.setStatus('Product deleted successfully.', 'success');
+      showNotice('Product deleted successfully.');
       this.renderProducts();
     } catch (error) {
-      this.setStatus('Failed to delete product: ' + error.message, 'error');
+      showNotice('Failed to delete product: ' + error.message, 'error', 'error');
     }
   }
 
