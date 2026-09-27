@@ -74,7 +74,7 @@ function renderOwners(owners) {
       }
       try {
         toggle.disabled = true;
-        await updateBusinessOwnerStatus(owner.id, next);
+        await updateBusinessOwnerStatus(owner.id, next, next ? owner.currentPlanId : null);
         showNotice('Business owner status updated successfully.');
         renderOwners(await getBusinessOwners(ownerSearch?.value || null));
       } catch (error) {
@@ -120,8 +120,19 @@ function renderPlans(plans) {
       <p class="plan-price">$${Number(plan.price || 0).toFixed(2)} <span>/ ${escapeHtml(plan.billingCycle || 'Monthly')}</span></p>
       <p class="plan-description">${escapeHtml(plan.description || '')}</p>
       <ul class="plan-features">${(plan.features || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-      <div class="plan-card-actions"><a href="addPlan.html" class="btn btn-secondary">Edit</a></div>
+      <div class="plan-card-actions"><a href="addPlan.html?id=${plan.id}" class="btn btn-secondary">Edit</a>
+        <button type="button" class="btn btn-danger delete-plan-btn" data-plan-id="${plan.id}">Delete</button></div>
     `;
+    card.querySelector(".delete-plan-btn")?.addEventListener("click", async () => {
+      const confirmed = await showConfirm("Delete this plan? This cannot be undone.", { confirmText: "Delete Plan" });
+      if (!confirmed) return;
+      try {
+        const { deletePlan } = await import("../services/planService.js");
+        await deletePlan(plan.id);
+        showNotice("Plan deleted successfully.");
+        await loadPlans();
+      } catch (error) { showNotice(error.message || "Failed to delete plan.", "error"); }
+    });
     plansList.appendChild(card);
   });
 }
