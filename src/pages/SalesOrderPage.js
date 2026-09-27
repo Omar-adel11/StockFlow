@@ -74,10 +74,8 @@ export class SalesOrdersPage {
   }
 
   async init() {
-    await Promise.all([
-      this.loadDropdownData(),
-      this.loadOrders()
-    ]);
+    await this.loadDropdownData();
+    if (this.ordersList) await this.loadOrders();
   }
 
   async loadDropdownData() {
@@ -242,6 +240,7 @@ export class SalesOrdersPage {
   }
 
   renderOrdersList() {
+    if (!this.ordersList) return;
     this.ordersList.innerHTML = '';
 
     if (!salesOrderState.orders || salesOrderState.orders.length === 0) {
