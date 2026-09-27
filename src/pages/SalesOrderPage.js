@@ -1,4 +1,5 @@
 import { salesOrderService } from '../services/salesOrderService.js';
+import { makeSearchableSelect, refreshSearchableSelect } from '../utils/searchableSelect.js';
 import { productService } from '../services/ProductService.js';
 import { customerService } from '../services/CustomerService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -93,6 +94,7 @@ export class SalesOrdersPage {
 
       this.populateSelect(this.customerSelect, salesOrderState.customers, 'Select Customer...', (c) => c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || `ID: ${c.id}`);
       this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.name || `ID: ${w.id}`);
+      makeSearchableSelect(this.supplierSelect || this.customerSelect); makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -146,7 +148,7 @@ export class SalesOrdersPage {
           <input type="number" class="form-control so-item-qty" data-id="${item.id}" min="1" value="${item.quantitySold}" />
         </td>
         <td>
-          <input type="number" class="form-control so-item-price" data-id="${item.id}" min="0.01" step="0.01" value="${item.billedUnitPrice || ''}" placeholder="0.00" />
+          <input type="number" class="form-control so-item-price" readonly data-id="${item.id}" min="0.01" step="0.01" value="${item.billedUnitPrice || ''}" placeholder="0.00" />
         </td>
         <td class="so-item-subtotal-cell">$${subtotal.toFixed(2)}</td>
         <td>
@@ -156,6 +158,8 @@ export class SalesOrdersPage {
 
       this.itemsTbody.appendChild(row);
     });
+
+    this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
 
     this.updateTotalDisplay();
   }
@@ -183,7 +187,7 @@ export class SalesOrdersPage {
     if (target.classList.contains('so-item-qty')) {
       updateLineItem(id, { quantitySold: target.value });
       this.updateRowSubtotal(target);
-    } else if (target.classList.contains('so-item-price')) {
+    } else if (target.classList.contains('so-item-price')) { return;
       updateLineItem(id, { billedUnitPrice: target.value });
       this.updateRowSubtotal(target);
     }
