@@ -2,6 +2,7 @@ import { validatePlanForm } from '../validation/planValidation.js';
 import { fetchPlans, createPlan, updatePlan, deletePlan } from '../services/planService.js';
 import { setPlans, getPlanById } from '../state/planState.js';
 import { escapeHtml } from '../utils/helpers.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 
 const form = document.getElementById('plan-form');
 const formTitle = document.getElementById('form-title');
@@ -156,7 +157,7 @@ form.addEventListener('submit', async (event) => {
 });
 
 async function handleDelete(id) {
-    const confirmed = confirm("Delete this plan? This can't be undone.");
+    const confirmed = await showConfirm("Delete this plan? This can't be undone.");
     if (!confirmed) return;
 
     try {
@@ -164,7 +165,7 @@ async function handleDelete(id) {
         await loadPlans();
     } catch (error) {
         console.error(error);
-        alert(`Couldn't delete this plan: ${error.message}`);
+        showNotice(`Couldn't delete this plan: ${error.message}`, 'error');
     }
 }
 
