@@ -34,7 +34,7 @@ form.addEventListener('submit', async (event) => {
         await authService.changePassword(data, token);
         formStatus.textContent = 'Password changed successfully!';
         setTimeout(() => {
-            window.location.href = 'admin.html';
+            window.location.href = 'profile.html';
         }, 1500);
     } catch (error) {
         console.error(error);
