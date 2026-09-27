@@ -1,5 +1,6 @@
 import { salesOrderService } from '../services/salesOrderService.js';
-import { makeSearchableSelect, refreshSearchableSelect } from '../utils/searchableSelect.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { productService } from '../services/ProductService.js';
 import { customerService } from '../services/CustomerService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -94,7 +95,7 @@ export class SalesOrdersPage {
 
       this.populateSelect(this.customerSelect, salesOrderState.customers, 'Select Customer...', (c) => c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || `ID: ${c.id}`);
       this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.name || `ID: ${w.id}`);
-      makeSearchableSelect(this.supplierSelect || this.customerSelect); makeSearchableSelect(this.warehouseSelect);
+      makeSearchableSelect(this.customerSelect); makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -187,10 +188,7 @@ export class SalesOrdersPage {
     if (target.classList.contains('so-item-qty')) {
       updateLineItem(id, { quantitySold: target.value });
       this.updateRowSubtotal(target);
-    } else if (target.classList.contains('so-item-price')) { return;
-      updateLineItem(id, { billedUnitPrice: target.value });
-      this.updateRowSubtotal(target);
-    }
+    
   }
 
   updateRowSubtotal(target) {
@@ -321,24 +319,24 @@ export class SalesOrdersPage {
 
     if (fulfillBtn) {
       const id = fulfillBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`)) {
+      if (await showConfirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`, {confirmText:'Fulfill Order'})) {
         try {
           fulfillBtn.disabled = true;
           await salesOrderService.fulfillOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to fulfill order.');
+          showNotice(err.message || 'Failed to fulfill order.', 'error');
         }
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to cancel Sales Order #${id}?`)) {
+      if (await showConfirm(`Are you sure you want to cancel Sales Order #${id}?`, {confirmText:'Cancel Order'})) {
         try {
           cancelBtn.disabled = true;
           await salesOrderService.cancelOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to cancel order.');
+          showNotice(err.message || 'Failed to cancel order.', 'error');
         }
       }
     }
