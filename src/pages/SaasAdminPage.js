@@ -73,6 +73,11 @@ function renderOwners(owners) {
         return;
       }
       try {
+        if (next && !owner.currentPlanId) {
+          toggle.checked = false;
+          showNotice('Assign a subscription plan before activating this business owner.', 'error');
+          return;
+        }
         toggle.disabled = true;
         await updateBusinessOwnerStatus(owner.id, next, next ? owner.currentPlanId : null);
         showNotice('Business owner status updated successfully.');
