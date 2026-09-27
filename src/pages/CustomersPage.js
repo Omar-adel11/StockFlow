@@ -50,7 +50,7 @@ class CustomersPage {
         if (this.logoutBtn) {
             this.logoutBtn.addEventListener('click', () => {
                 clearSession();
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
         }
 
