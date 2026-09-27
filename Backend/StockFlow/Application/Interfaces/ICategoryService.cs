@@ -9,7 +9,7 @@ namespace Application.Interfaces
 {
     public interface ICategoryService
     {
-        Task<IReadOnlyCollection<Response>> GetAllCategoriesAsync();
+        Task<IReadOnlyCollection<Response>> GetAllCategoriesAsync(string? search);
         Task<Response?> GetCategoryAsync(int id);
         Task<Response> CreateCategoryAsync(CreateRequest createRequest, int BusinessId);
         Task<Response?> UpdateCategoryAsync(int Id, UpdateRequest updateRequest);

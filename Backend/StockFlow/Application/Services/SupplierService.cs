@@ -43,16 +43,17 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<SuppliersDtos.SupplierResponse>> GetAllSuppliersAsync()
+        public async Task<IReadOnlyCollection<SuppliersDtos.SupplierResponse>> GetAllSuppliersAsync(string? search)
         {
-            // Execute the query first in-memory so MapToResponse works safely
-            var suppliers = await SupplierSet
-                .AsNoTracking()
-                .ToListAsync();
+            var query = SupplierSet.AsNoTracking();
 
-            return suppliers
-                .Select(MapToResponse)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(c => c.Name.Contains(search) || c.ContactEmail.Contains(search));
+            }
+            var suppliers = await query.ToListAsync();
+            return suppliers.Select(MapToResponse).ToList();
         }
 
         public async Task<SuppliersDtos.SupplierResponse?> GetSupplierAsync(int id)

@@ -11,6 +11,7 @@ using Domain.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static Application.DTOs.businessOwner.BusinessOwnerDto;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services
 {
@@ -18,7 +19,7 @@ namespace Application.Services
     {
 
 
-        public async Task<IEnumerable<BusinessOwnerResponseDto>> GetAllBusinessOwnersAsync()
+        public async Task<IEnumerable<BusinessOwnerResponseDto>> GetAllBusinessOwnersAsync(string? search)
         {
             // 1. Fetch users belonging to the BusinessOwner role via Identity
             var usersInRole = await _userManager.GetUsersInRoleAsync(Roles.BusinessOwner);
@@ -27,22 +28,32 @@ namespace Application.Services
             var ownerIds = usersInRole.Select(u => u.Id).ToList();
 
             // 3. Project into DTOs while ignoring global query filters on tenants/businesses
-            return await _context.Users
+            var query = _context.Users
                 .IgnoreQueryFilters()
-                .Where(u => ownerIds.Contains(u.Id))
-                .Select(u => new BusinessOwnerResponseDto
-                {
-                    Id = u.Id,
-                    FullName = u.Name,
-                    Email = u.Email,
-                    IsActive = u.Business != null && u.Business.IsActive,
-                    BusinessId = u.Business != null ? u.Business.Id : null,
-                    BusinessName = u.Business != null ? u.Business.Name : null,
-                    CurrentPlanId = u.Business != null ? u.Business.PlanId : null,
-                    CurrentPlanName = u.Business != null && u.Business.Plan != null
+                .Where(u => ownerIds.Contains(u.Id));
+
+            if(!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(u =>
+                u.Name.Contains(search) || u.Email.Contains(search) ||(u.Business != null && u.Business.Name.Contains(search)));
+            }
+
+
+                return await query.Select(u => new BusinessOwnerResponseDto
+                 {
+                     Id = u.Id,
+                     FullName = u.Name,
+                     Email = u.Email,
+                     IsActive = u.Business != null && u.Business.IsActive,
+                     BusinessId = u.Business != null ? u.Business.Id : null,
+                     BusinessName = u.Business != null ? u.Business.Name : null,
+                     CurrentPlanId = u.Business != null ? u.Business.PlanId : null,
+                     CurrentPlanName = u.Business != null && u.Business.Plan != null
                         ? u.Business.Plan.Name
                         : null
-                })
+                 })
                 .ToListAsync();
         }
 

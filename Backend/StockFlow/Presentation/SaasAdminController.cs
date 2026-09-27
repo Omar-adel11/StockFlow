@@ -20,9 +20,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("business-owners")]
-        public async Task<IActionResult> GetAllBusinessOwners()
+        public async Task<IActionResult> GetAllBusinessOwners([FromQuery] string? search)
         {
-            var owners = await _adminService.GetAllBusinessOwnersAsync();
+            var owners = await _adminService.GetAllBusinessOwnersAsync(search);
             return Ok(owners);
         }
 

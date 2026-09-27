@@ -42,11 +42,12 @@ namespace Application.Services
                 )).ToList()
             );
 
-        public async Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync()
+        public async Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync(int count = 20)
         {
             return await SalesOrders
                 .AsNoTracking()
                 .OrderByDescending(so => so.OrderDate)
+                .Take(count)
                 .Select(ToSalesResponse)
                 .ToListAsync();
         }

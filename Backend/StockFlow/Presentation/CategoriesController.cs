@@ -20,9 +20,9 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync();
+            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync(search);
             return Ok(categories);
         }
 

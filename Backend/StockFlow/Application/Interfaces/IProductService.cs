@@ -9,7 +9,7 @@ namespace Application.Interfaces
 {
     public interface IProductService
     {
-        Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync();
+        Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync(string? search);
         Task<ProductResponse?> GetProductByIdAsync(int id);
         Task<ProductResponse?> GetProductBySkuAsync(string sku);
         Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest,int businessId);

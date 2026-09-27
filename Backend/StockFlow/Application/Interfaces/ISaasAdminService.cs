@@ -10,7 +10,7 @@ namespace Application.Interfaces
 {
     public interface ISaaSAdminService
     {
-        Task<IEnumerable<BusinessOwnerResponseDto>> GetAllBusinessOwnersAsync();
+        Task<IEnumerable<BusinessOwnerResponseDto>> GetAllBusinessOwnersAsync(string? search);
         Task<bool> UpdateBusinessOwnerStatusAsync(int ownerId, UpdateOwnerStatusRequest request);
     }
 }

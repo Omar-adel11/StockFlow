@@ -36,6 +36,45 @@ namespace Application.Services
                 .ToListAsync();
         }
 
+        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>>
+    GetInventoryAsync(
+        int? productId = null,
+        int? warehouseId = null,
+        bool lowStockOnly = false,
+        string? searchTerm = null)
+        {
+            var query = InventoryItems.Include(i => i.Product)
+                .AsNoTracking();
+
+            if (productId.HasValue)
+            {
+                query = query.Where(i => i.ProductId == productId.Value);
+            }
+
+            if (warehouseId.HasValue)
+            {
+                query = query.Where(i => i.WarehouseId == warehouseId.Value);
+            }
+
+            if (lowStockOnly)
+            {
+                query = query.Where(i => i.QuantityOnHand <= i.Product.ReorderLevel);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim();
+
+                query = query.Where(i =>
+                    i.Product.Name.Contains(searchTerm) ||
+                    i.Product.SKU.Contains(searchTerm));
+            }
+
+            return await query
+                .Select(ToInventoryResponse)
+                .ToListAsync();
+        }
+
         public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByWarehouseAsync(int warehouseId)
         {
             return await InventoryItems

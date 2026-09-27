@@ -10,7 +10,7 @@ namespace Application.Interfaces
 {
     public interface ISalesOrderService
     {
-        Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync();
+        Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync(int count = 20);
         Task<SalesResponse?> GetOrderByIdAsync(int id);
         Task<SalesResponse> CreateSalesOrderAsync(SalesCreateRequest createRequest, int currentUserId,int businessId);
         Task<bool> FulfillSalesOrderAsync(int id,int businessId);

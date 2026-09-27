@@ -21,6 +21,9 @@ namespace Application.Interfaces
 
         // Low stock alert query for dashboard
         Task<IReadOnlyCollection<LowStockResponse>> GetLowStockItemsAsync();
-    
+
+        Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryAsync(int? productId = null,int? warehouseId = null,bool lowStockOnly = false,string? searchTerm = null);
+
+
 }
 }

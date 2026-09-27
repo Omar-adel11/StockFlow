@@ -47,16 +47,26 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync()
+        public async Task<IReadOnlyCollection<ProductResponse>>GetAllProductsAsync(string? search)
         {
-            var products = await _productSet.AsNoTracking()
-                                            .Include(p => p.Category)
-                                            .Include(p => p.PreferredSupplier)
-                                            .ToListAsync(); 
+            var query = _productSet.AsNoTracking();
 
-            return products.Select(MapToResponse).ToList();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(p => p.Name.Contains(search) || p.SKU.Contains(search));
+            }
+
+            var products = await query
+                .Include(p => p.Category)
+                .Include(p => p.PreferredSupplier)
+                .ToListAsync();
+
+            return products
+                .Select(MapToResponse)
+                .ToList();
         }
-
         public async Task<ProductResponse?> GetProductByIdAsync(int id)
         {
             var product = await GetProductEntityAsync(id);

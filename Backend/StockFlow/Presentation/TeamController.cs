@@ -77,10 +77,10 @@ namespace WebApi.Controllers
 
         [HttpGet("members")]
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
-        public async Task<IActionResult> GetTeamMembers()
+        public async Task<IActionResult> GetTeamMembers([FromQuery] string? search)
         {
             var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
-            var members = await _teamService.GetTeamMembersAsync(businessId);
+            var members = await _teamService.GetTeamMembersAsync(businessId, search);
             return Ok(members);
         }
 

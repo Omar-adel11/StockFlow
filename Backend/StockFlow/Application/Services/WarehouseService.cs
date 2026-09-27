@@ -24,12 +24,16 @@ namespace Application.Services
                 w.IsActive
             );
 
-        public async Task<IReadOnlyCollection<WarehouseDtos.WarehouseResponse>> GetAllWarehousesAsync()
+        public async Task<IReadOnlyCollection<WarehouseDtos.WarehouseResponse>> GetAllWarehousesAsync(string? search)
         {
-            return await WarehouseSet
-                .AsNoTracking()
-                .Select(MapToResponseExpression)
-                .ToListAsync();
+            var query = WarehouseSet.AsNoTracking();
+            if(!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(w => w.Name.Contains(search));
+            }
+
+               return await query.Select(MapToResponseExpression).ToListAsync();
         }
 
         public async Task<WarehouseDtos.WarehouseResponse?> GetWarehouseAsync(int id)

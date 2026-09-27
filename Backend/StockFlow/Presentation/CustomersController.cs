@@ -18,9 +18,9 @@ namespace WebAPI.Controllers
         private readonly IServiceManager _serviceManager = serviceManager;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var customers = await _serviceManager.CustomerService.GetAllCustomersAsync();
+            var customers = await _serviceManager.CustomerService.GetAllCustomersAsync(search);
             return Ok(customers);
         }
 
