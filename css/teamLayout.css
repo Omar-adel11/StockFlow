@@ -299,3 +299,13 @@
   color: var(--color-text-muted);
   font-size: 0.9rem;
 }
+/* Keep the native role dialog centered across browsers. */
+#role-modal.modal{
+  position:fixed;
+  inset:0;
+  margin:auto;
+  max-height:fit-content;
+}
+#role-modal.modal::backdrop{
+  background:rgba(14,42,34,.48);
+}
