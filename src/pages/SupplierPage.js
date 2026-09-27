@@ -75,7 +75,7 @@ class SuppliersPage {
       setSuppliers(suppliers);
       this.renderSuppliers();
     } catch (error) {
-      showNotice('Failed to load suppliers: ' + error.message, 'error', 'error');
+      showNotice('Failed to load suppliers: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -139,7 +139,7 @@ class SuppliersPage {
 
     const validation = validateSupplierForm(rawFormData);
     if (!validation.isValid) {
-      showNotice(validation.errors.join(' '), 'error', 'error');
+      showNotice(validation.errors.join(' '), 'error');
       return;
     }
 
@@ -162,7 +162,7 @@ class SuppliersPage {
       await this.loadSuppliers();
     } catch (error) {
       console.error('API Error details:', error);
-      showNotice(error.message || 'An error occurred while saving supplier.', 'error', 'error');
+      showNotice(error.message || 'An error occurred while saving supplier.', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -192,7 +192,7 @@ class SuppliersPage {
       showNotice('Supplier deleted successfully.');
       this.renderSuppliers();
     } catch (error) {
-      showNotice('Failed to delete supplier: ' + error.message, 'error', 'error');
+      showNotice('Failed to delete supplier: ' + error.message, 'error');
     }
   }
 
