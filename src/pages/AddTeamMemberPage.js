@@ -1,0 +1,3 @@
+import { teamService } from '../services/teamService.js';import { clearSession } from '../sessions/session.js';
+const form=document.getElementById('invite-form'),status=document.getElementById('status');document.getElementById('logout-btn')?.addEventListener('click',()=>{clearSession();location.href='index.html';});
+form.addEventListener('submit',async e=>{e.preventDefault();try{await teamService.invite({email:document.getElementById('email').value.trim(),role:document.getElementById('role').value});location.href='team.html';}catch(err){status.textContent=err.message;}});
