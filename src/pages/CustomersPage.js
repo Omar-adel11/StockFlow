@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import * as customerService from '../services/CustomerService.js';
 import { validateCustomerForm, buildCustomerPayload } from '../validation/customerValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -81,7 +82,7 @@ class CustomersPage {
             setCustomers(customersData || []);
             this.renderCustomers();
         } catch (error) {
-            this.setStatus('Failed to load customers: ' + error.message, 'error');
+            showNotice('Failed to load customers: ' + error.message, 'error', 'error');
         } finally {
             this.showLoading(false);
         }
@@ -151,7 +152,7 @@ class CustomersPage {
 
     const validation = validateCustomerForm(rawFormData);
     if (!validation.isValid) {
-        this.setStatus(validation.errors.join(' '), 'error');
+        showNotice(validation.errors.join(' '), 'error', 'error');
         return;
     }
 
@@ -182,15 +183,15 @@ class CustomersPage {
                 const cleanField = field.replace(/^addresses\[\d+\]\./i, '').replace(/^addresses\./i, '');
                 messages.push(`${cleanField}: ${Array.isArray(errList) ? errList.join(', ') : errList}`);
             }
-            this.setStatus(`Validation Failed: ${messages.join(' | ')}`, 'error');
+            showNotice(`Validation Failed: ${messages.join(' | ')}`, 'error', 'error');
         } 
         // 2. Check for detail string in ProblemDetails
         else if (error.data && error.data.detail) {
-            this.setStatus(`Error: ${error.data.detail}`, 'error');
+            showNotice(`Error: ${error.data.detail}`, 'error', 'error');
         } 
         // 3. Fallback to error message
         else {
-            this.setStatus(error.message || 'Validation Error occurred on server.', 'error');
+            showNotice(error.message || 'Validation Error occurred on server.', 'error', 'error');
         }
     } finally {
         this.submitBtn.disabled = false;
@@ -221,15 +222,15 @@ class CustomersPage {
     }
 
     async deleteCustomer(id) {
-        if (!confirm('Are you sure you want to delete this customer?')) return;
+        if (!await showConfirm('Are you sure you want to delete this customer?')) return;
 
         try {
             await customerService.deleteCustomer(id);
             removeCustomerFromState(id);
-            this.setStatus('Customer deleted successfully.', 'success');
+            showNotice('Customer deleted successfully.');
             this.renderCustomers();
         } catch (error) {
-            this.setStatus('Failed to delete customer: ' + error.message, 'error');
+            showNotice('Failed to delete customer: ' + error.message, 'error', 'error');
         }
     }
 
