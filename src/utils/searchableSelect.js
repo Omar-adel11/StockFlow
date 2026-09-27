@@ -9,7 +9,6 @@ export function makeSearchableSelect(select) {
   input.type = 'search';
   input.placeholder = select.options[0]?.textContent || 'Search...';
   input.autocomplete = 'off';
-  input.setAttribute('aria-label', input.placeholder);
 
   const menu = document.createElement('div');
   menu.className = 'searchable-select-menu';
@@ -20,26 +19,27 @@ export function makeSearchableSelect(select) {
   select.classList.add('searchable-select-source');
 
   const options = () => [...select.options].filter(o => o.value !== '');
-
   const close = () => menu.classList.remove('open');
 
   const render = (filter = '') => {
     const normalized = filter.trim().toLowerCase();
     const matches = options().filter(o => !normalized || o.textContent.toLowerCase().includes(normalized));
     menu.innerHTML = '';
+
     if (!matches.length) {
       const empty = document.createElement('div');
       empty.className = 'searchable-select-empty';
       empty.textContent = 'No matches found';
       menu.appendChild(empty);
+      menu.classList.add('open');
       return;
     }
+
     matches.forEach(option => {
       const item = document.createElement('div');
       item.className = 'searchable-select-option';
       item.textContent = option.textContent;
       item.dataset.value = option.value;
-      item.setAttribute('role', 'option');
       item.addEventListener('mousedown', e => e.preventDefault());
       item.addEventListener('click', () => {
         select.value = option.value;
@@ -53,23 +53,29 @@ export function makeSearchableSelect(select) {
 
   const sync = () => {
     const option = [...select.options].find(o => o.value === select.value);
-    if (!select.value) { input.value = ''; input.placeholder = select.dataset.searchPlaceholder || 'Search or select...'; return; }
+    if (!select.value) {
+      input.value = '';
+      input.placeholder = select.options[0]?.textContent || 'Search or select...';
+      return;
+    }
     input.value = option?.textContent || '';
     input.placeholder = '';
   };
 
   input.addEventListener('focus', () => {
-    if (!select.value) input.value = '';
-    render(input.value);
+    render('');
     menu.classList.add('open');
   });
+
   input.addEventListener('input', () => {
     render(input.value);
     menu.classList.add('open');
   });
+
   input.addEventListener('keydown', e => {
     if (e.key === 'Escape') close();
   });
+
   select.addEventListener('change', sync);
   document.addEventListener('click', e => {
     if (!wrapper.contains(e.target)) close();
