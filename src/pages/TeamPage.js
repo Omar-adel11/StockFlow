@@ -144,7 +144,7 @@ async function loadInvites() {
     }
     invites.forEach(invite => {
       const row = document.createElement('tr');
-      row.innerHTML = `<td>${escapeHtml(invite.email)}</td><td><span class="role-badge role-${String(invite.role || 'Staff').toLowerCase()}">${escapeHtml(invite.role || 'Staff')}</span></td><td>${formatDate(invite.createdAt)}</td><td>${formatDate(invite.expiresAt)}</td><td class="table-actions"><button type="button" class="btn btn-danger btn-small revoke-invite-btn">Revoke</button></td>`;
+      row.innerHTML = `<td>${escapeHtml(invite.email)}</td><td><span class="role-badge role-${String(invite.role || 'Staff').toLowerCase()}">${escapeHtml(invite.role || 'Staff')}</span></td><td>${formatDate(invite.createdAtUtc || invite.createdAt)}</td><td>${formatDate(invite.expiresAtUtc || invite.expiresAt)}</td><td class="table-actions"><button type="button" class="btn btn-danger btn-small revoke-invite-btn">Revoke</button></td>`;
       row.querySelector('.revoke-invite-btn').addEventListener('click', async () => {
         const confirmed = await showConfirm(`Revoke the invitation for ${invite.email}?`, { confirmText: 'Revoke Invite' });
         if (!confirmed) return;
