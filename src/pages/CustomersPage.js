@@ -42,6 +42,8 @@ class CustomersPage {
         this.customersList = document.getElementById('customers-list');
         this.customersEmpty = document.getElementById('customers-empty');
         this.customersLoading = document.getElementById('customers-loading');
+    this.searchInput = document.getElementById('customers-search');
+        this.searchTimer = null;
     }
 
     bindEvents() {
@@ -68,13 +70,14 @@ class CustomersPage {
             return;
         }
 
+        this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadCustomers(this.searchInput.value || null),300); });
         await this.loadCustomers();
     }
 
-    async loadCustomers() {
+    async loadCustomers(search = null) {
         this.showLoading(true);
         try {
-            const customersData = await customerService.getAllCustomers();
+            const customersData = await customerService.getAllCustomers(search);
             setCustomers(customersData || []);
             this.renderCustomers();
         } catch (error) {
