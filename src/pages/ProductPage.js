@@ -42,6 +42,8 @@ class ProductsPage {
     this.productsList = document.getElementById('products-list');
     this.productsEmpty = document.getElementById('products-empty');
     this.productsLoading = document.getElementById('products-loading');
+    this.searchInput = document.getElementById('product-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -68,6 +70,7 @@ class ProductsPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadProducts(this.searchInput.value || null),300); });
     await Promise.all([
       this.loadCategories(),
       this.loadSuppliers(),
@@ -111,10 +114,10 @@ class ProductsPage {
     });
   }
 
-  async loadProducts() {
+  async loadProducts(search = null) {
     this.showLoading(true);
     try {
-      const products = await productService.getAll();
+      const products = await productService.getAll(search);
       setProducts(products);
       this.renderProducts();
     } catch (error) {
