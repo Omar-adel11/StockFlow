@@ -134,7 +134,8 @@ export class SalesOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       salesOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-        productOptions += `<option value="${p.id}" data-price="${p.unitPrice ?? 0}" ${isSelected}>${p.name} (${p.sku || ''})</option>`;
+       const cost = p.unitSellingPrice ?? p.unitPrice ?? 0;
+productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
       const qty = parseInt(item.quantitySold, 10) || 0;
@@ -167,20 +168,25 @@ export class SalesOrdersPage {
   }
 
   handleLineItemChange(e) {
-    const target = e.target;
-    if (target.classList.contains('so-item-product')) {
-      const id = parseFloat(target.getAttribute('data-id'));
-      const productId = target.value;
-      const selectedOption = target.options[target.selectedIndex];
-      const defaultPrice = selectedOption?.getAttribute('data-price') || 0;
+  const target = e.target;
+  if (target.classList.contains('so-item-product')) {
+    const id = parseFloat(target.getAttribute('data-id'));
+    const productId = target.value;
+    const selectedOption = target.options[target.selectedIndex];
+    const defaultPrice = selectedOption?.getAttribute('data-cost') || 0;
 
-      updateLineItem(id, {
-        productId,
-        billedUnitPrice: defaultPrice
-      });
-      this.renderLineItems();
-    }
+    updateLineItem(id, {
+      productId,
+      billedUnitPrice: defaultPrice
+    });
+
+    const row = target.closest('tr');
+    const priceInput = row?.querySelector('.so-item-price');
+    if (priceInput) priceInput.value = defaultPrice;
+
+    this.updateRowSubtotal(target);
   }
+}
 
   handleLineItemInput(e) {
     const target = e.target;

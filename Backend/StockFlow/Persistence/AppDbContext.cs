@@ -64,7 +64,9 @@ namespace Persistence
 
                 var isActiveProperty = clrType.GetProperty("IsActive");
                 bool hasIsActive = isActiveProperty != null &&
-                                   isActiveProperty.PropertyType == typeof(bool);
+                                   isActiveProperty.PropertyType == typeof(bool) &&
+                   !isActiveProperty.IsDefined(typeof(System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute), true) &&
+                   entityType.FindProperty("IsActive") != null; // <--- Ensures EF Core actually mapped this property to the DB;
 
                 if (hasBusinessId || hasIsActive)
                 {

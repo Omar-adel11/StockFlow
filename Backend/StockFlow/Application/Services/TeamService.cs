@@ -130,11 +130,15 @@ namespace Application.Services
 
         public async Task<UserDTO> AcceptInviteAsync(AcceptInviteRequest acceptInviteDTO)
         {
-        // 1. Fetch & Validate Invitation
-        var invite = await _dbContext.TeamInvitations
+            // 1. Fetch & Validate Invitation
+
+            
+            var invite = await _dbContext.TeamInvitations.IgnoreQueryFilters()
             .FirstOrDefaultAsync(ti => ti.Token == acceptInviteDTO.Token);
 
-        if (invite is null || !invite.IsActive)
+            
+
+            if (invite is null || !invite.IsActive)
         {
             throw new InvalidOperationException("This invitation link is invalid or expired.");
         }

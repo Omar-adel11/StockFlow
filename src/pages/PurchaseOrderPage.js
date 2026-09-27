@@ -134,7 +134,8 @@ export class PurchaseOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       purchaseOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-        productOptions += `<option value="${p.id}" data-cost="${p.unitPrice ?? 0}" ${isSelected}>${p.name} (${p.sku || ''})</option>`;
+        const cost = p.unitSellingPrice ?? p.unitPrice ?? 0;
+productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
       const qty = parseInt(item.quantityOrdered, 10) || 0;
