@@ -22,7 +22,7 @@ export class SalesOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
-    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadOrders(this.searchInput.value || null),300); });
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => this.loadOrders(this.searchInput.value || null), 300); });
     this.init();
   }
 
@@ -98,7 +98,8 @@ export class SalesOrdersPage {
 
       this.populateSelect(this.customerSelect, salesOrderState.customers, 'Select Customer...', (c) => c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || `ID: ${c.id}`);
       this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.name || `ID: ${w.id}`);
-      makeSearchableSelect(this.customerSelect); makeSearchableSelect(this.warehouseSelect);
+      makeSearchableSelect(this.customerSelect);
+      makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -164,7 +165,6 @@ export class SalesOrdersPage {
     });
 
     this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
-
     this.updateTotalDisplay();
   }
 
@@ -191,7 +191,10 @@ export class SalesOrdersPage {
     if (target.classList.contains('so-item-qty')) {
       updateLineItem(id, { quantitySold: target.value });
       this.updateRowSubtotal(target);
-    
+    } else if (target.classList.contains('so-item-price')) {
+      updateLineItem(id, { billedUnitPrice: target.value });
+      this.updateRowSubtotal(target);
+    }
   }
 
   updateRowSubtotal(target) {
@@ -322,7 +325,7 @@ export class SalesOrdersPage {
 
     if (fulfillBtn) {
       const id = fulfillBtn.getAttribute('data-id');
-      if (await showConfirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`, {confirmText:'Fulfill Order'})) {
+      if (await showConfirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`, { confirmText: 'Fulfill Order', danger: false })) {
         try {
           fulfillBtn.disabled = true;
           await salesOrderService.fulfillOrder(id);
@@ -333,7 +336,7 @@ export class SalesOrdersPage {
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (await showConfirm(`Are you sure you want to cancel Sales Order #${id}?`, {confirmText:'Cancel Order'})) {
+      if (await showConfirm(`Are you sure you want to cancel Sales Order #${id}?`, { confirmText: 'Cancel Order' })) {
         try {
           cancelBtn.disabled = true;
           await salesOrderService.cancelOrder(id);
