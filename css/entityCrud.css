@@ -167,3 +167,33 @@
     padding: 24px;
   }
 }
+
+/* Shared entity list cards: four across on desktop. Categories keeps its existing grid. */
+.entity-list-section .entity-grid:not(#categories-list){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.entity-list-section .list-toolbar>input[type="search"]{
+  width:280px;
+  height:42px;
+  padding:0 14px;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:var(--color-white);
+  color:var(--color-text);
+  font-size:.92rem;
+  box-sizing:border-box;
+}
+.entity-list-section .list-toolbar>input[type="search"]:focus{
+  outline:2px solid rgba(39,122,81,.16);
+  border-color:var(--color-primary);
+}
+@media(max-width:1100px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:800px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .entity-list-section .list-toolbar>input[type="search"]{width:100%}
+}
+@media(max-width:520px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr}
+}
