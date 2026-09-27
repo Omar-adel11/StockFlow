@@ -31,8 +31,8 @@ async function init() {
         logoutBtn.addEventListener('click', authService.logout);
     }
 
-    form.addEventListener('submit', handleFormSubmit);
-    cancelBtn.addEventListener('click', resetForm);
+    form?.addEventListener('submit', handleFormSubmit);
+    cancelBtn?.addEventListener('click', resetForm);
 
     searchInput?.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadCategories(searchInput.value || null), 300); });
     await loadCategories();
