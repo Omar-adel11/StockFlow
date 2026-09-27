@@ -75,7 +75,7 @@ class WarehousesPage {
       setWarehouses(warehouses);
       this.renderWarehouses();
     } catch (error) {
-      showNotice('Failed to load warehouses: ' + error.message, 'error', 'error');
+      showNotice('Failed to load warehouses: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -136,7 +136,7 @@ class WarehousesPage {
 
     const validation = validateWarehouseForm(rawFormData);
     if (!validation.isValid) {
-      showNotice(validation.errors.join(' '), 'error', 'error');
+      showNotice(validation.errors.join(' '), 'error');
       return;
     }
 
@@ -160,7 +160,7 @@ class WarehousesPage {
       await this.loadWarehouses();
     } catch (error) {
       console.error('API Error details:', error);
-      showNotice(error.message || 'An error occurred while saving warehouse.', 'error', 'error');
+      showNotice(error.message || 'An error occurred while saving warehouse.', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -193,7 +193,7 @@ class WarehousesPage {
       showNotice('Warehouse deleted successfully.');
       this.renderWarehouses();
     } catch (error) {
-      showNotice('Failed to delete warehouse: ' + error.message, 'error', 'error');
+      showNotice('Failed to delete warehouse: ' + error.message, 'error');
     }
   }
 
