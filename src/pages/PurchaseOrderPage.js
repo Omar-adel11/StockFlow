@@ -1,4 +1,5 @@
 import { purchaseOrderService } from '../services/purchaseOrderService.js';
+import { makeSearchableSelect, refreshSearchableSelect } from '../utils/searchableSelect.js';
 import { productService } from '../services/ProductService.js';
 import { supplierService } from '../services/SupplierService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -146,7 +147,7 @@ export class PurchaseOrdersPage {
           <input type="number" class="form-control po-item-qty" data-id="${item.id}" min="1" value="${item.quantityOrdered}" />
         </td>
         <td>
-          <input type="number" class="form-control po-item-price" data-id="${item.id}" min="0.01" step="0.01" value="${item.agreedUnitPrice || ''}" placeholder="0.00" />
+          <input type="number" class="form-control po-item-price" readonly data-id="${item.id}" min="0.01" step="0.01" value="${item.agreedUnitPrice || ''}" placeholder="0.00" />
         </td>
         <td class="po-item-subtotal-cell">$${subtotal.toFixed(2)}</td>
         <td>
@@ -156,6 +157,8 @@ export class PurchaseOrdersPage {
 
       this.itemsTbody.appendChild(row);
     });
+
+    this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
 
     this.updateTotalDisplay();
   }
@@ -183,7 +186,7 @@ export class PurchaseOrdersPage {
     if (target.classList.contains('po-item-qty')) {
       updateLineItem(id, { quantityOrdered: target.value });
       this.updateRowSubtotal(target);
-    } else if (target.classList.contains('po-item-price')) {
+    } else if (target.classList.contains('po-item-price')) { return;
       updateLineItem(id, { agreedUnitPrice: target.value });
       this.updateRowSubtotal(target);
     }
