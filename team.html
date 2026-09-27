@@ -53,7 +53,7 @@
           <p>Invite teammates and manage their roles within your business.</p>
         </div>
 
-        <button type="button" class="btn btn-primary" data-open-invite>+ Invite Member</button>
+        <a href="addTeamMember.html" class="btn btn-primary">+ Invite Member</a>
       </header>
 
       <main class="admin-main">
@@ -162,40 +162,6 @@
       </main>
     </div>
   </div>
-
-  <!-- ==================== INVITE MODAL ==================== -->
-  <dialog id="invite-modal" class="modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div>
-          <span class="section-label">Team access</span>
-          <h2>Invite a teammate</h2>
-          <p>Send an invitation to a Manager or Staff member.</p>
-        </div>
-        <button type="button" class="modal-close" aria-label="Close">&times;</button>
-      </div>
-
-      <form id="invite-form">
-        <div class="form-group">
-          <label for="invite-email">Email address</label>
-          <input type="email" id="invite-email" name="email" placeholder="teammate@example.com" required />
-        </div>
-
-        <div class="form-group">
-          <label for="invite-role">Role</label>
-          <select id="invite-role" name="role" required>
-            <option value="Staff">Staff</option>
-            <option value="Manager">Manager</option>
-          </select>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">Send Invitation</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
 
   <!-- ==================== ROLE MODAL ==================== -->
   <dialog id="role-modal" class="modal">
