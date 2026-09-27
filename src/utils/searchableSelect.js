@@ -14,16 +14,27 @@ export function makeSearchableSelect(select) {
   menu.className = 'searchable-select-menu';
   menu.setAttribute('role', 'listbox');
 
-  wrapper.append(input, menu);
+  wrapper.append(input);
   select.parentNode.insertBefore(wrapper, select);
+  document.body.appendChild(menu);
   select.classList.add('searchable-select-source');
 
   const options = () => [...select.options].filter(o => o.value !== '');
   const close = () => menu.classList.remove('open');
+  const positionMenu = () => {
+    const rect = input.getBoundingClientRect();
+    menu.style.position = 'fixed';
+    menu.style.left = `${rect.left}px`;
+    menu.style.width = `${rect.width}px`;
+    menu.style.maxWidth = `${rect.width}px`;
+    menu.style.top = `${rect.bottom + 4}px`;
+    menu.style.zIndex = '100000';
+  };
 
   const render = (filter = '') => {
     const normalized = filter.trim().toLowerCase();
     const matches = options().filter(o => !normalized || o.textContent.toLowerCase().includes(normalized));
+    positionMenu();
     menu.innerHTML = '';
 
     if (!matches.length) {
@@ -64,11 +75,13 @@ export function makeSearchableSelect(select) {
 
   input.addEventListener('focus', () => {
     render('');
+    positionMenu();
     menu.classList.add('open');
   });
 
   input.addEventListener('input', () => {
     render(input.value);
+    positionMenu();
     menu.classList.add('open');
   });
 
@@ -77,6 +90,8 @@ export function makeSearchableSelect(select) {
   });
 
   select.addEventListener('change', sync);
+  window.addEventListener('resize', () => { if (menu.classList.contains('open')) positionMenu(); });
+  window.addEventListener('scroll', () => { if (menu.classList.contains('open')) positionMenu(); }, true);
   document.addEventListener('click', e => {
     if (!wrapper.contains(e.target)) close();
   });
