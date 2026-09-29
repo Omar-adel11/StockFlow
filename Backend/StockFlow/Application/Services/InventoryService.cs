@@ -27,29 +27,13 @@ namespace Application.Services
                 i.QuantityOnHand <= (i.Product != null ? i.Product.ReorderLevel : 0)
             );
 
-        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByProductAsync(int productId,bool? lowStock = false)
-        {
-            var query =  InventoryItems
-                .AsNoTracking();
 
-            if (lowStock is not null || lowStock == true )
-            {
-                query = query.Where(i => i.QuantityOnHand <= (i.Product != null ? i.Product.ReorderLevel : 0));
-            }
 
-            var inventoryItem =  await query.Where(i => i.ProductId == productId)
-                .Select(ToInventoryResponse)
-                .ToListAsync();
-
-            return inventoryItem;
-        }
-
-        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>>
-    GetInventoryAsync(
-        int? productId = null,
-        int? warehouseId = null,
-        bool lowStockOnly = false,
-        string? searchTerm = null)
+        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryAsync(
+       int? productId = null,
+       int? warehouseId = null,
+       bool lowStockOnly = false,
+       string? searchTerm = null)
         {
             var query = InventoryItems.Include(i => i.Product)
                 .AsNoTracking();
@@ -83,28 +67,14 @@ namespace Application.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByWarehouseAsync(int warehouseId, bool? lowStock = false)
-        {
-            var query = InventoryItems
-                .AsNoTracking();
-            if(lowStock is not null || lowStock == true)
-            {
-                query = query.Where(i => i.QuantityOnHand <= (i.Product != null ? i.Product.ReorderLevel : 0));
-            }
-                var inventoryItem = await query.Where(i => i.WarehouseId == warehouseId)
-                .Select(ToInventoryResponse)
-                .ToListAsync();
+        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByProductAsync(int productId)
+            => await GetInventoryAsync(productId: productId);
 
-            return inventoryItem;
-        }
+        public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByWarehouseAsync(int warehouseId)
+            => await GetInventoryAsync(warehouseId: warehouseId);
 
         public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryOverviewAsync()
-        {
-            return await InventoryItems
-                .AsNoTracking()
-                .Select(ToInventoryResponse)
-                .ToListAsync();
-        }
+            => await GetInventoryAsync();
 
         public async Task<IReadOnlyCollection<InventoryDtos.LowStockResponse>> GetLowStockItemsAsync()
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Domain.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
 using static Application.DTOs.Dashboarddtos.Dashboarddtos;
 
@@ -29,7 +30,6 @@ namespace Application.Services
             // -------------------------------------------------------------
             var totalProducts = await _dbContext.Products.CountAsync();
 
-            // Products created during current month vs. previous month
             var currentMonthProductsCount = await _dbContext.Products
                 .CountAsync(p => p.CreatedAt >= currentMonthStart);
 
@@ -55,34 +55,40 @@ namespace Application.Services
                 .ToListAsync();
 
             // -------------------------------------------------------------
-            // 3. Orders, Revenue & Growth Calculations
+            // 3. Orders, Revenue & Growth Calculations (FILTERED BY COMPLETED)
             // -------------------------------------------------------------
-            var totalOrders = await _dbContext.SalesOrders.CountAsync();
+            // Base query for valid/completed sales orders only
+            var completedSalesOrders = _dbContext.SalesOrders
+                .Where(so => so.Status == OrderStatus.Completed);
+
+            var totalOrders = await completedSalesOrders.CountAsync();
 
             // Orders placed in current month vs. previous month
-            var currentMonthOrdersCount = await _dbContext.SalesOrders
+            var currentMonthOrdersCount = await completedSalesOrders
                 .CountAsync(so => so.OrderDate >= currentMonthStart);
 
-            var previousMonthOrdersCount = await _dbContext.SalesOrders
+            var previousMonthOrdersCount = await completedSalesOrders
                 .CountAsync(so => so.OrderDate >= previousMonthStart && so.OrderDate < currentMonthStart);
 
             var ordersGrowthPercentage = previousMonthOrdersCount > 0
                 ? (double)((currentMonthOrdersCount - previousMonthOrdersCount) / (double)previousMonthOrdersCount * 100)
                 : (currentMonthOrdersCount > 0 ? 100.0 : 0.0);
 
-            // Revenue calculations
-            var currentMonthSales = await _dbContext.SalesOrders
+            // Revenue calculations (Excludes Cancelled and Pending)
+            var currentMonthSales = await completedSalesOrders
                 .Where(so => so.OrderDate >= currentMonthStart)
                 .SumAsync(so => (decimal?)so.TotalAmount) ?? 0m;
 
-            var previousMonthSales = await _dbContext.SalesOrders
+            var previousMonthSales = await completedSalesOrders
                 .Where(so => so.OrderDate >= previousMonthStart && so.OrderDate < currentMonthStart)
                 .SumAsync(so => (decimal?)so.TotalAmount) ?? 0m;
 
-            var totalRevenue = await _dbContext.SalesOrders
+            var totalRevenue = await completedSalesOrders
                 .SumAsync(so => (decimal?)so.TotalAmount) ?? 0m;
+
             var totalCost = await _dbContext.PurchaseOrders
-                .SumAsync(so => (decimal?)so.TotalAmount) ?? 0m;
+                .Where(po => po.Status == OrderStatus.Completed) // Apply same logic if POs have statuses
+                .SumAsync(po => (decimal?)po.TotalAmount) ?? 0m;
 
             var grossProfit = totalRevenue - totalCost;
 
@@ -91,10 +97,10 @@ namespace Application.Services
                 : (currentMonthSales > 0 ? 100.0 : 0.0);
 
             // -------------------------------------------------------------
-            // 4. Monthly Sales (Last 6 Months)
+            // 4. Monthly Sales (Last 6 Months - FILTERED BY COMPLETED)
             // -------------------------------------------------------------
             var sixMonthsAgo = currentMonthStart.AddMonths(-5);
-            var rawMonthlyData = await _dbContext.SalesOrders
+            var rawMonthlyData = await completedSalesOrders
                 .Where(so => so.OrderDate >= sixMonthsAgo)
                 .GroupBy(so => new { so.OrderDate.Year, so.OrderDate.Month })
                 .Select(g => new
@@ -130,7 +136,7 @@ namespace Application.Services
                 .Take(3)
                 .Select(so => new RecentActivityDto
                 {
-                    Title = "Sales order completed",
+                    Title = $"Sales order {so.Status.ToString().ToLower()}",
                     Subtitle = $"SO-{so.Id}",
                     CreatedAt = so.OrderDate
                 }).ToListAsync();
@@ -171,7 +177,7 @@ namespace Application.Services
             }).ToList();
 
             // -------------------------------------------------------------
-            // Return DTO with Fully Dynamic Values
+            // Return DTO
             // -------------------------------------------------------------
             return new DashboardSummaryDto
             {
