@@ -24,7 +24,8 @@ namespace Application.Services
                 SKU = createRequest.ItemSKU,
                 CategoryId = createRequest.CategoryId,
                 PreferredSupplierId = createRequest?.PreferredSupplierId,
-                UnitPrice = createRequest.UnitSellingPrice,
+                UnitPrice = createRequest.UnitPrice,
+                UnitSellingPrice = createRequest.UnitSellingPrice,
                 ReorderLevel = createRequest.ReorderLevel,
                 IsActive = true,
                 BusinessId = businessId,
@@ -47,16 +48,26 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync()
+        public async Task<IReadOnlyCollection<ProductResponse>>GetAllProductsAsync(string? search)
         {
-            var products = await _productSet.AsNoTracking()
-                                            .Include(p => p.Category)
-                                            .Include(p => p.PreferredSupplier)
-                                            .ToListAsync(); 
+            var query = _productSet.AsNoTracking();
 
-            return products.Select(MapToResponse).ToList();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(p => p.Name.Contains(search) || p.SKU.Contains(search));
+            }
+
+            var products = await query
+                .Include(p => p.Category)
+                .Include(p => p.PreferredSupplier)
+                .ToListAsync();
+
+            return products
+                .Select(MapToResponse)
+                .ToList();
         }
-
         public async Task<ProductResponse?> GetProductByIdAsync(int id)
         {
             var product = await GetProductEntityAsync(id);
@@ -81,7 +92,8 @@ namespace Application.Services
         {
             var product = await GetProductEntityAsync(id);
             product.Name = updateRequest.Name;
-            product.UnitPrice = updateRequest.UnitSellingPrice;
+            product.UnitPrice = updateRequest.UnitPrice;
+            product.UnitSellingPrice = updateRequest.UnitSellingPrice;
             product.ReorderLevel = updateRequest.ReorderLevel;
             product.CategoryId = updateRequest.CategoryId;
             product.PreferredSupplierId = updateRequest.PreferredSupplierId;
@@ -116,6 +128,7 @@ namespace Application.Services
              product.Id,
              product.SKU,
              product.Name,
+             product.UnitSellingPrice,
              product.UnitPrice,
              product.ReorderLevel,
              product.CategoryId,

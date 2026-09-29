@@ -37,16 +37,17 @@ namespace Application.Services
                     soi.Product != null ? soi.Product.Name : string.Empty,
                     soi.Product != null ? soi.Product.SKU : string.Empty,
                     soi.Quantity,
-                    soi.UnitPrice,
-                    soi.Quantity * soi.UnitPrice
+                    soi.UnitSellingPrice,
+                    soi.Quantity * soi.UnitSellingPrice
                 )).ToList()
             );
 
-        public async Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync()
+        public async Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync(int count = 20)
         {
             return await SalesOrders
                 .AsNoTracking()
                 .OrderByDescending(so => so.OrderDate)
+                .Take(count)
                 .Select(ToSalesResponse)
                 .ToListAsync();
         }
@@ -67,17 +68,44 @@ namespace Application.Services
 
         public async Task<SalesResponse> CreateSalesOrderAsync(SalesCreateRequest createRequest, int currentUserId, int businessId)
         {
+            // ------------------------------------------------------------------
+            // 1. Stock Validation Check
+            // ------------------------------------------------------------------
+            var requestedProductIds = createRequest.Items.Select(i => i.ProductId).Distinct().ToList();
+
+            // Query inventory levels for the requested warehouse
+            var availableInventory = await InventoryItems
+                .Where(i => i.WarehouseId == createRequest.WarehouseId && requestedProductIds.Contains(i.ProductId))
+                .ToDictionaryAsync(i => i.ProductId, i => i.QuantityOnHand);
+
+            // Validate that every item exists in inventory and has sufficient stock
+            foreach (var item in createRequest.Items)
+            {
+                if (!availableInventory.TryGetValue(item.ProductId, out var currentStock))
+                {
+                    throw new InvalidOperationException($"Product with ID {item.ProductId} is not stocked in warehouse {createRequest.WarehouseId}.");
+                }
+
+                if (currentStock < item.QuantitySold)
+                {
+                    throw new InvalidOperationException($"Insufficient stock for product ID {item.ProductId}. Requested: {item.QuantitySold}, Available: {currentStock}.");
+                }
+            }
+
+            // ------------------------------------------------------------------
+            // 2. Order Creation
+            // ------------------------------------------------------------------
             string invoiceNumber = $"INV-{DateTime.UtcNow:yyyyMM}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
             var orderItems = createRequest.Items.Select(i => new SalesOrderItem
             {
                 ProductId = i.ProductId,
                 Quantity = i.QuantitySold,
-                UnitPrice = i.BilledUnitPrice,
+                UnitSellingPrice = i.BilledUnitPrice,
                 BusinessId = businessId
             }).ToList();
 
-            decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
+            decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitSellingPrice);
 
             var salesOrder = new SalesOrder
             {

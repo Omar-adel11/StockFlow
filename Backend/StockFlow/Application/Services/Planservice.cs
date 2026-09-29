@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Exceptions.NotFound;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
 {
@@ -11,7 +13,7 @@ namespace Application.Services
     {
         private readonly IPlanRepository _planRepository;
 
-        public PlanService(IPlanRepository planRepository)
+        public PlanService(IPlanRepository planRepository,UserManager<User> userManager)
         {
             _planRepository = planRepository;
         }
@@ -95,6 +97,8 @@ namespace Application.Services
                 .ToList();
         }
 
+       
+
         private static PlanResponseDto MapToResponse(Plan plan)
         {
             return new PlanResponseDto
@@ -108,5 +112,7 @@ namespace Application.Services
                 Features = plan.Features.Select(f => f.Name).ToList()
             };
         }
+
+      
     }
 }

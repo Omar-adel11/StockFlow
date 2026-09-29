@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - StockFlow</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/adminShell.css">
+    <link rel="stylesheet" href="css/dashboardLayout.css">
+    <link rel="stylesheet" href="css/uiEnhancements.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="images/logo.jpg" alt="StockFlow">
+                StockFlow
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html" class="active"><span class="nav-icon">▦</span> Dashboard</a></li>
+                <li><a href="categories.html"><span class="nav-icon">📁</span> Categories</a></li>
+                <li><a href="products.html"><span class="nav-icon">📦</span> Products</a></li>
+                <li><a href="inventory.html"><span class="nav-icon">🏷️</span> Inventory</a></li>
+                <li><a href="warehouses.html"><span class="nav-icon">🏬</span> Warehouses</a></li>
+                <li><a href="suppliers.html"><span class="nav-icon">🤝</span> Suppliers</a></li>
+                <li><a href="customers.html"><span class="nav-icon">👥</span> Customers</a></li>
+                <li><a href="purchase-orders.html"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+                <li><a href="sales-orders.html"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+                <li><a href="team.html"><span class="nav-icon">👤</span> Team Members</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="profile.html">Profile</a>
+                <button type="button" id="logout-btn">Log Out</button>
+            </div>
+        </aside>
+
+        <div class="admin-content">
+            <header class="admin-topbar">
+                <div>
+                    <span class="topbar-eyebrow">Overview</span>
+                    <h1>Dashboard</h1>
+                    <p>Your inventory and order activity at a glance.</p>
+                </div>
+            </header>
+
+            <main class="admin-main dashboard-main">
+                <section class="welcome-card card"><div><span class="section-label">Business Overview</span><h2 id="dashboard-greeting">Good morning.</h2><p id="dashboard-greeting-subtitle">Loading your inventory activity...</p></div><a href="inventory.html" class="btn btn-secondary">View Inventory</a></section>
+                <section class="stats-grid">
+                    <article class="card stat-card"><span>Total Products</span><strong id="total-products">0</strong><small id="products-growth">—</small></article>
+                    <article class="card stat-card"><span>Low Stock Items</span><strong id="low-stock-count">0</strong><small>Needs attention</small></article>
+                    <article class="card stat-card"><span>Total Orders</span><strong id="total-orders">0</strong><small id="orders-growth">—</small></article>
+                    <article class="card stat-card"><span>Total Revenue</span><strong id="total-revenue">$0.00</strong><small id="revenue-growth">—</small></article>
+                    <article class="card stat-card"><span>Gross Profit</span><strong id="gross-profit">$0.00</strong><small>Revenue minus purchase cost</small></article>
+                </section>
+                <section class="dashboard-grid">
+                    <article class="card dashboard-panel"><div class="panel-head"><div><h2>Sales Overview</h2><p>Monthly sales performance</p></div></div><div id="sales-bars" class="chart"></div></article>
+                    <article class="card dashboard-panel"><div class="panel-head"><div><h2>Low Stock Alerts</h2><p>Products below minimum level</p></div><a href="inventory.html">View all</a></div><div id="low-stock-list" class="simple-list"><p class="empty-state">Loading...</p></div></article>
+                </section>
+                <section class="dashboard-grid">
+                    <article class="card dashboard-panel"><div class="panel-head"><div><h2>Recent Activity</h2><p>Latest inventory and order operations</p></div></div><div id="recent-activity-list" class="simple-list"><p class="empty-state">Loading...</p></div></article>
+                    <article class="card dashboard-panel"><div class="panel-head"><div><h2>Inventory by Category</h2><p>Current product distribution</p></div></div><div id="category-list" class="simple-list"><p class="empty-state">Loading...</p></div></article>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="./src/pages/DashboardPage.js"></script>
+  <script type="module" src="./src/utils/roleSidebar.js"></script>
+</body>
+</html>

@@ -19,9 +19,9 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var warehouses = await _serviceManager.WarehouseService.GetAllWarehousesAsync();
+            var warehouses = await _serviceManager.WarehouseService.GetAllWarehousesAsync(search);
             return Ok(warehouses);
         }
 

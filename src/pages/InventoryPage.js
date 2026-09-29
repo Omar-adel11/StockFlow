@@ -91,7 +91,7 @@ export class InventoryPage {
     items.forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
-      option.textContent = item.name || item.productName || `ID: ${item.id}`;
+      option.textContent = item.warehouseName || item.name || item.productName || `ID: ${item.id}`;
       selectElement.appendChild(option);
     });
   }

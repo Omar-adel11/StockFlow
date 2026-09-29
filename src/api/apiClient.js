@@ -63,96 +63,117 @@ async function fetchWithAuth(url, options = {}) {
 }
 
 // Response parsing helper
-// Response parsing helper
+function valueToMessage(value) {
+  if (value == null) return '';
+
+  if (typeof value === 'string') return value.trim();
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .flatMap(item => {
+        const message = valueToMessage(item);
+        return message ? [message] : [];
+      })
+      .filter(Boolean)
+      .join(' | ');
+  }
+
+  if (typeof value === 'object') {
+    // Backend validation shape: { field: "request", errors: ["..."] }
+    if (value.field && value.errors != null) {
+      const message = valueToMessage(value.errors);
+      return message ? `${value.field}: ${message}` : String(value.field);
+    }
+
+    // ASP.NET validation shape: { errors: { Field: ["..."] } }
+    if (value.errors != null) {
+      if (Array.isArray(value.errors)) {
+        return valueToMessage(value.errors);
+      }
+
+      if (typeof value.errors === 'object') {
+        return Object.entries(value.errors)
+          .map(([field, messages]) => {
+            const message = valueToMessage(messages);
+            return message ? `${field}: ${message}` : '';
+          })
+          .filter(Boolean)
+          .join(' | ');
+      }
+    }
+
+    // Prefer explicit human-readable backend messages.
+    for (const key of ['detail', 'message', 'errorMessage', 'ErrorMessage', 'description', 'title', 'error']) {
+      if (value[key] != null) {
+        const message = valueToMessage(value[key]);
+        if (message) return message;
+      }
+    }
+
+    // Some middleware returns an object keyed by indexes (0, 1, ...).
+    const nested = Object.entries(value)
+      .filter(([key]) => !['status', 'statusCode', 'traceId', 'type', 'instance'].includes(key))
+      .map(([, item]) => valueToMessage(item))
+      .filter(Boolean);
+
+    return nested.join(' | ');
+  }
+
+  return String(value);
+}
+
+function fallbackStatusMessage(status) {
+  switch (status) {
+    case 400: return 'The request could not be processed. Please check the entered data.';
+    case 401: return 'Your session has expired or you are not authenticated. Please log in again.';
+    case 403: return 'You do not have permission to perform this action.';
+    case 404: return 'The requested resource was not found.';
+    case 409: return 'This operation conflicts with the current data.';
+    case 422: return 'The submitted data is invalid. Please check the entered values.';
+    case 500: return 'A server error occurred. Please try again later.';
+    default: return 'The request could not be completed. Please try again.';
+  }
+}
+
+export function getReadableErrorMessage(errorData, status = 0) {
+  const message = valueToMessage(errorData);
+  return message || fallbackStatusMessage(status);
+}
+
 async function handleResponse(response) {
   if (response.ok) {
     if (response.status === 204) return null;
-    return await response.json();
+
+    const text = await response.text();
+    if (!text.trim()) return null;
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
   }
 
-  let errorMessage = `HTTP ${response.status} Error`;
+  let errorData = null;
 
   try {
-    const errorData = await response.json();
-
-    if (errorData) {
-      const extractedMessages = [];
-
-      // Helper function to extract text strings from any nested error structure
-      const extractMessage = (err) => {
-        if (!err) return null;
-        if (typeof err === 'string') return err;
-        if (typeof err === 'object') {
-          return err.description || err.errorMessage || err.message || err.title || JSON.stringify(err);
-        }
-        return String(err);
-      };
-
-      // 1. Handle ASP.NET Core Validation Problem Details (errors dictionary)
-      if (errorData.errors && typeof errorData.errors === 'object') {
-        for (const key in errorData.errors) {
-          const fieldErrors = errorData.errors[key];
-          if (Array.isArray(fieldErrors)) {
-            fieldErrors.forEach((err) => {
-              const msg = extractMessage(err);
-              if (msg) extractedMessages.push(`${key}: ${msg}`);
-            });
-          } else {
-            const msg = extractMessage(fieldErrors);
-            if (msg) extractedMessages.push(`${key}: ${msg}`);
-          }
-        }
-      } 
-      // 2. Handle Identity Error Arrays: [{ code: "...", description: "..." }]
-      else if (Array.isArray(errorData)) {
-        errorData.forEach((err) => {
-          const msg = extractMessage(err);
-          if (msg) extractedMessages.push(msg);
-        });
-      } 
-      // 3. Handle standard Error Responses: { title: "...", detail: "..." }
-      else if (errorData.title || errorData.message || errorData.detail) {
-        extractedMessages.push(errorData.detail || errorData.message || errorData.title);
-      }
-
-      if (extractedMessages.length > 0) {
-        errorMessage = extractedMessages.join(' | ');
+    const text = await response.text();
+    if (text.trim()) {
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = text;
       }
     }
-  } catch (e) {
-    // Response payload was not valid JSON
+  } catch {
+    // Keep the friendly status fallback below.
   }
 
-  throw new Error(errorMessage);
-}
-function extractErrorMessage(errorData) {
-    if (!errorData) return 'An error occurred while making the request';
-    if (typeof errorData === 'string') return errorData;
-
-    if (typeof errorData === 'object') {
-        // If ASP.NET Core returns standard model validation errors dictionary
-        if (errorData.errors && typeof errorData.errors === 'object') {
-            const fieldErrors = Object.entries(errorData.errors)
-                .map(([field, msgs]) => {
-                    const cleanField = field.replace(/^addresses\[\d+\]\./i, '').replace(/^addresses\./i, '');
-                    const messageString = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
-                    return `${cleanField}: ${messageString}`;
-                })
-                .join(' | ');
-
-            if (fieldErrors) return fieldErrors;
-        }
-
-        // Fallback checks for common response properties
-        return errorData.detail || 
-               errorData.ErrorMessage || 
-               errorData.message || 
-               errorData.errorMessage || 
-               errorData.title || 
-               JSON.stringify(errorData);
-    }
-
-    return String(errorData);
+  throw new Error(getReadableErrorMessage(errorData, response.status));
 }
 // --- Exported HTTP Methods ---
 

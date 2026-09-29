@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { supplierService } from '../services/SupplierService.js';
 import { validateSupplierForm, buildSupplierPayload } from '../validation/supplierValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -35,18 +36,20 @@ class SuppliersPage {
     this.suppliersList = document.getElementById('suppliers-list');
     this.suppliersEmpty = document.getElementById('suppliers-empty');
     this.suppliersLoading = document.getElementById('suppliers-loading');
+    this.searchInput = document.getElementById('supplier-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
     if (this.logoutBtn) {
       this.logoutBtn.addEventListener('click', () => {
         clearSession();
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       });
     }
 
     if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
     if (this.cancelBtn) {
@@ -61,17 +64,18 @@ class SuppliersPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadSuppliers(this.searchInput.value || null),300); });
     await this.loadSuppliers();
   }
 
-  async loadSuppliers() {
+  async loadSuppliers(search = null) {
     this.showLoading(true);
     try {
-      const suppliers = await supplierService.getAll();
+      const suppliers = await supplierService.getAll(search);
       setSuppliers(suppliers);
       this.renderSuppliers();
     } catch (error) {
-      this.setStatus('Failed to load suppliers: ' + error.message, 'error');
+      showNotice('Failed to load suppliers: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -114,7 +118,7 @@ class SuppliersPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(supplier));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addSupplier.html?id=${supplier.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteSupplier(supplier.id));
 
       this.suppliersList.appendChild(card);
@@ -135,7 +139,7 @@ class SuppliersPage {
 
     const validation = validateSupplierForm(rawFormData);
     if (!validation.isValid) {
-      this.setStatus(validation.errors.join(' '), 'error');
+      showNotice(validation.errors.join(' '), 'error');
       return;
     }
 
@@ -158,7 +162,7 @@ class SuppliersPage {
       await this.loadSuppliers();
     } catch (error) {
       console.error('API Error details:', error);
-      this.setStatus(error.message || 'An error occurred while saving supplier.', 'error');
+      showNotice(error.message || 'An error occurred while saving supplier.', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -180,15 +184,15 @@ class SuppliersPage {
   }
 
   async deleteSupplier(id) {
-    if (!confirm('Are you sure you want to delete this supplier?')) return;
+    if (!await showConfirm('Are you sure you want to delete this supplier?')) return;
 
     try {
       await supplierService.delete(id);
       removeSupplierFromState(id);
-      this.setStatus('Supplier deleted successfully.', 'success');
+      showNotice('Supplier deleted successfully.');
       this.renderSuppliers();
     } catch (error) {
-      this.setStatus('Failed to delete supplier: ' + error.message, 'error');
+      showNotice('Failed to delete supplier: ' + error.message, 'error');
     }
   }
 

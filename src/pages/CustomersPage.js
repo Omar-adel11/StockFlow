@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import * as customerService from '../services/CustomerService.js';
 import { validateCustomerForm, buildCustomerPayload } from '../validation/customerValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -42,18 +43,20 @@ class CustomersPage {
         this.customersList = document.getElementById('customers-list');
         this.customersEmpty = document.getElementById('customers-empty');
         this.customersLoading = document.getElementById('customers-loading');
+    this.searchInput = document.getElementById('customers-search');
+        this.searchTimer = null;
     }
 
     bindEvents() {
         if (this.logoutBtn) {
             this.logoutBtn.addEventListener('click', () => {
                 clearSession();
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
         }
 
         if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
         }
 
         if (this.cancelBtn) {
@@ -68,17 +71,18 @@ class CustomersPage {
             return;
         }
 
+        this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadCustomers(this.searchInput.value || null),300); });
         await this.loadCustomers();
     }
 
-    async loadCustomers() {
+    async loadCustomers(search = null) {
         this.showLoading(true);
         try {
-            const customersData = await customerService.getAllCustomers();
+            const customersData = await customerService.getAllCustomers(search);
             setCustomers(customersData || []);
             this.renderCustomers();
         } catch (error) {
-            this.setStatus('Failed to load customers: ' + error.message, 'error');
+            showNotice('Failed to load customers: ' + error.message, 'error');
         } finally {
             this.showLoading(false);
         }
@@ -100,12 +104,24 @@ class CustomersPage {
             card.className = 'card entity-card';
             
             // Extract primary/first address from the addresses array
-            const addr = (customer.addresses && customer.addresses.length > 0) 
-                ? customer.addresses[0] 
-                : (customer.address || {});
+            const addresses = customer.addresses || customer.Addresses || [];
+const addr = addresses.find(a => a.isDefault ?? a.IsDefault) ||
+    addresses.find(a => a.IsDefault) ||
+    addresses[0] ||
+    customer.address ||
+    customer.Address ||
+    customer.defaultAddress ||
+    customer.DefaultAddress ||
+    {};
 
-            const zip = addr.zipCode || addr.postalCode || '';
-            const addressString = [addr.street, addr.city, addr.state, zip, addr.country]
+            const zip = addr.zipCode || addr.ZipCode || addr.postalCode || addr.PostalCode || '';
+            const addressString = [
+    addr.street || addr.Street,
+    addr.city || addr.City,
+    addr.state || addr.State,
+    zip,
+    addr.country || addr.Country
+]
                 .filter(Boolean)
                 .join(', ') || 'No address specified';
 
@@ -124,7 +140,7 @@ class CustomersPage {
                 </div>
             `;
 
-            card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(customer));
+            card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addCustomer.html?id=${customer.id}`; });
             card.querySelector('.delete-btn').addEventListener('click', () => this.deleteCustomer(customer.id));
 
             this.customersList.appendChild(card);
@@ -148,7 +164,7 @@ class CustomersPage {
 
     const validation = validateCustomerForm(rawFormData);
     if (!validation.isValid) {
-        this.setStatus(validation.errors.join(' '), 'error');
+        showNotice(validation.errors.join(' '), 'error');
         return;
     }
 
@@ -179,15 +195,15 @@ class CustomersPage {
                 const cleanField = field.replace(/^addresses\[\d+\]\./i, '').replace(/^addresses\./i, '');
                 messages.push(`${cleanField}: ${Array.isArray(errList) ? errList.join(', ') : errList}`);
             }
-            this.setStatus(`Validation Failed: ${messages.join(' | ')}`, 'error');
+            showNotice(`Validation Failed: ${messages.join(' | ')}`, 'error');
         } 
         // 2. Check for detail string in ProblemDetails
         else if (error.data && error.data.detail) {
-            this.setStatus(`Error: ${error.data.detail}`, 'error');
+            showNotice(`Error: ${error.data.detail}`, 'error');
         } 
         // 3. Fallback to error message
         else {
-            this.setStatus(error.message || 'Validation Error occurred on server.', 'error');
+            showNotice(error.message || 'Validation Error occurred on server.', 'error');
         }
     } finally {
         this.submitBtn.disabled = false;
@@ -218,15 +234,15 @@ class CustomersPage {
     }
 
     async deleteCustomer(id) {
-        if (!confirm('Are you sure you want to delete this customer?')) return;
+        if (!await showConfirm('Are you sure you want to delete this customer?')) return;
 
         try {
             await customerService.deleteCustomer(id);
             removeCustomerFromState(id);
-            this.setStatus('Customer deleted successfully.', 'success');
+            showNotice('Customer deleted successfully.');
             this.renderCustomers();
         } catch (error) {
-            this.setStatus('Failed to delete customer: ' + error.message, 'error');
+            showNotice('Failed to delete customer: ' + error.message, 'error');
         }
     }
 

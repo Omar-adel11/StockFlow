@@ -31,6 +31,9 @@ namespace Application
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<ITeamService, TeamService>();
             services.AddScoped<ISaaSAdminService, SaaSAdminService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IBusinessService, BusinessService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             services.AddHttpContextAccessor();
 

@@ -10,7 +10,7 @@ namespace Application.Interfaces
 {
     public interface ICustomerService
     {
-        Task<IReadOnlyCollection<CustomerResponse>> GetAllCustomersAsync();
+        Task<IReadOnlyCollection<CustomerResponse>> GetAllCustomersAsync(string? search);
         Task<CustomerResponse?> GetCustomerAsync(int id);
         Task<CustomerResponse> CreateCustomerAsync(CustomerCreateRequest createRequest, int businessId);
         Task<CustomerResponse?> UpdateCustomerAsync(int id, CustomerUpdateRequest updateRequest);

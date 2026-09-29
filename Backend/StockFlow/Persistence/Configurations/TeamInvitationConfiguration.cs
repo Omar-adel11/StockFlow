@@ -41,6 +41,7 @@ namespace Persistence.Configurations
             // Ignore calculated property so EF Core doesn't attempt to map it as a database column
             builder.Ignore(ti => ti.IsActive);
 
+
             builder.HasIndex(e => e.BusinessId);
         }
     }

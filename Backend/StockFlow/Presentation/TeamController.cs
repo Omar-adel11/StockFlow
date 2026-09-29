@@ -61,7 +61,7 @@ namespace WebApi.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> GetPendingInvites()
         {
-            var businessId = int.Parse(User.FindFirstValue("business_id")!);
+            var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
             var invites = await _teamService.GetPendingInvitesAsync(businessId);
             return Ok(invites);
         }
@@ -70,17 +70,17 @@ namespace WebApi.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
         public async Task<IActionResult> CancelInvite(int id)
         {
-            var businessId = int.Parse(User.FindFirstValue("business_id")!);
+            var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
             await _teamService.CancelInviteAsync(id, businessId);
             return Ok(new { message = "Invitation revoked successfully." });
         }
 
         [HttpGet("members")]
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager}")]
-        public async Task<IActionResult> GetTeamMembers()
+        public async Task<IActionResult> GetTeamMembers([FromQuery] string? search)
         {
             var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
-            var members = await _teamService.GetTeamMembersAsync(businessId);
+            var members = await _teamService.GetTeamMembersAsync(businessId, search);
             return Ok(members);
         }
 

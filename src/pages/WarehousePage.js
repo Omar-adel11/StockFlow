@@ -1,3 +1,4 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { warehouseService } from '../services/WarehouseService.js';
 import { validateWarehouseForm, buildWarehousePayload } from '../validation/warehouseValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
@@ -35,18 +36,20 @@ class WarehousesPage {
     this.warehousesList = document.getElementById('warehouses-list');
     this.warehousesEmpty = document.getElementById('warehouses-empty');
     this.warehousesLoading = document.getElementById('warehouses-loading');
+    this.searchInput = document.getElementById('warehouse-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
     if (this.logoutBtn) {
       this.logoutBtn.addEventListener('click', () => {
         clearSession();
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       });
     }
 
     if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
     if (this.cancelBtn) {
@@ -61,17 +64,18 @@ class WarehousesPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadWarehouses(this.searchInput.value || null),300); });
     await this.loadWarehouses();
   }
 
-  async loadWarehouses() {
+  async loadWarehouses(search = null) {
     this.showLoading(true);
     try {
-      const warehouses = await warehouseService.getAll();
+      const warehouses = await warehouseService.getAll(search);
       setWarehouses(warehouses);
       this.renderWarehouses();
     } catch (error) {
-      this.setStatus('Failed to load warehouses: ' + error.message, 'error');
+      showNotice('Failed to load warehouses: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -113,7 +117,7 @@ class WarehousesPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(warehouse));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addWarehouse.html?id=${warehouse.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteWarehouse(warehouse.id));
 
       this.warehousesList.appendChild(card);
@@ -132,7 +136,7 @@ class WarehousesPage {
 
     const validation = validateWarehouseForm(rawFormData);
     if (!validation.isValid) {
-      this.setStatus(validation.errors.join(' '), 'error');
+      showNotice(validation.errors.join(' '), 'error');
       return;
     }
 
@@ -156,7 +160,7 @@ class WarehousesPage {
       await this.loadWarehouses();
     } catch (error) {
       console.error('API Error details:', error);
-      this.setStatus(error.message || 'An error occurred while saving warehouse.', 'error');
+      showNotice(error.message || 'An error occurred while saving warehouse.', 'error');
     } finally {
       this.submitBtn.disabled = false;
     }
@@ -181,15 +185,15 @@ class WarehousesPage {
   }
 
   async deleteWarehouse(id) {
-    if (!confirm('Are you sure you want to delete this warehouse?')) return;
+    if (!await showConfirm('Are you sure you want to delete this warehouse?')) return;
 
     try {
       await warehouseService.delete(id);
       removeWarehouseFromState(id);
-      this.setStatus('Warehouse deleted successfully.', 'success');
+      showNotice('Warehouse deleted successfully.');
       this.renderWarehouses();
     } catch (error) {
-      this.setStatus('Failed to delete warehouse: ' + error.message, 'error');
+      showNotice('Failed to delete warehouse: ' + error.message, 'error');
     }
   }
 

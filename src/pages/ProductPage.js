@@ -1,3 +1,5 @@
+import { showConfirm, showNotice } from '../utils/ui.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
 import { productService } from '../services/ProductService.js';
 import { getAllCategories } from '../services/categoryService.js';
 import { supplierService } from '../services/SupplierService.js';
@@ -42,18 +44,20 @@ class ProductsPage {
     this.productsList = document.getElementById('products-list');
     this.productsEmpty = document.getElementById('products-empty');
     this.productsLoading = document.getElementById('products-loading');
+    this.searchInput = document.getElementById('product-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
     if (this.logoutBtn) {
       this.logoutBtn.addEventListener('click', () => {
         clearSession();
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
       });
     }
 
     if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
     if (this.cancelBtn) {
@@ -68,6 +72,7 @@ class ProductsPage {
       return;
     }
 
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer=setTimeout(()=>this.loadProducts(this.searchInput.value || null),300); });
     await Promise.all([
       this.loadCategories(),
       this.loadSuppliers(),
@@ -80,6 +85,7 @@ class ProductsPage {
       const categories = await getAllCategories();
       setCategories(categories);
       this.populateSelect(this.categorySelect, categories, 'Select Category', false);
+      makeSearchableSelect(this.categorySelect);
     } catch (error) {
       console.error('Failed to load categories:', error);
       this.categorySelect.innerHTML = '<option value="">Failed to load categories</option>';
@@ -91,6 +97,7 @@ class ProductsPage {
       const suppliers = await supplierService.getAll();
       setSuppliers(suppliers);
       this.populateSelect(this.supplierSelect, suppliers, 'None', true);
+      makeSearchableSelect(this.supplierSelect);
     } catch (error) {
       console.error('Failed to load suppliers:', error);
       this.supplierSelect.innerHTML = '<option value="">None</option>';
@@ -111,14 +118,14 @@ class ProductsPage {
     });
   }
 
-  async loadProducts() {
+  async loadProducts(search = null) {
     this.showLoading(true);
     try {
-      const products = await productService.getAll();
+      const products = await productService.getAll(search);
       setProducts(products);
       this.renderProducts();
     } catch (error) {
-      this.setStatus('Failed to load products: ' + error.message, 'error');
+      showNotice('Failed to load products: ' + error.message, 'error');
     } finally {
       this.showLoading(false);
     }
@@ -143,9 +150,10 @@ class ProductsPage {
       const categoryName = product.categoryName || product.category?.name || 'Uncategorized';
       const supplierName = product.preferredSupplierName || product.preferredSupplier?.name || 'None';
       
-      // Read price using unitSellingPrice / UnitSellingPrice / unitPrice
-      const rawPrice = product.unitSellingPrice ?? product.UnitSellingPrice ?? product.unitPrice;
-      const formattedPrice = typeof rawPrice === 'number' ? `$${rawPrice.toFixed(2)}` : '$0.00';
+      const rawUnitPrice = product.unitPrice ?? product.UnitPrice ?? 0;
+      const rawSellingPrice = product.unitSellingPrice ?? product.UnitSellingPrice ?? 0;
+      const formattedUnitPrice = Number(rawUnitPrice).toFixed(2);
+      const formattedSellingPrice = Number(rawSellingPrice).toFixed(2);
 
       card.innerHTML = `
         <div class="entity-card-header">
@@ -158,7 +166,8 @@ class ProductsPage {
           <p><strong>SKU:</strong> ${this.escapeHtml(skuVal)}</p>
           <p><strong>Category:</strong> ${this.escapeHtml(categoryName)}</p>
           <p><strong>Preferred Supplier:</strong> ${this.escapeHtml(supplierName)}</p>
-          <p><strong>Selling Price:</strong> ${formattedPrice}</p>
+          <p><strong>Unit Price:</strong> ${formattedUnitPrice}</p>
+          <p><strong>Selling Price:</strong> ${formattedSellingPrice}</p>
           <p><strong>Reorder Level:</strong> ${product.reorderLevel ?? 0}</p>
         </div>
         <div class="entity-card-actions">
@@ -167,7 +176,7 @@ class ProductsPage {
         </div>
       `;
 
-      card.querySelector('.edit-btn').addEventListener('click', () => this.startEdit(product));
+      card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addProduct.html?id=${product.id}`; });
       card.querySelector('.delete-btn').addEventListener('click', () => this.deleteProduct(product.id));
 
       this.productsList.appendChild(card);
@@ -191,7 +200,7 @@ class ProductsPage {
 
   const validation = validateProductForm(rawFormData);
   if (!validation.isValid) {
-    this.setStatus(validation.errors.join(' '), 'error');
+    showNotice(validation.errors.join(' '), 'error');
     return;
   }
 
@@ -215,7 +224,7 @@ class ProductsPage {
     await this.loadProducts();
   } catch (error) {
     console.error('API Error details:', error);
-    this.setStatus(error.message || 'An error occurred while saving product.', 'error');
+    showNotice(error.message || 'An error occurred while saving product.', 'error');
   } finally {
     this.submitBtn.disabled = false;
   }
@@ -241,15 +250,15 @@ class ProductsPage {
   }
 
   async deleteProduct(id) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!await showConfirm('Are you sure you want to delete this product?')) return;
 
     try {
       await productService.delete(id);
       removeProductFromState(id);
-      this.setStatus('Product deleted successfully.', 'success');
+      showNotice('Product deleted successfully.');
       this.renderProducts();
     } catch (error) {
-      this.setStatus('Failed to delete product: ' + error.message, 'error');
+      showNotice('Failed to delete product: ' + error.message, 'error');
     }
   }
 

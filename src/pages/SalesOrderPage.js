@@ -1,4 +1,6 @@
 import { salesOrderService } from '../services/salesOrderService.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { productService } from '../services/ProductService.js';
 import { customerService } from '../services/CustomerService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -20,6 +22,7 @@ export class SalesOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => this.loadOrders(this.searchInput.value || null), 300); });
     this.init();
   }
 
@@ -36,6 +39,8 @@ export class SalesOrdersPage {
     this.ordersList = document.getElementById('sales-orders-list');
     this.ordersEmpty = document.getElementById('sales-orders-empty');
     this.ordersLoading = document.getElementById('sales-orders-loading');
+    this.searchInput = document.getElementById('sales-order-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -69,10 +74,8 @@ export class SalesOrdersPage {
   }
 
   async init() {
-    await Promise.all([
-      this.loadDropdownData(),
-      this.loadOrders()
-    ]);
+    await this.loadDropdownData();
+    if (this.ordersList) await this.loadOrders();
   }
 
   async loadDropdownData() {
@@ -92,7 +95,9 @@ export class SalesOrdersPage {
       setProducts(products);
 
       this.populateSelect(this.customerSelect, salesOrderState.customers, 'Select Customer...', (c) => c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || `ID: ${c.id}`);
-      this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.name || `ID: ${w.id}`);
+      this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.warehouseName || w.WarehouseName || w.name || w.Name || `ID: ${w.id}`);
+      makeSearchableSelect(this.customerSelect);
+      makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
@@ -129,7 +134,8 @@ export class SalesOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       salesOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-        productOptions += `<option value="${p.id}" data-price="${p.unitPrice || p.price || 0}" ${isSelected}>${p.name} (${p.sku || ''})</option>`;
+       const cost = p.unitSellingPrice ?? p.UnitSellingPrice ?? p.unitPrice ?? p.UnitPrice ?? 0;
+productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
       const qty = parseInt(item.quantitySold, 10) || 0;
@@ -146,7 +152,7 @@ export class SalesOrdersPage {
           <input type="number" class="form-control so-item-qty" data-id="${item.id}" min="1" value="${item.quantitySold}" />
         </td>
         <td>
-          <input type="number" class="form-control so-item-price" data-id="${item.id}" min="0.01" step="0.01" value="${item.billedUnitPrice || ''}" placeholder="0.00" />
+          <input type="number" class="form-control so-item-price" readonly data-id="${item.id}" min="0.01" step="0.01" value="${item.billedUnitPrice || ''}" placeholder="0.00" />
         </td>
         <td class="so-item-subtotal-cell">$${subtotal.toFixed(2)}</td>
         <td>
@@ -157,24 +163,30 @@ export class SalesOrdersPage {
       this.itemsTbody.appendChild(row);
     });
 
+    this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
     this.updateTotalDisplay();
   }
 
   handleLineItemChange(e) {
-    const target = e.target;
-    if (target.classList.contains('so-item-product')) {
-      const id = parseFloat(target.getAttribute('data-id'));
-      const productId = target.value;
-      const selectedOption = target.options[target.selectedIndex];
-      const defaultPrice = selectedOption?.getAttribute('data-price') || 0;
+  const target = e.target;
+  if (target.classList.contains('so-item-product')) {
+    const id = parseFloat(target.getAttribute('data-id'));
+    const productId = target.value;
+    const selectedOption = target.options[target.selectedIndex];
+    const defaultPrice = selectedOption?.getAttribute('data-cost') || 0;
 
-      updateLineItem(id, {
-        productId,
-        billedUnitPrice: defaultPrice
-      });
-      this.renderLineItems();
-    }
+    updateLineItem(id, {
+      productId,
+      billedUnitPrice: defaultPrice
+    });
+
+    const row = target.closest('tr');
+    const priceInput = row?.querySelector('.so-item-price');
+    if (priceInput) priceInput.value = defaultPrice;
+
+    this.updateRowSubtotal(target);
   }
+}
 
   handleLineItemInput(e) {
     const target = e.target;
@@ -214,12 +226,12 @@ export class SalesOrdersPage {
     }
   }
 
-  async loadOrders() {
+  async loadOrders(search = null) {
     if (this.ordersLoading) this.ordersLoading.hidden = false;
     if (this.ordersEmpty) this.ordersEmpty.hidden = true;
 
     try {
-      const data = await salesOrderService.getAll();
+      const data = await salesOrderService.getAll(search);
       setOrders(Array.isArray(data) ? data : (data.items || []));
       this.renderOrdersList();
     } catch (err) {
@@ -234,6 +246,7 @@ export class SalesOrdersPage {
   }
 
   renderOrdersList() {
+    if (!this.ordersList) return;
     this.ordersList.innerHTML = '';
 
     if (!salesOrderState.orders || salesOrderState.orders.length === 0) {
@@ -317,24 +330,24 @@ export class SalesOrdersPage {
 
     if (fulfillBtn) {
       const id = fulfillBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`)) {
+      if (await showConfirm(`Are you sure you want to fulfill Sales Order #${id}? Stock will be deducted.`, { confirmText: 'Fulfill Order', danger: false })) {
         try {
           fulfillBtn.disabled = true;
           await salesOrderService.fulfillOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to fulfill order.');
+          showNotice(err.message || 'Failed to fulfill order.', 'error');
         }
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to cancel Sales Order #${id}?`)) {
+      if (await showConfirm(`Are you sure you want to cancel Sales Order #${id}?`, { confirmText: 'Cancel Order' })) {
         try {
           cancelBtn.disabled = true;
           await salesOrderService.cancelOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to cancel order.');
+          showNotice(err.message || 'Failed to cancel order.', 'error');
         }
       }
     }
@@ -360,7 +373,13 @@ export class SalesOrdersPage {
 
     try {
       if (this.submitBtn) this.submitBtn.disabled = true;
-      await salesOrderService.create(payload);
+      if (this.editingId) {
+        const confirmed = await showConfirm(`Update order #${this.editingId}?`, { confirmText: 'Update Order', danger: false });
+        if (!confirmed) return;
+        await salesOrderService.update(this.editingId, payload);
+      } else {
+        await salesOrderService.create(payload);
+      }
       this.setStatus('Sales order created successfully.', 'success');
 
       this.form.reset();

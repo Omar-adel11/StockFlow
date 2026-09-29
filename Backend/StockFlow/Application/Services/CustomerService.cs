@@ -52,10 +52,17 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<CustomerDtos.CustomerResponse>> GetAllCustomersAsync()
+        public async Task<IReadOnlyCollection<CustomerDtos.CustomerResponse>> GetAllCustomersAsync(string? search)
         {
-            var customers = await CustomerSet
-                .AsNoTracking()
+            var query = CustomerSet.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(c => c.Name.Contains(search) || c.Email.Contains(search));
+            }
+
+            var customers = await query
                 .Include(c => c.Addresses)
                 .ToListAsync();
 

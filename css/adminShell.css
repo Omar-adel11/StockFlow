@@ -16,6 +16,11 @@
 .admin-sidebar {
   width: 240px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   background-color: var(--color-dark);
   color: #b9c9c1;
   display: flex;
@@ -42,7 +47,9 @@
 
 .sidebar-nav {
   list-style: none;
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   padding-top: 8px;
 }
 
@@ -77,6 +84,8 @@
 }
 
 .sidebar-footer {
+  flex-shrink: 0;
+  margin-top: auto;
   padding: 16px 24px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }

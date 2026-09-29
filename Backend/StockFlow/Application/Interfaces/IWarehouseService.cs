@@ -10,7 +10,7 @@ namespace Application.Interfaces
 {
     public interface IWarehouseService
     {
-        Task<IReadOnlyCollection<WarehouseResponse>> GetAllWarehousesAsync();
+        Task<IReadOnlyCollection<WarehouseResponse>> GetAllWarehousesAsync(string? search);
         Task<WarehouseResponse?> GetWarehouseAsync(int id);
         Task<WarehouseResponse> CreateWarehouseAsync(WarehouseCreateRequest createRequest, int businessId);
         Task<WarehouseResponse?> UpdateWarehouseAsync(int id, WarehouseUpdateRequest updateRequest);

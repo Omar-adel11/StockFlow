@@ -1,4 +1,6 @@
 import { purchaseOrderService } from '../services/purchaseOrderService.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 import { productService } from '../services/ProductService.js';
 import { supplierService } from '../services/SupplierService.js';
 import { warehouseService } from '../services/WarehouseService.js';
@@ -20,6 +22,7 @@ export class PurchaseOrdersPage {
   constructor() {
     this.initElements();
     this.bindEvents();
+    this.searchInput?.addEventListener('input', () => { clearTimeout(this.searchTimer); this.searchTimer = setTimeout(() => this.loadOrders(this.searchInput.value || null), 300); });
     this.init();
   }
 
@@ -36,6 +39,8 @@ export class PurchaseOrdersPage {
     this.ordersList = document.getElementById('purchase-orders-list');
     this.ordersEmpty = document.getElementById('purchase-orders-empty');
     this.ordersLoading = document.getElementById('purchase-orders-loading');
+    this.searchInput = document.getElementById('purchase-order-search');
+    this.searchTimer = null;
   }
 
   bindEvents() {
@@ -69,10 +74,8 @@ export class PurchaseOrdersPage {
   }
 
   async init() {
-    await Promise.all([
-      this.loadDropdownData(),
-      this.loadOrders()
-    ]);
+    await this.loadDropdownData();
+    if (this.ordersList) await this.loadOrders();
   }
 
   async loadDropdownData() {
@@ -91,20 +94,22 @@ export class PurchaseOrdersPage {
       setWarehouses(warehouses);
       setProducts(products);
 
-      this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...');
-      this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...');
+      this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...', item => item.name || item.Name || `ID: ${item.id}`);
+      this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...', item => item.warehouseName || item.WarehouseName || item.name || item.Name || `ID: ${item.id}`);
+      makeSearchableSelect(this.supplierSelect);
+      makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
       console.error('Failed to load dropdown options:', err);
     }
   }
 
-  populateSelect(selectElement, items, defaultLabel) {
+  populateSelect(selectElement, items, defaultLabel, labelFormatter) {
     if (!selectElement) return;
     selectElement.innerHTML = `<option value="">${defaultLabel}</option>`;
     items.forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
-      option.textContent = item.name || `ID: ${item.id}`;
+      option.textContent = labelFormatter ? labelFormatter(item) : (item.name || item.Name || `ID: ${item.id}`);
       selectElement.appendChild(option);
     });
   }
@@ -129,7 +134,8 @@ export class PurchaseOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       purchaseOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-        productOptions += `<option value="${p.id}" data-cost="${p.unitPrice || p.costPrice || 0}" ${isSelected}>${p.name} (${p.sku || ''})</option>`;
+        const cost = p.unitPrice ?? p.UnitPrice ?? 0;
+productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
       const qty = parseInt(item.quantityOrdered, 10) || 0;
@@ -146,7 +152,7 @@ export class PurchaseOrdersPage {
           <input type="number" class="form-control po-item-qty" data-id="${item.id}" min="1" value="${item.quantityOrdered}" />
         </td>
         <td>
-          <input type="number" class="form-control po-item-price" data-id="${item.id}" min="0.01" step="0.01" value="${item.agreedUnitPrice || ''}" placeholder="0.00" />
+          <input type="number" class="form-control po-item-price" readonly data-id="${item.id}" min="0.01" step="0.01" value="${item.agreedUnitPrice || ''}" placeholder="0.00" />
         </td>
         <td class="po-item-subtotal-cell">$${subtotal.toFixed(2)}</td>
         <td>
@@ -157,6 +163,7 @@ export class PurchaseOrdersPage {
       this.itemsTbody.appendChild(row);
     });
 
+    this.itemsTbody.querySelectorAll('select').forEach(makeSearchableSelect);
     this.updateTotalDisplay();
   }
 
@@ -214,12 +221,12 @@ export class PurchaseOrdersPage {
     }
   }
 
-  async loadOrders() {
+  async loadOrders(search = null) {
     if (this.ordersLoading) this.ordersLoading.hidden = false;
     if (this.ordersEmpty) this.ordersEmpty.hidden = true;
 
     try {
-      const data = await purchaseOrderService.getAll();
+      const data = await purchaseOrderService.getAll(search);
       setOrders(Array.isArray(data) ? data : (data.items || []));
       this.renderOrdersList();
     } catch (err) {
@@ -234,6 +241,7 @@ export class PurchaseOrdersPage {
   }
 
   renderOrdersList() {
+    if (!this.ordersList) return;
     this.ordersList.innerHTML = '';
 
     if (!purchaseOrderState.orders || purchaseOrderState.orders.length === 0) {
@@ -317,24 +325,24 @@ export class PurchaseOrdersPage {
 
     if (receiveBtn) {
       const id = receiveBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`)) {
+      if (await showConfirm(`Are you sure you want to mark Purchase Order #${id} as received? Stock will be updated.`, { confirmText: 'Receive Order', danger: false })) {
         try {
           receiveBtn.disabled = true;
           await purchaseOrderService.receiveOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to receive order.');
+          showNotice(err.message || 'Failed to receive order.', 'error');
         }
       }
     } else if (cancelBtn) {
       const id = cancelBtn.getAttribute('data-id');
-      if (confirm(`Are you sure you want to cancel Purchase Order #${id}?`)) {
+      if (await showConfirm(`Are you sure you want to cancel Purchase Order #${id}?`, { confirmText: 'Cancel Order' })) {
         try {
           cancelBtn.disabled = true;
           await purchaseOrderService.cancelOrder(id);
           await this.loadOrders();
         } catch (err) {
-          alert(err.message || 'Failed to cancel order.');
+          showNotice(err.message || 'Failed to cancel order.', 'error');
         }
       }
     }
@@ -360,7 +368,13 @@ export class PurchaseOrdersPage {
 
     try {
       if (this.submitBtn) this.submitBtn.disabled = true;
-      await purchaseOrderService.create(payload);
+      if (this.editingId) {
+        const confirmed = await showConfirm(`Update order #${this.editingId}?`, { confirmText: 'Update Order', danger: false });
+        if (!confirmed) return;
+        await purchaseOrderService.update(this.editingId, payload);
+      } else {
+        await purchaseOrderService.create(payload);
+      }
       this.setStatus('Purchase order created successfully.', 'success');
 
       this.form.reset();

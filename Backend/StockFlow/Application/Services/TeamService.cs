@@ -18,6 +18,7 @@ using Domain.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services
 {
@@ -89,7 +90,7 @@ namespace Application.Services
 
             // 5. Send Email with invite URL
             var business = await _dbContext.Business.FindAsync(currentBusinessId);
-            var inviteLink = $"http://localhost:5500/accept-invite?token={token}";
+            var inviteLink = $"http://localhost:5500/accept-invite.html?token={token}";
 
             await _emailService.SendEmailAsync(
                 request.Email,
@@ -129,11 +130,15 @@ namespace Application.Services
 
         public async Task<UserDTO> AcceptInviteAsync(AcceptInviteRequest acceptInviteDTO)
         {
-        // 1. Fetch & Validate Invitation
-        var invite = await _dbContext.TeamInvitations
+            // 1. Fetch & Validate Invitation
+
+            
+            var invite = await _dbContext.TeamInvitations.IgnoreQueryFilters()
             .FirstOrDefaultAsync(ti => ti.Token == acceptInviteDTO.Token);
 
-        if (invite is null || !invite.IsActive)
+            
+
+            if (invite is null || !invite.IsActive)
         {
             throw new InvalidOperationException("This invitation link is invalid or expired.");
         }
@@ -240,23 +245,33 @@ namespace Application.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<TeamMemberDto>> GetTeamMembersAsync(int businessId)
+        public async Task<IEnumerable<TeamMemberDto>> GetTeamMembersAsync(int businessId,string? search)
         {
             // Join Users with UserRoles and Roles to fetch team members scoped to the tenant
-            var members = await (from user in _dbContext.Users
-                                 join userRole in _dbContext.UserRoles on user.Id equals userRole.UserId
-                                 join role in _dbContext.Roles on userRole.RoleId equals role.Id
-                                 where user.BusinessId == businessId
-                                 select new TeamMemberDto
-                                 {
-                                     Id = user.Id,
-                                     Name = user.Name,
-                                     Email = user.Email!,
-                                     Role = role.Name!,
-                                     BusinessId = user.BusinessId ?? 0
-                                 }).ToListAsync();
+            var query =from user in _dbContext.Users
+                       join userRole in _dbContext.UserRoles on user.Id equals userRole.UserId
+                       join role in _dbContext.Roles on userRole.RoleId equals role.Id
+                       where user.BusinessId == businessId
+                       select new TeamMemberDto
+                       {
+                           Id = user.Id,
+                           Name = user.Name,
+                           Email = user.Email!,
+                           Role = role.Name!,
+                           BusinessId = user.BusinessId ?? 0
+                       };
 
-            return members;
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(m =>
+                    m.Name.Contains(search) ||
+                    m.Email.Contains(search) ||
+                    m.Role.Contains(search));
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<TeamMemberDto?> GetMemberByIdAsync(int memberId, int businessId)

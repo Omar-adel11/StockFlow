@@ -167,3 +167,97 @@
     padding: 24px;
   }
 }
+
+/* Shared entity list cards: four across on desktop. Categories keeps its existing grid. */
+.entity-list-section .entity-grid:not(#categories-list){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.entity-list-section .list-toolbar>input[type="search"]{
+  width:280px;
+  height:42px;
+  padding:0 14px;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+  background:var(--color-white);
+  color:var(--color-text);
+  font-size:.92rem;
+  box-sizing:border-box;
+}
+.entity-list-section .list-toolbar>input[type="search"]:focus{
+  outline:2px solid rgba(39,122,81,.16);
+  border-color:var(--color-primary);
+}
+@media(max-width:1100px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:800px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .entity-list-section .list-toolbar>input[type="search"]{width:100%}
+}
+@media(max-width:520px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr}
+}
+
+/* Final list layout: full content width, four cards per row on desktop. */
+.admin-main>.entity-list-section{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+.entity-list-section .entity-grid:not(#categories-list){
+  width:100%;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+.entity-list-section .entity-grid#categories-list{
+  grid-template-columns:repeat(2,minmax(260px,1fr));
+}
+.entity-list-section .list-toolbar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:20px;
+}
+.entity-list-section .list-toolbar>input[type="search"]{
+  display:block!important;
+  width:300px!important;
+  min-width:240px;
+  height:42px!important;
+  padding:0 14px!important;
+  border:1px solid var(--color-border)!important;
+  border-radius:8px!important;
+  background:var(--color-white)!important;
+  color:var(--color-text)!important;
+  font:inherit!important;
+  font-size:.92rem!important;
+  box-sizing:border-box!important;
+  box-shadow:none!important;
+}
+.entity-list-section .list-toolbar>input[type="search"]::placeholder{
+  color:var(--color-text-muted);
+  opacity:1;
+}
+.entity-list-section .list-toolbar>input[type="search"]:focus{
+  outline:2px solid rgba(39,122,81,.15)!important;
+  border-color:var(--color-primary)!important;
+}
+@media(max-width:1100px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:800px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .entity-list-section .list-toolbar{align-items:stretch;flex-direction:column}
+ .entity-list-section .list-toolbar>input[type="search"]{width:100%!important}
+}
+@media(max-width:520px){
+ .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr!important}
+}
+
+/* Entity cards use the same two-column proportions as Categories. */
+.entity-list-section .entity-grid:not(#categories-list){
+  grid-template-columns:repeat(2,minmax(320px,1fr))!important;
+}
+@media(max-width:800px){
+  .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr!important}
+}

@@ -65,6 +65,7 @@ namespace StockFlow.Middlewares
                     NotFoundException or
                     BadRequestException or
                     RegisterationBadRequestException => exception.Message,
+                    InvalidOperationException => exception.Message,
                     _ => "Internal Server Error. Please try again later."
                 }
             };

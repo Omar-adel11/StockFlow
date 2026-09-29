@@ -16,7 +16,7 @@ namespace Application.Interfaces
         Task CancelInviteAsync(int inviteId, int currentBusinessId);
         Task<List<TeamInvitationDto>> GetPendingInvitesAsync(int currentBusinessId);
 
-        Task<IEnumerable<TeamMemberDto>> GetTeamMembersAsync(int businessId);
+        Task<IEnumerable<TeamMemberDto>> GetTeamMembersAsync(int businessId,string? search);
         Task<TeamMemberDto?> GetMemberByIdAsync(int memberId, int businessId);
         Task UpdateMemberRoleAsync(int memberId, string newRole, int businessId);
         Task RemoveMemberAsync(int memberId, int businessId);

@@ -4,6 +4,7 @@ import * as categoryValidation from '../validation/categoryValidation.js';
 import * as categoryState from '../state/categoryState.js';
 import * as authService from '../services/authService.js';
 import { escapeHtml } from '../utils/helpers.js';
+import { showConfirm, showNotice } from '../utils/ui.js';
 
 let editingCategoryId = null;
 
@@ -20,6 +21,8 @@ const categoriesList = document.getElementById('categories-list');
 const categoriesEmpty = document.getElementById('categories-empty');
 const categoriesLoading = document.getElementById('categories-loading');
 const logoutBtn = document.getElementById('logout-btn');
+const searchInput = document.getElementById('category-search');
+let searchTimer;
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -28,24 +31,25 @@ async function init() {
         logoutBtn.addEventListener('click', authService.logout);
     }
 
-    form.addEventListener('submit', handleFormSubmit);
-    cancelBtn.addEventListener('click', resetForm);
+    form?.addEventListener('submit', handleFormSubmit);
+    cancelBtn?.addEventListener('click', resetForm);
 
+    searchInput?.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadCategories(searchInput.value || null), 300); });
     await loadCategories();
 }
 
-async function loadCategories() {
+async function loadCategories(search = null) {
     categoriesLoading.hidden = false;
     categoriesEmpty.hidden = true;
     categoriesList.innerHTML = '';
 
     try {
-        const data = await categoryService.getAllCategories();
+        const data = await categoryService.getAllCategories(search);
         categoryState.setCategories(data || []);
         renderCategories();
     } catch (error) {
         console.error('Failed to fetch categories:', error);
-        formStatus.textContent = 'Failed to load categories. Please try again.';
+        showNotice('Failed to load categories. Please try again.', 'error');
     } finally {
         categoriesLoading.hidden = true;
     }
@@ -76,7 +80,7 @@ function renderCategories() {
             </div>
         `;
 
-        card.querySelector('.edit-btn').addEventListener('click', () => startEdit(category.id));
+        card.querySelector('.edit-btn').addEventListener('click', () => { window.location.href = `addCategory.html?id=${category.id}`; });
         card.querySelector('.delete-btn').addEventListener('click', () => handleDelete(category.id));
 
         categoriesList.appendChild(card);
@@ -107,18 +111,18 @@ async function handleFormSubmit(event) {
         if (editingCategoryId) {
             const updatedCategory = await categoryService.updateCategory(editingCategoryId, payload);
             categoryState.updateCategoryInState(updatedCategory || { id: editingCategoryId, ...payload });
-            formStatus.textContent = 'Category updated successfully!';
+            showNotice('Category updated successfully.');
         } else {
             const newCategory = await categoryService.createCategory(payload);
             categoryState.addCategoryToState(newCategory);
-            formStatus.textContent = 'Category created successfully!';
+            showNotice('Category created successfully.');
         }
 
         renderCategories();
         resetForm();
     } catch (error) {
         console.error(error);
-        formStatus.textContent = error.message || 'Operation failed.';
+        showNotice(error.message || 'Operation failed.', 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -148,7 +152,8 @@ function resetForm() {
 }
 
 async function handleDelete(id) {
-    if (!confirm('Are you sure you want to delete this category?')) return;
+    const confirmed = await showConfirm('Are you sure you want to delete this category?');
+    if (!confirmed) return;
 
     try {
         await categoryService.deleteCategory(id);
@@ -160,6 +165,6 @@ async function handleDelete(id) {
         }
     } catch (error) {
         console.error('Delete failed:', error);
-        alert(error.message || 'Failed to delete category.');
+        showNotice(error.message || 'Failed to delete category.', 'error');
     }
 }

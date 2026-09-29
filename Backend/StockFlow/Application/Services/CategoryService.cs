@@ -21,7 +21,8 @@ namespace Application.Services
             {
                 Name = createRequest.Name,
                 Description = createRequest.Description,
-                IsActive = true
+                IsActive = true,
+                BusinessId = BusinessId,
             };
             await CategorySet.AddAsync(category);
             await _context.SaveChangesAsync();
@@ -42,9 +43,18 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<CategoryDtos.Response>> GetAllCategoriesAsync()
+        public async Task<IReadOnlyCollection<CategoryDtos.Response>> GetAllCategoriesAsync(string? search)
         {
-            return await CategorySet.AsNoTracking().Select(c => new CategoryDtos.Response(c.Id,c.Name,c.Description)).ToListAsync();
+            var query = CategorySet.AsNoTracking();
+
+            if(! string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                 query = query.Where(c=>c.Name.Contains(search) || c.Description.Contains(search));
+            }
+
+            return await query.Select(c => new CategoryDtos.Response(c.Id, c.Name, c.Description)).ToListAsync();
+
         }
 
         public async Task<CategoryDtos.Response?> GetCategoryAsync(int id)
