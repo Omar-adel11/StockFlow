@@ -3,15 +3,7 @@
    ========================================================== */
 
 .navbar {
-  padding: 10px 0;
-  background-color: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.logo {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
+  padding: 20px 0;
 }
 
 .navbar-inner {
@@ -22,10 +14,8 @@
 }
 
 .logo-img {
-  height: 64px;
+  height: 80px;
   width: auto;
-  display: block;
-  object-fit: contain;
 }
 
 .nav-links {
