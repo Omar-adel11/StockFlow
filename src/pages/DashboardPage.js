@@ -14,7 +14,7 @@ function getRole() {
     return p.role || p['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || '';
   } catch { return ''; }
 }
-function render(data) {
+function formatDate(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}\n\nfunction render(data) {
   const name=sessionStorage.getItem('name') || 'there';
   document.getElementById('dashboard-greeting').textContent='Good morning, ' + name + '.';
   document.getElementById('dashboard-greeting-subtitle').textContent='Here is what is happening with your inventory today.';
@@ -36,7 +36,7 @@ function render(data) {
   ).join('') || '<p class="empty-state">No low stock items.</p>';
 
   document.getElementById('recent-activity-list').innerHTML=(data.recentActivities||[]).slice(0,6).map(x =>
-    '<div><b>' + esc(x.title) + '</b><span>' + esc(x.subtitle) + '</span></div>'
+    '<div><b>' + esc(x.title) + '</b><span>' + esc(x.subtitle) + ' · ' + formatDate(x.createdAt) + '</span></div>'
   ).join('') || '<p class="empty-state">No recent activity.</p>';
 
   document.getElementById('category-list').innerHTML=(data.categoryDistribution||[]).map(x =>
