@@ -94,8 +94,8 @@ export class PurchaseOrdersPage {
       setWarehouses(warehouses);
       setProducts(products);
 
-      this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...');
-      this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...');
+      this.populateSelect(this.supplierSelect, purchaseOrderState.suppliers, 'Select Supplier...', item => item.name || item.Name || `ID: ${item.id}`);
+      this.populateSelect(this.warehouseSelect, purchaseOrderState.warehouses, 'Select Destination Warehouse...', item => item.warehouseName || item.WarehouseName || item.name || item.Name || `ID: ${item.id}`);
       makeSearchableSelect(this.supplierSelect);
       makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
@@ -103,13 +103,13 @@ export class PurchaseOrdersPage {
     }
   }
 
-  populateSelect(selectElement, items, defaultLabel) {
+  populateSelect(selectElement, items, defaultLabel, labelFormatter) {
     if (!selectElement) return;
     selectElement.innerHTML = `<option value="">${defaultLabel}</option>`;
     items.forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
-      option.textContent = item.warehouseName || item.WarehouseName || item.name || item.Name || `ID: ${item.id}`;
+      option.textContent = labelFormatter ? labelFormatter(item) : (item.name || item.Name || `ID: ${item.id}`);
       selectElement.appendChild(option);
     });
   }
