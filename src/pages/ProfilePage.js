@@ -27,7 +27,7 @@ function render(p){
   initials.textContent=letters||'U';
   if(currentProfile.imgUrl){
     const raw=String(currentProfile.imgUrl).replace(/^\/+/, '');
-    image.src=/^https?:\/\//i.test(String(currentProfile.imgUrl)) ? currentProfile.imgUrl : `${baseUrl}/images/${raw}`;
+    image.src=/^https?:\/\//i.test(String(currentProfile.imgUrl)) ? currentProfile.imgUrl : `${baseUrl}/files/images/${raw}`;
     image.hidden=false; initials.hidden=true;
     image.onerror=()=>{image.hidden=true;initials.hidden=false;};
   }else{image.removeAttribute('src');image.hidden=true;initials.hidden=false;}
