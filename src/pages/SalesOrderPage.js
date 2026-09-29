@@ -95,7 +95,7 @@ export class SalesOrdersPage {
       setProducts(products);
 
       this.populateSelect(this.customerSelect, salesOrderState.customers, 'Select Customer...', (c) => c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || `ID: ${c.id}`);
-      this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.name || `ID: ${w.id}`);
+      this.populateSelect(this.warehouseSelect, salesOrderState.warehouses, 'Select Fulfilling Warehouse...', (w) => w.warehouseName || w.WarehouseName || w.name || w.Name || `ID: ${w.id}`);
       makeSearchableSelect(this.customerSelect);
       makeSearchableSelect(this.warehouseSelect);
     } catch (err) {
@@ -134,7 +134,7 @@ export class SalesOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       salesOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-       const cost = p.unitSellingPrice ?? p.unitPrice ?? 0;
+       const cost = p.unitSellingPrice ?? p.UnitSellingPrice ?? p.unitPrice ?? p.UnitPrice ?? 0;
 productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
