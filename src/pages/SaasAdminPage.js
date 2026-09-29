@@ -161,7 +161,9 @@ function setupAssignPlanModal(){
     if(!selectedOwner?.businessId) return showNotice('This business owner has no business to assign a plan to.','error');
     const planId=document.getElementById('assign-plan-select').value;
     if(!planId) return showNotice('Select a plan first.','error');
-    if(!await showConfirm('Assign this plan to '+(selectedOwner.fullName||selectedOwner.name)+'?',{confirmText:'Assign Plan',danger:false})) return;
+    modal.close();
+    const confirmed=await showConfirm('Assign this plan to '+(selectedOwner.fullName||selectedOwner.name)+'?',{confirmText:'Assign Plan',danger:false});
+    if(!confirmed) return;
     try{
       const btn=form.querySelector('button[type="submit"]');btn.disabled=true;
       await assignPlan(selectedOwner.businessId,Number(planId));
