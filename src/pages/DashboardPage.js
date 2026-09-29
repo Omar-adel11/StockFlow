@@ -14,7 +14,9 @@ function getRole() {
     return p.role || p['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || '';
   } catch { return ''; }
 }
-function formatDate(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}\n\nfunction render(data) {
+function formatDate(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+
+function render(data) {
   const name=sessionStorage.getItem('name') || 'there';
   document.getElementById('dashboard-greeting').textContent='Good morning, ' + name + '.';
   document.getElementById('dashboard-greeting-subtitle').textContent='Here is what is happening with your inventory today.';
