@@ -109,7 +109,7 @@ export class PurchaseOrdersPage {
     items.forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
-      option.textContent = item.name || `ID: ${item.id}`;
+      option.textContent = item.warehouseName || item.WarehouseName || item.name || item.Name || `ID: ${item.id}`;
       selectElement.appendChild(option);
     });
   }
@@ -134,7 +134,7 @@ export class PurchaseOrdersPage {
       let productOptions = '<option value="">Select Product...</option>';
       purchaseOrderState.products.forEach(p => {
         const isSelected = String(p.id) === String(item.productId) ? 'selected' : '';
-        const cost = p.unitSellingPrice ?? p.unitPrice ?? 0;
+        const cost = p.unitPrice ?? p.UnitPrice ?? 0;
 productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p.name} (${p.itemSKU || p.sku || ''})</option>`;
       });
 
