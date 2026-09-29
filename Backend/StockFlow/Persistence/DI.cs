@@ -40,6 +40,8 @@ namespace Persistence
             services.AddScoped<IContactRepository, ContactRepository>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
+
 
 
             
