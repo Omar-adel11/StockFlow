@@ -150,9 +150,10 @@ class ProductsPage {
       const categoryName = product.categoryName || product.category?.name || 'Uncategorized';
       const supplierName = product.preferredSupplierName || product.preferredSupplier?.name || 'None';
       
-      // Read price using unitSellingPrice / UnitSellingPrice / unitPrice
-      const rawPrice = product.unitSellingPrice ?? product.UnitSellingPrice ?? product.unitPrice;
-      const formattedPrice = typeof rawPrice === 'number' ? `$${rawPrice.toFixed(2)}` : '$0.00';
+      const rawUnitPrice = product.unitPrice ?? product.UnitPrice ?? 0;
+      const rawSellingPrice = product.unitSellingPrice ?? product.UnitSellingPrice ?? 0;
+      const formattedUnitPrice = Number(rawUnitPrice).toFixed(2);
+      const formattedSellingPrice = Number(rawSellingPrice).toFixed(2);
 
       card.innerHTML = `
         <div class="entity-card-header">
