@@ -1,6 +1,7 @@
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { clearSession } from '../sessions/session.js';
 import { getMyProfile, updateMyProfile } from '../services/profileService.js';
+import { baseUrl } from '../api/apiClient.js';
 
 const form=document.getElementById('profile-form');
 const editBtn=document.getElementById('edit-profile-btn');
@@ -24,7 +25,12 @@ function render(p){
   document.getElementById('summary-role').textContent=currentProfile.role||'User';
   const letters=name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
   initials.textContent=letters||'U';
-  if(currentProfile.imgUrl){image.src=currentProfile.imgUrl;image.hidden=false;initials.hidden=true;}else{image.hidden=true;initials.hidden=false;}
+  if(currentProfile.imgUrl){
+    const raw=String(currentProfile.imgUrl).replace(/^\/+/, '');
+    image.src=/^https?:\/\//i.test(String(currentProfile.imgUrl)) ? currentProfile.imgUrl : `${baseUrl}/images/${raw}`;
+    image.hidden=false; initials.hidden=true;
+    image.onerror=()=>{image.hidden=true;initials.hidden=false;};
+  }else{image.removeAttribute('src');image.hidden=true;initials.hidden=false;}
 }
 function edit(){
   const p=currentProfile||{};
@@ -36,6 +42,7 @@ function edit(){
 editBtn?.addEventListener('click',edit);
 cancelBtn?.addEventListener('click',()=>{form.hidden=true;summary.hidden=false;});
 changeImageBtn?.addEventListener('click',()=>imageInput?.click());
+imageInput?.addEventListener('change',()=>{const file=imageInput.files?.[0];if(!file)return;image.src=URL.createObjectURL(file);image.hidden=false;initials.hidden=true;});
 
 form?.addEventListener('submit',async e=>{
   e.preventDefault();
