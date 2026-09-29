@@ -11,3 +11,7 @@ export async function getBusinessOwners(search = null) {
 export async function updateBusinessOwnerStatus(id, isActive, planId = null) {
   return putWithAuth(`${endpoint}/${id}/status`, { isActive, planId });
 }
+
+export async function assignPlan(businessId, planId) {
+  return putWithAuth(`${endpoint.replace('/business-owners','')}/businesses/${businessId}/plan/${planId}`, {});
+}
