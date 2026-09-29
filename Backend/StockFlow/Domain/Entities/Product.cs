@@ -21,12 +21,14 @@ namespace Domain.Entities
         public Supplier? PreferredSupplier { get; set; }
 
         public decimal UnitPrice { get; set; }
+        public decimal UnitSellingPrice { get; set; }
 
         // Drives the dashboard's Low Stock Alert - when a w    arehouse's
         // QuantityOnHand for this product drops to or below this number.
         public int ReorderLevel { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
         public ICollection<PurchaseOrderItem> PurchaseOrderItems { get; set; } = new List<PurchaseOrderItem>();

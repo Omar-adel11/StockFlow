@@ -41,6 +41,7 @@ namespace Persistence
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
+            
 
 
 

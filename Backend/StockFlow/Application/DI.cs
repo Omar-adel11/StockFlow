@@ -33,6 +33,7 @@ namespace Application
             services.AddScoped<ISaaSAdminService, SaaSAdminService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IBusinessService, BusinessService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             services.AddHttpContextAccessor();
 

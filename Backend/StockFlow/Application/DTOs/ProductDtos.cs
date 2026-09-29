@@ -13,6 +13,7 @@ namespace Application.DTOs
             [Required][MaxLength(100)] string ItemSKU,
             [Required][MaxLength(200)] string Name,
             [Range(0, double.MaxValue)] decimal UnitSellingPrice,
+            [Range(0, double.MaxValue)] decimal UnitPrice,
             [Range(0, int.MaxValue)] int ReorderLevel,
             [Required] int CategoryId,
             int? PreferredSupplierId
@@ -21,6 +22,7 @@ namespace Application.DTOs
         public record ProductUpdateRequest(
             [Required][MaxLength(200)] string Name,
             [Range(0, double.MaxValue)] decimal UnitSellingPrice,
+            [Range(0, double.MaxValue)] decimal UnitPrice,
             [Range(0, int.MaxValue)] int ReorderLevel,
             [Required] int CategoryId,
             int? PreferredSupplierId,
@@ -32,6 +34,7 @@ namespace Application.DTOs
             string ItemSKU,
             string Name,
             decimal UnitSellingPrice,
+            decimal UnitPrice,
             int ReorderLevel,
             int CategoryId,
             string CategoryName,

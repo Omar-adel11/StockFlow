@@ -24,7 +24,8 @@ namespace Application.Services
                 SKU = createRequest.ItemSKU,
                 CategoryId = createRequest.CategoryId,
                 PreferredSupplierId = createRequest?.PreferredSupplierId,
-                UnitPrice = createRequest.UnitSellingPrice,
+                UnitPrice = createRequest.UnitPrice,
+                UnitSellingPrice = createRequest.UnitSellingPrice,
                 ReorderLevel = createRequest.ReorderLevel,
                 IsActive = true,
                 BusinessId = businessId,
@@ -91,7 +92,8 @@ namespace Application.Services
         {
             var product = await GetProductEntityAsync(id);
             product.Name = updateRequest.Name;
-            product.UnitPrice = updateRequest.UnitSellingPrice;
+            product.UnitPrice = updateRequest.UnitPrice;
+            product.UnitSellingPrice = updateRequest.UnitSellingPrice;
             product.ReorderLevel = updateRequest.ReorderLevel;
             product.CategoryId = updateRequest.CategoryId;
             product.PreferredSupplierId = updateRequest.PreferredSupplierId;
@@ -126,6 +128,7 @@ namespace Application.Services
              product.Id,
              product.SKU,
              product.Name,
+             product.UnitSellingPrice,
              product.UnitPrice,
              product.ReorderLevel,
              product.CategoryId,

@@ -37,8 +37,8 @@ namespace Application.Services
                     soi.Product != null ? soi.Product.Name : string.Empty,
                     soi.Product != null ? soi.Product.SKU : string.Empty,
                     soi.Quantity,
-                    soi.UnitPrice,
-                    soi.Quantity * soi.UnitPrice
+                    soi.UnitSellingPrice,
+                    soi.Quantity * soi.UnitSellingPrice
                 )).ToList()
             );
 
@@ -74,11 +74,11 @@ namespace Application.Services
             {
                 ProductId = i.ProductId,
                 Quantity = i.QuantitySold,
-                UnitPrice = i.BilledUnitPrice,
+                UnitSellingPrice = i.BilledUnitPrice,
                 BusinessId = businessId
             }).ToList();
 
-            decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
+            decimal totalAmount = orderItems.Sum(i => i.Quantity * i.UnitSellingPrice);
 
             var salesOrder = new SalesOrder
             {

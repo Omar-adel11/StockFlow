@@ -13,7 +13,7 @@ namespace Persistence.Configurations
             entity.HasKey(i => i.Id);
 
             entity.Property(i => i.Quantity).IsRequired();
-            entity.Property(i => i.UnitPrice).HasColumnType("decimal(10,2)");
+            entity.Property(i => i.UnitSellingPrice).HasColumnType("decimal(10,2)");
 
             entity.HasOne(i => i.SalesOrder)
                   .WithMany(s => s.Items)
@@ -28,7 +28,7 @@ namespace Persistence.Configurations
 
             entity.HasOne(c => c.Business).WithMany().HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.BusinessId);
-            entity.Property(p => p.UnitPrice)
+            entity.Property(p => p.UnitSellingPrice)
    .HasPrecision(18, 2);
         }
     }
