@@ -1,4 +1,4 @@
-import { getBusinessOwners, updateBusinessOwnerStatus } from '../services/saasAdminService.js';
+import { getBusinessOwners, updateBusinessOwnerStatus, assignPlan } from '../services/saasAdminService.js';
 import { fetchPlans } from '../services/planService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import * as authService from '../services/authService.js';
@@ -13,10 +13,12 @@ const plansLoading = document.getElementById('plans-loading');
 const logoutBtn = document.getElementById('logout-btn');
 
 let searchTimer;
+let selectedOwner=null;
 
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
+  setupAssignPlanModal();
   logoutBtn?.addEventListener('click', () => authService.logout());
   ownerSearch?.addEventListener('input', () => {
     clearTimeout(searchTimer);
@@ -90,7 +92,7 @@ function renderOwners(owners) {
       }
     });
 
-    row.querySelector('.assign-plan-btn')?.addEventListener('click', () => showNotice('Plan assignment UI is ready for the existing modal flow.', 'warning'));
+    row.querySelector('.assign-plan-btn')?.addEventListener('click', () => openAssignPlan(owner));
 
     ownersList.appendChild(row);
   });
@@ -147,4 +149,40 @@ function initials(name = '') {
 }
 function escapeHtml(value) {
   return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setupAssignPlanModal(){
+  const modal=document.getElementById('assign-plan-modal');
+  const form=document.getElementById('assign-plan-form');
+  const close=()=>modal?.close();
+  modal?.querySelectorAll('.modal-close, .modal-actions button[type="button"]').forEach(b=>b.addEventListener('click',close));
+  form?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(!selectedOwner?.businessId) return showNotice('This business owner has no business to assign a plan to.','error');
+    const planId=document.getElementById('assign-plan-select').value;
+    if(!planId) return showNotice('Select a plan first.','error');
+    if(!await showConfirm('Assign this plan to '+(selectedOwner.fullName||selectedOwner.name)+'?',{confirmText:'Assign Plan',danger:false})) return;
+    try{
+      const btn=form.querySelector('button[type="submit"]');btn.disabled=true;
+      await assignPlan(selectedOwner.businessId,Number(planId));
+      modal.close();showNotice('Plan assigned successfully.');
+      await loadOwners(ownerSearch?.value||null);
+    }catch(error){showNotice(error.message||'Failed to assign plan.','error');}
+    finally{form.querySelector('button[type="submit"]').disabled=false;}
+  });
+}
+async function openAssignPlan(owner){
+  selectedOwner=owner;
+  const modal=document.getElementById('assign-plan-modal');
+  const select=document.getElementById('assign-plan-select');
+  document.getElementById('assign-plan-owner').textContent='Select a plan for '+(owner.fullName||owner.name||'this business')+'.';
+  try{
+    const plans=await fetchPlans();
+    select.innerHTML='<option value="">Select a plan</option>';
+    (Array.isArray(plans)?plans:[]).filter(p=>p.isActive!==false).forEach(p=>{
+      const o=document.createElement('option');o.value=p.id;o.textContent=p.name+' — $'+Number(p.price||0).toFixed(2);if(Number(p.id)===Number(owner.currentPlanId))o.selected=true;select.appendChild(o);
+    });
+    document.getElementById('assign-plan-status').textContent=owner.currentPlanName||'No Plan';
+    modal.showModal();
+  }catch(error){showNotice(error.message||'Failed to load plans.','error');}
 }
