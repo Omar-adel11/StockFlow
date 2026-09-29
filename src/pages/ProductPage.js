@@ -165,7 +165,8 @@ class ProductsPage {
           <p><strong>SKU:</strong> ${this.escapeHtml(skuVal)}</p>
           <p><strong>Category:</strong> ${this.escapeHtml(categoryName)}</p>
           <p><strong>Preferred Supplier:</strong> ${this.escapeHtml(supplierName)}</p>
-          <p><strong>Selling Price:</strong> ${formattedPrice}</p>
+          <p><strong>Unit Price:</strong> ${formattedUnitPrice}</p>
+          <p><strong>Selling Price:</strong> ${formattedSellingPrice}</p>
           <p><strong>Reorder Level:</strong> ${product.reorderLevel ?? 0}</p>
         </div>
         <div class="entity-card-actions">
