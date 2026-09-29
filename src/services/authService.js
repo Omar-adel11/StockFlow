@@ -1,4 +1,4 @@
-import { post, baseUrl, postWithAuth } from "../api/apiClient.js";
+import { post, baseUrl, postWithAuth, getReadableErrorMessage } from "../api/apiClient.js";
 import * as session from '../sessions/session.js';
 
 const loginEndpoint = `${baseUrl}/api/Authentication/login`;
@@ -14,11 +14,21 @@ export async function register(formData) {
     });
     
     if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-            errorData?.errors ? Object.values(errorData.errors).flat().join(' ') : 
-            errorData?.message || 'Registration failed'
-        );
+        let errorData = null;
+        try {
+            const text = await response.text();
+            if (text.trim()) {
+                try {
+                    errorData = JSON.parse(text);
+                } catch {
+                    errorData = text;
+                }
+            }
+        } catch {
+            // Use the friendly status fallback below.
+        }
+
+        throw new Error(getReadableErrorMessage(errorData, response.status));
     }
     if (response.status === 204) return null;
     return response.json();
