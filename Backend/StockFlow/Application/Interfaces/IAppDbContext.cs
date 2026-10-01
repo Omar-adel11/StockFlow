@@ -28,6 +28,8 @@ namespace Application.Interfaces
         DbSet<Customer> Customers { get; }
         DbSet<Business> Business { get; }
         DbSet<TeamInvitation> TeamInvitations { get; }
+        DbSet<PaymentTransaction> PaymentTransactions { get; }
+        DbSet<TenantSubscription> TenantSubscriptions { get; }
         DatabaseFacade Database { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

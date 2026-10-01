@@ -14,6 +14,7 @@ namespace Domain.Entities
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
+        public string Currency { get; set; } = "EGP"; 
         public BillingCycle BillingCycle { get; set; }
         public string Description { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;

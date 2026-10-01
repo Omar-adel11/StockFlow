@@ -46,6 +46,8 @@ namespace Application
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ICacheService, RedisCacheService>();
 
+
+            services.AddScoped<IPaymentService, PaymentService>();
             // Service Manager (Unit of Work pattern for Services)
             services.AddScoped<IServiceManager, ServiceManager>();
 

@@ -47,10 +47,7 @@ namespace Application.Services.Auth
                 throw new UnauthorizedAccessException("Your account has been deactivated. Please contact your business owner or administrator.");
             }
 
-            if (user.Business != null && !user.Business.IsActive)
-            {
-                throw new UnauthorizedAccessException("Your business subscription has been deactivated. Please contact your administrator.");
-            }
+            
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDTO.password);
             if (!isPasswordValid)

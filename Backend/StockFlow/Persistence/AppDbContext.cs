@@ -37,7 +37,9 @@ namespace Persistence
         public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
         public DbSet<SalesOrderItem> SalesOrderItems => Set<SalesOrderItem>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
-        public DbSet<TeamInvitation> TeamInvitations { get; set; }
+        public DbSet<TeamInvitation> TeamInvitations => Set<TeamInvitation>();
+        public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+        public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
 
         public int? CurrentBusinessId
         {
@@ -52,10 +54,19 @@ namespace Persistence
         {
             base.OnModelCreating(modelBuilder);
 
+
+            foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+            {
+                property.SetColumnType("decimal(18,2)");
+            }
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 var clrType = entityType.ClrType;
                 if (clrType == typeof(User)) continue;
+
 
                 var businessIdProperty = clrType.GetProperty("BusinessId");
                 bool hasBusinessId = businessIdProperty != null &&

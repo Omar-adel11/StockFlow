@@ -3,8 +3,10 @@ using Application.Interfaces.AuthInterfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Persistence.Email;
 using Persistence.Interceptors;
+using Persistence.Payments;
 using Persistence.Repositories;
 using Persistence.Repository;
 using StackExchange.Redis;
@@ -41,13 +43,17 @@ namespace Persistence
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ICacheRepository, CacheRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
-            
+
+            services.AddHttpClient<PaymobPaymentGateway>();
+            services.AddScoped<IPaymentGateway>(sp => sp.GetRequiredService<PaymobPaymentGateway>());
+            services.AddScoped<IPaymentGatewayFactory, PaymentGatewayFactory>();
+            services.AddSingleton<ILogger>(sp =>sp.GetRequiredService<ILoggerFactory>().CreateLogger("App"));
 
 
 
-            
 
-            
+
+
 
 
             return services;
