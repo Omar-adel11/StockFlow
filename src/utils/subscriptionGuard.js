@@ -1,5 +1,5 @@
 import { getAccessToken, clearSession } from '../sessions/session.js';
-import { getWithAuth } from '../api/apiClient.js';
+import { getWithAuth, baseUrl } from '../api/apiClient.js';
 
 const PUBLIC_PAGES = new Set([
   'index.html', 'login.html', 'signup.html', 'forgot-password.html',
@@ -53,7 +53,7 @@ async function enforceSubscription() {
   if (page === 'plans.html' || page === 'payment-success.html') return true;
 
   try {
-    const subscription = await getWithAuth('/api/Subscriptions/me');
+    const subscription = await getWithAuth(`${baseUrl}/api/Subscriptions/me`);
     if (isActiveSubscription(subscription)) return true;
   } catch (error) {
     // No subscription / expired subscription is handled by redirecting to pricing.
