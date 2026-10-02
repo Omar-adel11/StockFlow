@@ -66,7 +66,7 @@ namespace Application.Services
                 PlanId = plan.Id,
                 Status = SubscriptionStatus.Active,
                 StartDateUtc = DateTime.UtcNow,
-                EndDateUtc = DateTime.UtcNow.AddYears(100), // Non-expiring manual grant
+                EndDateUtc = DateTime.UtcNow.AddDays(30), // Non-expiring manual grant
                 AutoRenew = false,
                 ExternalSubscriptionId = "MANUAL_ADMIN_ASSIGNMENT"
             };
