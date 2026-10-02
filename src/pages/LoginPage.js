@@ -1,6 +1,7 @@
 import * as authService from '../services/authService.js';
 import * as authValidation from '../validation/authValidation.js';
-import * as session from '../sessions/session.js'; 
+import * as session from '../sessions/session.js';
+import { getWithAuth } from '../api/apiClient.js'; 
 
 const form = document.getElementById('login-form');
 const submitBtn = document.getElementById('submit-btn');
@@ -42,8 +43,21 @@ form.addEventListener('submit', async (event) => {
             // If the token cannot be decoded, keep the normal application route.
         }
 
-        window.location.href =
-            role === 'SaasAdmin' ? 'adminPanel.html' : 'dashboard.html';
+        if (role === 'SaasAdmin') {
+            window.location.href = 'adminPanel.html';
+            return;
+        }
+
+        try {
+            const subscription = await getWithAuth('https://localhost:7203/api/Subscriptions/me');
+            const status = String(subscription?.status ?? '').toLowerCase();
+            const active = (status === 'active' || status === '1')
+                && new Date(subscription?.endDateUtc) > new Date();
+
+            window.location.href = active ? 'dashboard.html' : 'plans.html?required=subscription';
+        } catch {
+            window.location.href = 'plans.html?required=subscription';
+        }
     } catch (error) {
         console.error(error);
         formStatus.textContent = error.message;
