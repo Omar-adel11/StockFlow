@@ -1,7 +1,7 @@
 import * as authService from '../services/authService.js';
 import * as authValidation from '../validation/authValidation.js';
 import * as session from '../sessions/session.js';
-import { getWithAuth } from '../api/apiClient.js'; 
+import { getWithAuth, baseUrl } from '../api/apiClient.js'; 
 
 const form = document.getElementById('login-form');
 const submitBtn = document.getElementById('submit-btn');
@@ -49,7 +49,7 @@ form.addEventListener('submit', async (event) => {
         }
 
         try {
-            const subscription = await getWithAuth('https://localhost:7203/api/Subscriptions/me');
+            const subscription = await getWithAuth(`${baseUrl}/api/Subscriptions/me`);
             const status = String(subscription?.status ?? '').toLowerCase();
             const active = (status === 'active' || status === '1')
                 && new Date(subscription?.endDateUtc) > new Date();
