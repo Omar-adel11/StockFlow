@@ -4,8 +4,20 @@ import * as session from '../sessions/session.js';
 const plansEndpoint = `${baseUrl}/api/Plans`;
 
 
+function normalizePlan(plan) {
+    return {
+        ...plan,
+        features: Array.isArray(plan?.features)
+            ? plan.features.map(f => typeof f === 'string'
+                ? { featureKey: '', name: f, value: '', isActive: true }
+                : f)
+            : []
+    };
+}
+
 export async function fetchPlans() {
-    return await get(plansEndpoint);
+    const plans = await get(plansEndpoint);
+    return Array.isArray(plans) ? plans.map(normalizePlan) : [];
 }
 
 export async function createPlan(data) {
