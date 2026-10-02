@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Result - StockFlow</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/indexLayout.css">
+  <link rel="stylesheet" href="./css/paymentSuccess.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo"><img src="images/logo.jpg" alt="StockFlow logo" class="logo-img"></a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="plans.html">Pricing</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+      <div class="navbar-actions"><a href="dashboard.html" class="btn btn-primary">Dashboard</a></div>
+    </div>
+  </header>
+
+  <main class="payment-result-page">
+    <section class="payment-result-card card">
+      <div id="payment-state">
+        <div class="payment-icon">✓</div>
+        <h1>Payment Successful</h1>
+        <p>Your payment was received. We are confirming your StockFlow subscription.</p>
+        <div id="subscription-details" class="subscription-details">Checking subscription status...</div>
+        <a href="dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="./src/pages/PaymentSuccessPage.js"></script>
+</body>
+</html>

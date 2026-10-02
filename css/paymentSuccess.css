@@ -1,0 +1,6 @@
+.payment-result-page{min-height:calc(100vh - 85px);display:grid;place-items:center;padding:40px 20px;background:var(--color-bg)}
+.payment-result-card{width:min(620px,100%);text-align:center;padding:48px 36px}
+.payment-icon{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 20px;background:#e7f7ef;color:#15956d;font-size:38px;font-weight:800}
+.payment-result-card h1{margin-bottom:12px}.payment-result-card p{color:var(--color-text-muted);margin-bottom:22px}
+.subscription-details{padding:18px;margin:0 0 24px;border-radius:12px;background:#f5f8f6;text-align:left;min-height:60px}
+.subscription-details p{margin:6px 0;color:var(--color-text)}.subscription-details .status{font-weight:700}

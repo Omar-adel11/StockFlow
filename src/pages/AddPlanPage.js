@@ -10,6 +10,48 @@ const id = new URLSearchParams(location.search).get('id');
 
 function field(name) { return form.elements[name]; }
 
+function buildFeatures() {
+  const features = [];
+  const warehouseMode = document.getElementById('max-warehouses-mode').value;
+  const warehouseValue = warehouseMode === 'unlimited' ? 'Unlimited' : document.getElementById('max-warehouses-value').value.trim();
+  if (warehouseValue) features.push({ featureKey: 'MAX_WAREHOUSES', value: warehouseValue, name: 'Maximum Warehouses', isActive: true });
+
+  const usersMode = document.getElementById('max-users-mode').value;
+  const usersValue = usersMode === 'unlimited' ? 'Unlimited' : document.getElementById('max-users-value').value.trim();
+  if (usersValue) features.push({ featureKey: 'MAX_USERS', value: usersValue, name: 'Maximum Users', isActive: true });
+
+  return features;
+}
+
+function loadFeatures(features = []) {
+  const map = new Map((features || []).map(f => [String(f.featureKey || '').toUpperCase(), f]));
+  for (const [key, modeId, valueId] of [
+    ['MAX_WAREHOUSES', 'max-warehouses-mode', 'max-warehouses-value'],
+    ['MAX_USERS', 'max-users-mode', 'max-users-value']
+  ]) {
+    const feature = map.get(key);
+    const mode = document.getElementById(modeId);
+    const input = document.getElementById(valueId);
+    if (!feature) continue;
+    if (String(feature.value).toLowerCase() === 'unlimited') {
+      mode.value = 'unlimited';
+      input.disabled = true;
+      input.value = '';
+    } else {
+      mode.value = 'limit';
+      input.disabled = false;
+      input.value = feature.value || '';
+    }
+  }
+}
+
+function wireFeatureModes() {
+  [['max-warehouses-mode','max-warehouses-value'],['max-users-mode','max-users-value']].forEach(([modeId,inputId])=>{
+    const mode=document.getElementById(modeId), input=document.getElementById(inputId);
+    mode.addEventListener('change',()=>{ input.disabled=mode.value==='unlimited'; if(input.disabled) input.value=''; });
+  });
+}
+
 async function init() {
   if (!id) return;
   const plans = await fetchPlans();
@@ -28,10 +70,12 @@ async function init() {
   field('billingCycle').value =
     cycle === 1 || String(cycle).toLowerCase() === 'yearly' ? '1' : '0';
   field('description').value = plan.description || '';
-  field('features').value = Array.isArray(plan.features) ? plan.features.join('\n') : '';
+  loadFeatures(plan.features);
   field('isActive').checked = plan.isActive !== false;
   submitButton.textContent = 'Update Plan';
 }
+
+wireFeatureModes();
 
 form?.addEventListener('submit', async e => {
   e.preventDefault();
@@ -42,7 +86,7 @@ form?.addEventListener('submit', async e => {
     billingCycle: field('billingCycle').value === '1' ? 1 : 0,
     description: field('description').value.trim(),
     isActive: field('isActive').checked,
-    features: field('features').value.split('\n').map(x => x.trim()).filter(Boolean)
+    features: buildFeatures()
   };
 
   if (!data.name || Number.isNaN(data.price)) {
