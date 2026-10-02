@@ -17,6 +17,7 @@ namespace Application.Interfaces
         DbSet<IdentityUserRole<int>> UserRoles { get; }
         DbSet<Product> Products { get; }
         DbSet<Plan> Plans { get; }
+        DbSet<PlanFeature> PlanFeatures { get; }
         DbSet<Category> Categories { get; }
         DbSet<CustomerAddress> CustomerAddresses { get; }
         DbSet<Supplier> Suppliers { get; }

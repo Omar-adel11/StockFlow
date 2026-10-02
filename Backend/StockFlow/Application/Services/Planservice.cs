@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.DTOs;
+using Application.DTOs.plandtos;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
 {
@@ -13,7 +13,7 @@ namespace Application.Services
     {
         private readonly IPlanRepository _planRepository;
 
-        public PlanService(IPlanRepository planRepository,UserManager<User> userManager)
+        public PlanService(IPlanRepository planRepository)
         {
             _planRepository = planRepository;
         }
@@ -62,8 +62,7 @@ namespace Application.Services
             plan.Description = request.Description.Trim();
             plan.IsActive = request.IsActive;
 
-            // Full replace rather than diffing which features were added,
-           
+            // Full replace strategy for aggregate root child collection
             plan.Features.Clear();
             foreach (var feature in BuildFeatureList(request.Features))
             {
@@ -81,7 +80,7 @@ namespace Application.Services
             var plan = await _planRepository.GetByIdAsync(id);
             if (plan is null)
             {
-                throw new Exception("Plan is not exists");
+                throw new PlanNotFoundException();
             }
 
             _planRepository.Delete(plan);
@@ -89,15 +88,22 @@ namespace Application.Services
             return true;
         }
 
-        private static List<PlanFeature> BuildFeatureList(List<string> featureNames)
+        private static List<PlanFeature> BuildFeatureList(List<PlanFeatureDto> featureDtos)
         {
-            return featureNames
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name => new PlanFeature { Name = name.Trim() })
+            if (featureDtos == null || !featureDtos.Any())
+                return new List<PlanFeature>();
+
+            return featureDtos
+                .Where(dto => !string.IsNullOrWhiteSpace(dto.FeatureKey))
+                .Select(dto => new PlanFeature
+                {
+                    FeatureKey = dto.FeatureKey.Trim().ToUpperInvariant(),
+                    Value = dto.Value?.Trim() ?? string.Empty,
+                    Name = string.IsNullOrWhiteSpace(dto.Name) ? dto.FeatureKey.Trim() : dto.Name.Trim(),
+                    IsActive = dto.IsActive
+                })
                 .ToList();
         }
-
-       
 
         private static PlanResponseDto MapToResponse(Plan plan)
         {
@@ -109,10 +115,14 @@ namespace Application.Services
                 BillingCycle = plan.BillingCycle.ToString(),
                 Description = plan.Description,
                 IsActive = plan.IsActive,
-                Features = plan.Features.Select(f => f.Name).ToList()
+                Features = plan.Features?.Select(f => new PlanFeatureDto
+                {
+                    Name = f.Name,
+                    FeatureKey = f.FeatureKey,
+                    Value = f.Value,
+                    IsActive = f.IsActive
+                }).ToList() ?? new List<PlanFeatureDto>()
             };
         }
-
-      
     }
 }

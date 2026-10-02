@@ -2,10 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Enum;
 
-namespace Application.DTOs
+namespace Application.DTOs.plandtos
 {
     // Used for both POST (create) and PUT (update) - same shape either way.
-    
+
     public class PlanRequestDto
     {
         [Required(ErrorMessage = "Name is required.")]
@@ -23,8 +23,7 @@ namespace Application.DTOs
 
         public bool IsActive { get; set; } = true;
 
-        // Features is a flat list of strings here; the service is responsible
-        // for turning that into PlanFeature rows.
-        public List<string> Features { get; set; } = new();
+        // Structured feature list mapping directly to PlanFeature rows
+        public List<PlanFeatureDto> Features { get; set; } = new();
     }
 }

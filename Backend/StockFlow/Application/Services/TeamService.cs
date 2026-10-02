@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Application.DTOs;
 using Application.DTOs.AuthDTOs;
 using Application.DTOs.Team;
 using Application.DTOs.userDtos;
@@ -11,6 +12,7 @@ using Application.Interfaces.AuthInterfaces;
 using Application.Services.Auth;
 using Application.Services.Helper;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using Domain.Exceptions.BadRequest;
 using Domain.Exceptions.NotFound;
 using Domain.Helpers;
@@ -30,6 +32,7 @@ namespace Application.Services
         private readonly IAppDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;
+        private readonly IFeatureService _featureService;
         private readonly IEmailService _emailService; // Assuming you have an IEmailService
         private readonly RoleManager<IdentityRole<int>> _roleManager;
 
@@ -40,7 +43,8 @@ namespace Application.Services
             IEmailService emailService,
             IRefreshTokenService refreshTokenService,
             IHostingEnvironment env,
-            RoleManager<IdentityRole<int>> roleManager
+            RoleManager<IdentityRole<int>> roleManager,
+            IFeatureService featureService
             )
         {
             _dbContext = dbContext;
@@ -50,10 +54,33 @@ namespace Application.Services
             _refreshTokenService = refreshTokenService;
             _env = env;
             _roleManager = roleManager; 
+            _featureService = featureService;
         }
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
         public async Task SendInviteAsync(SendInviteRequest request, int currentUserId, int currentBusinessId)
         {
+
+            // 1. Count active users PLUS pending invitations for this business
+            int existingUsersCount = await _dbContext.Users
+                .CountAsync(u => u.BusinessId == currentBusinessId);
+
+            int pendingInvitationsCount = await _dbContext.TeamInvitations
+                .CountAsync(i => i.BusinessId == currentBusinessId && i.ExpiresAtUtc > DateTime.UtcNow);
+
+            // Exclude the 1 Business Owner if your business rule states owner doesn't count against max seats
+            int currentStaffSeatCount = (existingUsersCount - 1) + pendingInvitationsCount;
+
+            // 2. Verify limit via FeatureService
+            bool canInvite = await _featureService.CanCreateEntityAsync(
+                currentBusinessId,
+                featureKey: FeatureType.MaxUsers,
+                currentCount: currentStaffSeatCount);
+
+            if (!canInvite)
+            {
+                throw new InvalidOperationException("You have reached the maximum number of allowed team members/invitations for your active plan. Please upgrade your subscription.");
+            }
+
             // 1. Enforce Role Restriction: Can only invite "Manager" or "Staff"
             if (request.Role != Roles.Manager && request.Role != Roles.Staff)
             {

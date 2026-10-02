@@ -46,25 +46,7 @@ namespace Controllers
             return Ok(response);
         }
 
-        /// <summary>
-        /// Retrieves the active subscription details for the current tenant business.
-        /// </summary>
-        [HttpGet("subscription")]
-        [Authorize]
-        public async Task<ActionResult<TenantSubscriptionResponse>> GetSubscription()
-        {
-            int businessId = GetCurrentBusinessId();
-            var subscription = await _paymentService.GetCurrentSubscriptionAsync(
-                businessId,
-                HttpContext.RequestAborted);
-
-            if (subscription == null)
-            {
-                return NotFound("No active subscription record found for this business.");
-            }
-
-            return Ok(subscription);
-        }
+       
 
         /// <summary>
         /// Public Webhook endpoint for Paymob transaction callbacks.
@@ -109,13 +91,15 @@ namespace Controllers
                 }
 
                 int businessId = int.Parse(reference.Split('-')[1]);
+                int planId = int.Parse(reference.Split('-')[2]);
 
                 var callbackRequest = new ProcessPaymentCallbackRequest(
                     Provider: "Paymob",
                     ExternalTransactionId: payload.Obj.Id.ToString(),
                     Amount: payload.Obj.AmountCents / 100m,
                     IsSuccess: payload.Obj.Success,
-                    BusinessId: businessId
+                    BusinessId: businessId,
+                    planId : planId
                 );
 
                 // 4. Delegate database update, transaction logging, and idempotency check to PaymentService
@@ -127,8 +111,8 @@ namespace Controllers
 
         private int GetCurrentBusinessId()
         {
-            var claim = User.FindFirst("BusinessId")?.Value;
-            return claim != null ? int.Parse(claim) : 1;
+            var claim = User.FindFirst("business_id")?.Value;
+            return claim != null ? int.Parse(claim) : 0;
         }
     }
 }

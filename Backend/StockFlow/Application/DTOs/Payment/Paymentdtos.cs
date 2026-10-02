@@ -40,7 +40,8 @@ namespace Application.DTOs.Payment
             string ExternalTransactionId,
             decimal Amount,
             bool IsSuccess,
-            int BusinessId
+            int BusinessId,
+            int planId
         );
 
         // Internal DTO mapping Paymob Webhook JSON schema

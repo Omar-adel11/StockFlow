@@ -48,6 +48,8 @@ namespace Application
 
 
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IFeatureService, FeatureService>();
+            services.AddScoped<ISubscriptionService, SubscriptionService>();
             // Service Manager (Unit of Work pattern for Services)
             services.AddScoped<IServiceManager, ServiceManager>();
 

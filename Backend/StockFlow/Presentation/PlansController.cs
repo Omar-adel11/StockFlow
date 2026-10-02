@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.DTOs;
+using Application.DTOs.plandtos;
 using Application.Interfaces;
 using Domain.Helpers;
 using Microsoft.AspNetCore.Authorization;

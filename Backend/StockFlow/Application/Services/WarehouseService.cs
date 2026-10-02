@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-    public class WarehouseService(IAppDbContext _context) : IWarehouseService
+    public class WarehouseService(IAppDbContext _context,IFeatureService _featureService) : IWarehouseService
     {
         private DbSet<Warehouse> WarehouseSet => _context.Warehouses;
 
@@ -44,6 +46,20 @@ namespace Application.Services
 
         public async Task<WarehouseDtos.WarehouseResponse> CreateWarehouseAsync(WarehouseDtos.WarehouseCreateRequest createRequest, int businessId)
         {
+
+            int currentWarehouseCount = await _context.Warehouses.CountAsync(w => w.BusinessId == businessId);
+
+            // 2. Verify limit via FeatureService
+            bool canCreate = await _featureService.CanCreateEntityAsync(
+                businessId,
+                featureKey: FeatureType.MaxWarehouses,
+                currentCount: currentWarehouseCount);
+
+            if (!canCreate)
+            {
+                throw new InvalidOperationException("You have reached the maximum number of allowed warehouses for your active plan. Please upgrade your subscription.");
+            }
+
             var warehouse = new Warehouse
             {
                 Name = createRequest.WarehouseName,

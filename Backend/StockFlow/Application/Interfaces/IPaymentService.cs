@@ -10,7 +10,6 @@ namespace Application.Interfaces
     public interface IPaymentService
     {
         Task<CheckoutSessionResponse> CreateCheckoutSessionAsync(int businessId, CreateCheckoutSessionRequest request, CancellationToken ct = default);
-        Task<bool> ProcessPaymentCallbackAsync(ProcessPaymentCallbackRequest request, CancellationToken ct = default);
-        Task<TenantSubscriptionResponse?> GetCurrentSubscriptionAsync(int businessId, CancellationToken ct = default);
+        Task ProcessPaymentCallbackAsync(ProcessPaymentCallbackRequest request, CancellationToken ct = default);
     }
 }
