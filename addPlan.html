@@ -91,9 +91,26 @@
             </div>
 
             <div class="form-group">
-              <label for="plan-features">Features</label>
-              <textarea id="plan-features" name="features" rows="7" placeholder="One feature per line"></textarea>
-              <p class="field-hint">Each line becomes a separate feature in the plan.</p>
+              <label>Plan Features</label>
+              <p class="field-hint">These are fixed StockFlow features. Set the limit for each feature instead of entering arbitrary feature names.</p>
+              <div class="feature-limit-grid">
+                <div class="feature-limit-row">
+                  <div><strong>Maximum Warehouses</strong><span class="field-hint">Number of warehouses this business can create.</span></div>
+                  <select id="max-warehouses-mode">
+                    <option value="limit">Set Limit</option>
+                    <option value="unlimited">Unlimited</option>
+                  </select>
+                  <input type="number" id="max-warehouses-value" min="1" step="1" placeholder="e.g. 5">
+                </div>
+                <div class="feature-limit-row">
+                  <div><strong>Maximum Users</strong><span class="field-hint">Number of team members/users allowed.</span></div>
+                  <select id="max-users-mode">
+                    <option value="limit">Set Limit</option>
+                    <option value="unlimited">Unlimited</option>
+                  </select>
+                  <input type="number" id="max-users-value" min="1" step="1" placeholder="e.g. 10">
+                </div>
+              </div>
             </div>
 
             <div class="form-group form-checkbox">
