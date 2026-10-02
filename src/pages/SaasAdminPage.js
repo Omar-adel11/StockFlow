@@ -126,7 +126,7 @@ function renderPlans(plans) {
       <div class="plan-card-header"><div><h3>${escapeHtml(plan.name)}</h3></div><span class="badge ${plan.isActive ? 'badge-active' : 'badge-inactive'}">${plan.isActive ? 'Active' : 'Inactive'}</span></div>
       <p class="plan-price">$${Number(plan.price || 0).toFixed(2)} <span>/ ${escapeHtml(plan.billingCycle || 'Monthly')}</span></p>
       <p class="plan-description">${escapeHtml(plan.description || '')}</p>
-      <ul class="plan-features">${(plan.features || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+      <ul class="plan-features">${(plan.features || []).map(featureText).filter(Boolean).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
       <div class="plan-card-actions"><a href="addPlan.html?id=${plan.id}" class="btn btn-secondary">Edit</a>
         <button type="button" class="btn btn-danger delete-plan-btn" data-plan-id="${plan.id}">Delete</button></div>
     `;
@@ -147,6 +147,15 @@ function renderPlans(plans) {
 function initials(name = '') {
   return name.split(/\s+/).filter(Boolean).slice(0,2).map(x => x[0].toUpperCase()).join('') || 'U';
 }
+function featureText(feature) {
+  if (typeof feature === 'string') return feature;
+  const name = feature?.name || feature?.featureKey || 'Feature';
+  const value = feature?.value;
+  if (!value || String(value).toLowerCase() === 'true') return name;
+  if (String(value).toLowerCase() === 'false') return '';
+  return `${name}: ${value}`;
+}
+
 function escapeHtml(value) {
   return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
