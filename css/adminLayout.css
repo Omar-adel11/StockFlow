@@ -559,3 +559,4 @@ main:has(#business-owners:target) .admin-tab[href="#business-owners"] {
     padding: 22px;
   }
 }
+.trial-plan-label{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:999px;background:#e7f7ef;color:#18794e;font-size:11px;font-weight:700;}
