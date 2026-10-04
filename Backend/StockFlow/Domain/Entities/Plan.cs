@@ -18,6 +18,7 @@ namespace Domain.Entities
         public BillingCycle BillingCycle { get; set; }
         public string Description { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
+        public bool IsFreeTrial { get; set; } = false;
 
         public ICollection<PlanFeature> Features { get; set; } = new List<PlanFeature>();
 

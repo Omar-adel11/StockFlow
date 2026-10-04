@@ -6,6 +6,8 @@ using Application.DTOs.plandtos;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -24,6 +26,8 @@ namespace Application.Services
             return plans.Select(MapToResponse).ToList();
         }
 
+
+
         public async Task<PlanResponseDto?> GetPlanByIdAsync(int id)
         {
             var plan = await _planRepository.GetByIdAsync(id);
@@ -32,6 +36,25 @@ namespace Application.Services
 
         public async Task<PlanResponseDto> CreatePlanAsync(PlanRequestDto request)
         {
+            if(request.IsFreeTrial)
+            {
+                if (request.IsFreeTrial && request.Price > 0)
+                {
+                    throw new InvalidOperationException("A free trial plan must have a price of 0.");
+                }
+
+                //  Ensure only one active Free Trial plan exists in the database
+
+                bool hasExistingFreeTrial = await _planRepository.AnyFreeTrialPlanAsync();
+
+                if (hasExistingFreeTrial)
+                {
+                    throw new InvalidOperationException("An active Free Trial plan already exists.");
+                }
+                
+            }
+           
+
             var plan = new Plan
             {
                 Name = request.Name.Trim(),
@@ -39,7 +62,8 @@ namespace Application.Services
                 BillingCycle = request.BillingCycle,
                 Description = request.Description.Trim(),
                 IsActive = request.IsActive,
-                Features = BuildFeatureList(request.Features)
+                Features = BuildFeatureList(request.Features),
+                IsFreeTrial = request.IsFreeTrial
             };
 
             await _planRepository.AddAsync(plan);
@@ -115,6 +139,7 @@ namespace Application.Services
                 BillingCycle = plan.BillingCycle.ToString(),
                 Description = plan.Description,
                 IsActive = plan.IsActive,
+                IsFreeTrial = plan.IsFreeTrial,
                 Features = plan.Features?.Select(f => new PlanFeatureDto
                 {
                     Name = f.Name,

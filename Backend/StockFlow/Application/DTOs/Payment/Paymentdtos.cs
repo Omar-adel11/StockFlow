@@ -14,6 +14,7 @@ namespace Application.DTOs.Payment
         public record CreateCheckoutSessionRequest(
             int PlanId,
             string Provider, // "Paymob" or "Stripe"
+            bool? AutoRenew ,
             string SuccessUrl,
             string CancelUrl
         );

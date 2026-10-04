@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Application.DTOs.Payment.Paymentdtos;
+using static Application.DTOs.Subscriptions.Subscriptiondtos;
 
 namespace Controllers
 {
@@ -19,40 +20,52 @@ namespace Controllers
         }
 
         /// <summary>
-        /// Initiates a subscription flow for the authenticated business owner.
-        /// Redirects to the payment gateway checkout.
+        /// Starts a 14-day free trial for eligible businesses.
         /// </summary>
-        [HttpPost("subscribe")]
-        public async Task<ActionResult<CheckoutSessionResponse>> Subscribe(
-            [FromBody] CreateCheckoutSessionRequest request)
+        [HttpPost("start-trial")]
+        public async Task<ActionResult<SubscriptionDto>> StartTrial(
+            [FromQuery] int planId,
+            CancellationToken ct)
         {
             int businessId = GetCurrentBusinessId();
+            var result = await _subscriptionService.StartFreeTrialAsync(
+                businessId,
+                planId,
+                ct);
 
-            var response = await _subscriptionService.SubscribeAsync(
-                businessId: businessId,
-                planId: request.PlanId,
-                provider: request.Provider,
-                successUrl: request.SuccessUrl,
-                cancelUrl: request.CancelUrl,
-                ct: HttpContext.RequestAborted);
-
-            return Ok(response);
+            return Ok(result);
         }
 
         /// <summary>
-        /// Retrieves the active subscription details for the current tenant business.
+        /// Retrieves active subscription details for the authenticated business owner.
         /// </summary>
         [HttpGet("me")]
-        public async Task<ActionResult<TenantSubscriptionResponse>> GetMySubscription()
+        public async Task<ActionResult<TenantSubscriptionResponse>> GetMySubscription(CancellationToken ct)
         {
             int businessId = GetCurrentBusinessId();
 
             var subscription = await _subscriptionService.GetCurrentSubscriptionAsync(
                 businessId,
-                HttpContext.RequestAborted);
-
+                ct);
 
             return Ok(subscription);
+        }
+
+        /// <summary>
+        /// Cancels/deactivates the active subscription for the authenticated business owner.
+        /// </summary>
+        [HttpPost("cancel")]
+        public async Task<ActionResult<bool>> DeactivateSubscription(
+            [FromQuery] int planId,
+            CancellationToken ct)
+        {
+            int businessId = GetCurrentBusinessId();
+
+            bool result = await _subscriptionService.DeactivateSubscription(
+                businessId,
+                planId);
+
+            return Ok(result);
         }
 
         private int GetCurrentBusinessId()

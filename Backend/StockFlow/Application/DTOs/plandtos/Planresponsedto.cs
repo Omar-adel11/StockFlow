@@ -11,6 +11,7 @@ namespace Application.DTOs.plandtos
 
         public string Description { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public bool IsFreeTrial { get; set; } = false;
 
         public List<PlanFeatureDto> Features { get; set; } = new();
     }

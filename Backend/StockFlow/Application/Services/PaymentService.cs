@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Entities.Enum;
+using Domain.Exceptions.NotFound;
 using Domain.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,23 +21,28 @@ namespace Application.Services
         private readonly IAppDbContext _dbContext;
         private readonly IPaymentGatewayFactory _gatewayFactory;
         private readonly ILogger<PaymentService> _logger;
-        private readonly ISaaSAdminService _saaSAdminService;
+        private readonly ISubscriptionService _subscriptionService;
 
 
         public PaymentService(
             IAppDbContext dbContext,
             IPaymentGatewayFactory gatewayFactory,
             ILogger<PaymentService> logger,
-            ISaaSAdminService saaSAdminService)
+            ISubscriptionService subscriptionService)
         {
             _dbContext = dbContext;
             _gatewayFactory = gatewayFactory;
             _logger = logger;
-            _saaSAdminService = saaSAdminService;
+            _subscriptionService = subscriptionService;
         }
 
         public async Task<CheckoutSessionResponse> CreateCheckoutSessionAsync(int businessId,CreateCheckoutSessionRequest request, CancellationToken ct = default)
         {
+
+            var business = await _dbContext.Business.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(b => b.Id == businessId, ct)
+                ?? throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
+
             var plan = await _dbContext.Plans.FirstOrDefaultAsync(p => p.Id == request.PlanId && p.IsActive, ct);
 
             if (plan == null)
@@ -44,64 +51,75 @@ namespace Application.Services
             }
 
 
-            var subscription = await _dbContext.TenantSubscriptions.FirstOrDefaultAsync(s => s.BusinessId == businessId, ct);
+           
+                string idempotencyKey = $"STOCKFLOW-{businessId}-{plan.Id}-{DateTime.UtcNow:yyyyMMddHHmm}";
 
-            
 
-
-            if (subscription == null)
-            {
-                subscription = new TenantSubscription
+                // 4. Record Pending Payment Transaction in DB
+                var pendingTransaction = new PaymentTransaction
                 {
                     BusinessId = businessId,
-                    PlanId = plan.Id,
-                    Plan = plan,
-                    Status = SubscriptionStatus.Expired,
-                    StartDateUtc = DateTime.UtcNow,
-                    EndDateUtc = DateTime.UtcNow
+                    ExternalTransactionId = idempotencyKey, // Used as lookup key during webhook
+                    Amount = plan.Price,
+                    Provider = request.Provider,
+                    Status = MyTransactionStatus.Pending, // Represents Pending
+                    CreatedAtUtc = DateTime.UtcNow
                 };
+
+                _dbContext.PaymentTransactions.Add(pendingTransaction);
+                await _dbContext.SaveChangesAsync(ct);
+
+
+            var subscription = await _dbContext.TenantSubscriptions
+    .IgnoreQueryFilters()
+    .AsNoTracking()
+    .Where(s => s.BusinessId == businessId)
+    .OrderByDescending(s => s.Id)
+    .FirstOrDefaultAsync(ct);
+
+            int extensionDays = plan.BillingCycle == 0 ? 30 : 365;
+            DateTime now = DateTime.UtcNow;
+
+            if (subscription != null)
+            {
+                // Calculate prospective extended end date for the gateway payload
+                DateTime baseDate = (subscription.Status == SubscriptionStatus.Active && subscription.EndDateUtc > now)
+                    ? subscription.EndDateUtc
+                    : now;
+
+                subscription.PlanId = request.PlanId;
+                subscription.EndDateUtc = baseDate.AddDays(extensionDays);
+                subscription.AutoRenew = request.AutoRenew ?? false;
             }
             else
             {
-                if (subscription.PlanId == request.PlanId
-                && subscription.Status == SubscriptionStatus.Active
-                && subscription.EndDateUtc > DateTime.UtcNow)
+                // Standalone in-memory entity passed solely to the gateway strategy
+                subscription = new TenantSubscription
                 {
-                    throw new InvalidOperationException("Your business is already subscribed to this active plan.");
-                }
-                subscription.PlanId = plan.Id;
-                subscription.Plan = plan;
+                    BusinessId = businessId,
+                    PlanId = request.PlanId,
+                    StartDateUtc = now,
+                    EndDateUtc = now.AddDays(extensionDays),
+                    Status = SubscriptionStatus.Pending,
+                    AutoRenew = request.AutoRenew ?? false
+                };
             }
-
-
-
-            string idempotencyKey = $"STOCKFLOW-{businessId}-{plan.Id}-{DateTime.UtcNow:yyyyMMddHHmm}";
-
-
-            // 4. Record Pending Payment Transaction in DB
-            var pendingTransaction = new PaymentTransaction
-            {
-                BusinessId = businessId,
-                ExternalTransactionId = idempotencyKey, // Used as lookup key during webhook
-                Amount = plan.Price,
-                Provider = request.Provider,
-                Status = MyTransactionStatus.Pending, // Represents Pending
-                CreatedAtUtc = DateTime.UtcNow
-            };
-
-            _dbContext.PaymentTransactions.Add(pendingTransaction);
-            await _dbContext.SaveChangesAsync(ct);
 
             var gateway = _gatewayFactory.GetProvider(request.Provider);
 
+
+
             return await gateway.CreateCheckoutSessionAsync(
-                subscription,
-                plan.Price,
-                plan.Currency,
-                idempotencyKey,
-                request.SuccessUrl,
-                request.CancelUrl,
-                ct);
+                    subscription,
+                    plan.Price,
+                    plan.Currency,
+                    idempotencyKey,
+                    request.SuccessUrl,
+                    request.CancelUrl,
+                    ct);
+
+
+
         }
 
         public async Task ProcessPaymentCallbackAsync(ProcessPaymentCallbackRequest request, CancellationToken ct)
@@ -129,81 +147,49 @@ namespace Application.Services
             }
 
             // 3. Update or Create Tenant Subscription
-            var subscription = await _dbContext.TenantSubscriptions
-                .FirstOrDefaultAsync(s => s.BusinessId == request.BusinessId, ct);
+
+            var plan = await _dbContext.Plans.FirstOrDefaultAsync(p => p.Id == request.planId);
+
+            if (plan is null)
+            {
+                throw new PlanNotFoundException();
+            }
 
             DateTime now = DateTime.UtcNow;
 
-            if (subscription == null)
+            var result = await _subscriptionService.ActivateSubscription(request.BusinessId,request.planId, plan.BillingCycle == 0 ? 30 : 365);
+            
+            if(result)
             {
-                subscription = new TenantSubscription
+                // 4. Mark Pending Transaction as Successful
+                if (pendingTransaction != null)
                 {
-                    BusinessId = request.BusinessId,
-                    PlanId = request.planId,
-                    Status = SubscriptionStatus.Active,
-                    StartDateUtc = now,
-                    EndDateUtc = now.AddDays(30)
-                };
-                _dbContext.TenantSubscriptions.Add(subscription);
-            }
-            else
-            {
-                // Stacking logic: extend from current EndDateUtc if currently active
-                DateTime baseDate = (subscription.Status == SubscriptionStatus.Active && subscription.EndDateUtc > now)
-                    ? subscription.EndDateUtc
-                    : now;
-
-                subscription.PlanId = request.planId;
-                subscription.Status = SubscriptionStatus.Active;
-                subscription.StartDateUtc = now;
-                subscription.EndDateUtc = baseDate.AddDays(30);
-            }
-
-            // 4. Mark Pending Transaction as Successful
-            if (pendingTransaction != null)
-            {
-                pendingTransaction.Status = MyTransactionStatus.Success;
-                pendingTransaction.Amount = request.Amount;
-            }
-            else
-            {
-                _dbContext.PaymentTransactions.Add(new PaymentTransaction
-                {
-                    BusinessId = request.BusinessId,
-                    ExternalTransactionId = request.ExternalTransactionId,
-                    Amount = request.Amount,
-                    Provider = request.Provider,
-                    Status = MyTransactionStatus.Success,
-                    CreatedAtUtc = now
-                });
-            }
-
-            // 5. Sync Business Owner Status
-            var owner = await _dbContext.Users
-                .Where(u => u.BusinessId == request.BusinessId
-                         && _dbContext.UserRoles.Any(ur => ur.UserId == u.Id
-                         && _dbContext.Roles.Any(r => r.Id == ur.RoleId && r.Name == Roles.BusinessOwner)))
-                .Select(u => new { u.Id })
-                .FirstOrDefaultAsync(ct);
-
-            if (owner != null)
-            {
-                var updateOwnerRequest = new UpdateOwnerStatusRequest
-                {
-                    IsActive = true,
-                    PlanId = request.planId
-                };
-
-                bool result = await _saaSAdminService.UpdateBusinessOwnerStatusAsync(owner.Id, updateOwnerRequest);
-                if (!result)
-                {
-                    _logger.LogError("Failed to update user plan for owner {OwnerId}", owner.Id);
-                    throw new InvalidOperationException("Failed to update business owner plan.");
+                    pendingTransaction.Status = MyTransactionStatus.Success;
+                    pendingTransaction.Amount = request.Amount;
                 }
-            }
+                else
+                {
+                    _dbContext.PaymentTransactions.Add(new PaymentTransaction
+                    {
+                        BusinessId = request.BusinessId,
+                        ExternalTransactionId = request.ExternalTransactionId,
+                        Amount = request.Amount,
+                        Provider = request.Provider,
+                        Status = MyTransactionStatus.Success,
+                        CreatedAtUtc = now
+                    });
+                }
 
-            // 6. Commit Database Transaction
-            await _dbContext.SaveChangesAsync(ct);
+                await _dbContext.SaveChangesAsync(ct);
+
+              
+                }
+                else
+                {
+                    _logger.LogError("Failed to activate subscription after payment success for Business {BusinessId}", request.BusinessId);
+                    throw new InvalidOperationException("Failed to activate subscription after payment success.");
+                }
+
         }
 
        

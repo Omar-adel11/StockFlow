@@ -18,7 +18,7 @@ namespace Application.Interfaces
         void Update(Plan plan);
 
         void Delete(Plan plan);
-
+        Task<bool> AnyFreeTrialPlanAsync();
         Task SaveChangesAsync();
 
     }

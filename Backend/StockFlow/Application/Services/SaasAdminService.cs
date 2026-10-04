@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs.businessOwner;
@@ -15,7 +16,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services
 {
-    public class SaaSAdminService(IAppDbContext _context, UserManager<User> _userManager) : ISaaSAdminService
+    public class SaaSAdminService(IAppDbContext _context, UserManager<User> _userManager,ISubscriptionService subscriptionService) : ISaaSAdminService
     {
 
 
@@ -76,6 +77,16 @@ namespace Application.Services
 
             var business = user.Business;
 
+            var plan = await _context.Plans
+                  .IgnoreQueryFilters()
+                  .FirstOrDefaultAsync(p => p.Id == request.PlanId);
+
+            if (plan is null)
+            {
+                throw new PlanNotFoundException();
+            }
+
+
             if (request.IsActive)
             {
                 // 1. If activating, a valid plan is mandatory
@@ -84,27 +95,25 @@ namespace Application.Services
                     throw new ArgumentException("A subscription plan must be assigned when activating a business owner.");
                 }
 
-                var planExists = await _context.Plans
-                    .IgnoreQueryFilters()
-                    .AnyAsync(p => p.Id == request.PlanId.Value);
-
-                if (!planExists)
-                {
-                    throw new PlanNotFoundException();
-                }
-
+              
                 business.PlanId = request.PlanId.Value;
                 business.IsActive = true;
+                //add tenant subscription
+                var result = await subscriptionService.ActivateSubscription(business.Id, plan.Id, plan.BillingCycle == 0 ? 30 : 365);
+                return result;
+
             }
             else
             {
                 // Deactivate the business tenant and clear the plan assignment
                 business.IsActive = false;
-                business.PlanId = request.PlanId; // Assigns null (or a new plan if explicitly provided)
+                business.PlanId = null; // Assigns null (or a new plan if explicitly provided)
+                //end subscription
+                var result = await subscriptionService.DeactivateSubscription(business.Id, plan.Id);
+                return result;
             }
 
-            await _context.SaveChangesAsync();
-            return true;
+           
         }
     }
 }

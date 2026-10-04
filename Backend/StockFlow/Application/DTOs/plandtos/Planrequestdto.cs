@@ -22,6 +22,7 @@ namespace Application.DTOs.plandtos
         public string Description { get; set; } = string.Empty;
 
         public bool IsActive { get; set; } = true;
+        public bool IsFreeTrial { get; set; } = false;
 
         // Structured feature list mapping directly to PlanFeature rows
         public List<PlanFeatureDto> Features { get; set; } = new();

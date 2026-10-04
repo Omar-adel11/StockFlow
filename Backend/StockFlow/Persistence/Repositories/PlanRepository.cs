@@ -46,6 +46,10 @@ namespace Persistence.Repositories
             _context.Plans.Remove(plan);
         }
 
+        public async Task<bool> AnyFreeTrialPlanAsync()
+        {
+            return await _context.Plans.AnyAsync(p => p.IsFreeTrial);
+        }
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

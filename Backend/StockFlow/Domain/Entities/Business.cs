@@ -15,5 +15,27 @@ namespace Domain.Entities
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public ICollection<User> Users { get; set; } = new List<User>();
+
+        public bool HasUsedFreeTrial { get; private set; } = false;
+
+        public bool CanStartFreeTrial()
+        {
+            // Must never have used a trial before
+            if (HasUsedFreeTrial)
+                return false;
+
+            return true;
+        }
+
+        public void MarkFreeTrialUsed()
+        {
+            HasUsedFreeTrial = true;
+        }
+
+        public void UndoMarkFreeTrialUsed()
+        {
+            HasUsedFreeTrial = false;
+        }
+
     }
 }
