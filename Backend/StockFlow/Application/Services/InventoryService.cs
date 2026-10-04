@@ -92,5 +92,9 @@ namespace Application.Services
                 ))
                 .ToListAsync();
         }
+
+        //move product across inventories
+
+
     }
 }

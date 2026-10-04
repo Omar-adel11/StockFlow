@@ -30,7 +30,7 @@ namespace Application.Services
         public async Task<bool> AssignPlanAsync(int businessId, int planId)
         {
             // 1. Validate Business Exists
-            var business = await _dbContext.Business.FindAsync(businessId);
+            var business = await _dbContext.Business.IgnoreQueryFilters().FirstOrDefaultAsync(b => b.Id == businessId);
             if (business == null)
             {
                 throw new BusinessNotFoundException();
