@@ -48,15 +48,17 @@ form.addEventListener('submit', async (event) => {
             return;
         }
 
+        const normalizedRole = String(role).toLowerCase().replace(/\\s+/g, '');
+        const isOwner = ['businessowner', 'owner'].includes(normalizedRole);
         try {
             const subscription = await getWithAuth(`${baseUrl}/api/Subscriptions/me`);
             const status = String(subscription?.status ?? '').toLowerCase();
-            const active = (status === 'active' || status === '1')
+            const active = ['active', 'trialing', '1', '5'].includes(status)
                 && new Date(subscription?.endDateUtc) > new Date();
-
-            window.location.href = active ? 'dashboard.html' : 'plans.html?required=subscription';
+            if (active) window.location.href = 'dashboard.html';
+            else window.location.href = isOwner ? 'plans.html?required=subscription' : 'subscription-expired.html';
         } catch {
-            window.location.href = 'plans.html?required=subscription';
+            window.location.href = isOwner ? 'plans.html?required=subscription' : 'subscription-expired.html';
         }
     } catch (error) {
         console.error(error);
