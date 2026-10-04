@@ -72,6 +72,7 @@ async function init() {
   field('description').value = plan.description || '';
   loadFeatures(plan.features);
   field('isActive').checked = plan.isActive !== false;
+  field('isFreeTrial').checked = plan.isFreeTrial === true;
   submitButton.textContent = 'Update Plan';
 }
 
@@ -86,6 +87,7 @@ form?.addEventListener('submit', async e => {
     billingCycle: field('billingCycle').value === '1' ? 1 : 0,
     description: field('description').value.trim(),
     isActive: field('isActive').checked,
+    isFreeTrial: field('isFreeTrial').checked,
     features: buildFeatures()
   };
 
