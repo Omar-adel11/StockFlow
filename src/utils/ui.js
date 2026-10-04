@@ -1,4 +1,5 @@
 let noticeTimer = null;
+let noticeHost;
 
 function getNoticeHost() {
   let host = document.getElementById('page-notice-host');
@@ -25,21 +26,17 @@ export function showNotice(message, type = 'success', duration = 3500) {
     <button type="button" class="page-notice-close" aria-label="Dismiss">&times;</button>
   `;
   card.querySelector('span').textContent = message;
-  card.querySelector('.page-notice-close').addEventListener('click', () => {
-    host.innerHTML = '';
-  });
+  card.querySelector('.page-notice-close').addEventListener('click', () => host.replaceChildren());
   host.appendChild(card);
   clearTimeout(noticeTimer);
-  if (duration > 0) {
-    noticeTimer = setTimeout(() => { host.innerHTML = ''; }, duration);
-  }
+  if (duration > 0) noticeTimer = setTimeout(() => host.replaceChildren(), duration);
 }
 
 export function showConfirm(message, options = {}) {
-  const { confirmText = 'Confirm', cancelText = 'Cancel', danger = true } = options;
+  const { confirmText = 'Confirm', cancelText = 'Cancel', danger = true, title = 'Confirm action' } = options;
   return new Promise(resolve => {
     const host = getNoticeHost();
-    host.innerHTML = '';
+    host.replaceChildren();
     const backdrop = document.createElement('div');
     backdrop.className = 'confirmation-overlay';
     const card = document.createElement('div');
@@ -49,28 +46,21 @@ export function showConfirm(message, options = {}) {
     card.innerHTML = `
       <div class="confirmation-content">
         <span class="confirmation-icon">!</span>
-        <div>
-          <h3>Confirm action</h3>
-          <p></p>
-        </div>
+        <div><h3></h3><p></p></div>
       </div>
       <div class="confirmation-actions">
-        <button type="button" class="btn btn-secondary confirmation-cancel">${cancelText}</button>
-        <button type="button" class="btn ${danger ? 'btn-danger' : 'btn-primary'} confirmation-ok">${confirmText}</button>
-      </div>
-    `;
+        <button type="button" class="btn btn-secondary confirmation-cancel"></button>
+        <button type="button" class="btn ${danger ? 'btn-danger' : 'btn-primary'} confirmation-ok"></button>
+      </div>`;
+    card.querySelector('h3').textContent = title;
     card.querySelector('p').textContent = message;
+    card.querySelector('.confirmation-cancel').textContent = cancelText;
+    card.querySelector('.confirmation-ok').textContent = confirmText;
     backdrop.appendChild(card);
-
-    const finish = value => {
-      host.innerHTML = '';
-      resolve(value);
-    };
+    const finish = value => { host.replaceChildren(); resolve(value); };
     card.querySelector('.confirmation-cancel').addEventListener('click', () => finish(false));
     card.querySelector('.confirmation-ok').addEventListener('click', () => finish(true));
-    backdrop.addEventListener('click', e => {
-      if (e.target === backdrop) finish(false);
-    });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) finish(false); });
     host.appendChild(backdrop);
     card.querySelector('.confirmation-cancel').focus();
   });
