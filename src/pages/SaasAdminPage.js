@@ -123,7 +123,7 @@ function renderPlans(plans) {
     const card = document.createElement('article');
     card.className = 'card plan-card';
     card.innerHTML = `
-      <div class="plan-card-header"><div><h3>${escapeHtml(plan.name)}</h3></div><span class="badge ${plan.isActive ? 'badge-active' : 'badge-inactive'}">${plan.isActive ? 'Active' : 'Inactive'}</span></div>
+      <div class="plan-card-header"><div><h3>${escapeHtml(plan.name)}</h3>${plan.isFreeTrial ? '<span class="trial-plan-label">Free Trial</span>' : ''}</div><span class="badge ${plan.isActive ? 'badge-active' : 'badge-inactive'}">${plan.isActive ? 'Active' : 'Inactive'}</span></div>
       <p class="plan-price">$${Number(plan.price || 0).toFixed(2)} <span>/ ${escapeHtml(plan.billingCycle || 'Monthly')}</span></p>
       <p class="plan-description">${escapeHtml(plan.description || '')}</p>
       <ul class="plan-features">${(plan.features || []).map(featureText).filter(Boolean).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
