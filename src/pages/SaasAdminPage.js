@@ -81,7 +81,7 @@ function renderOwners(owners) {
           return;
         }
         toggle.disabled = true;
-        await updateBusinessOwnerStatus(owner.id, next, next ? owner.currentPlanId : null);
+        await updateBusinessOwnerStatus(owner.id, next, owner.currentPlanId ?? null);
         showNotice('Business owner status updated successfully.');
         renderOwners(await getBusinessOwners(ownerSearch?.value || null));
       } catch (error) {
