@@ -32,16 +32,21 @@ export async function deletePlan(id) {
     return await delWithAuth(`${plansEndpoint}/${id}`);
 }
 
-export async function subscribeToPlan(planId, provider = 'Paymob') {
+export async function subscribeToPlan(planId, provider = 'Paymob', autoRenew = false) {
     const successUrl = new URL('payment-success.html', window.location.href).href;
     const cancelUrl = new URL('plans.html?payment=cancelled', window.location.href).href;
 
-    return await postWithAuth(`${baseUrl}/api/Subscriptions/subscribe`, {
+    return await postWithAuth(`${baseUrl}/api/Payments/checkout`, {
         planId: Number(planId),
         provider,
+        autoRenew,
         successUrl,
         cancelUrl
     });
+}
+
+export async function startFreeTrial(planId) {
+    return await postWithAuth(`${baseUrl}/api/Subscriptions/start-trial?planId=${encodeURIComponent(Number(planId))}`, {});
 }
 
 export async function getMySubscription() {
