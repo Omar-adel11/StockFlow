@@ -184,7 +184,7 @@ namespace Application.Services
 
             // Fetch the latest active (or active/trial) subscription record
             var subscription = await _dbContext.TenantSubscriptions
-                 .Where(s => s.BusinessId == businessId
+                 .Where(s => s.BusinessId == businessId && s.PlanId == planId
                           && s.Status == SubscriptionStatus.Active
                           && s.EndDateUtc > DateTime.UtcNow)
                  .OrderByDescending(s => s.Id)
