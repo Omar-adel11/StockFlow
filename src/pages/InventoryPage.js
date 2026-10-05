@@ -2,7 +2,12 @@ import '../sessions/authGuard.js';
 import { inventoryService } from '../services/InventoryService.js';
 import { productService } from '../services/ProductService.js';
 import { warehouseService } from '../services/WarehouseService.js';
-import { validateStockAdjustment, buildAdjustmentPayload } from '../validation/inventoryValidation.js';
+import { 
+  validateStockAdjustment, 
+  buildAdjustmentPayload,
+  validateStockTransfer,
+  buildTransferPayload
+} from '../validation/inventoryValidation.js';
 
 export class InventoryPage {
   constructor() {
@@ -31,6 +36,15 @@ export class InventoryPage {
     this.adjustSubmitBtn = document.getElementById('adjust-submit-btn');
     this.adjustStatus = document.getElementById('adjust-form-status');
 
+    // Transfer Stock Form controls
+    this.transferForm = document.getElementById('transfer-stock-form');
+    this.transferProduct = document.getElementById('transfer-product');
+    this.transferFrom = document.getElementById('transfer-from-warehouse');
+    this.transferTo = document.getElementById('transfer-to-warehouse');
+    this.transferQuantity = document.getElementById('transfer-quantity');
+    this.transferSubmitBtn = document.getElementById('transfer-submit-btn');
+    this.transferStatus = document.getElementById('transfer-form-status');
+
     // Current Stock Table
     this.inventoryTableBody = document.getElementById('inventory-table-body');
     this.inventoryEmpty = document.getElementById('inventory-empty');
@@ -55,6 +69,9 @@ export class InventoryPage {
     if (this.adjustForm) {
       this.adjustForm.addEventListener('submit', (e) => this.handleAdjustSubmit(e));
     }
+    if (this.transferForm) {
+      this.transferForm.addEventListener('submit', (e) => this.handleTransferSubmit(e));
+    }
   }
 
   async init() {
@@ -77,9 +94,12 @@ export class InventoryPage {
 
       this.populateSelect(this.filterProduct, this.products, 'All Products');
       this.populateSelect(this.adjustProduct, this.products, 'Select Product...');
-
       this.populateSelect(this.filterWarehouse, this.warehouses, 'All Warehouses');
       this.populateSelect(this.adjustWarehouse, this.warehouses, 'Select Warehouse...');
+
+      this.populateSelect(this.transferProduct, this.products, 'Select Product...');
+      this.populateSelect(this.transferFrom, this.warehouses, 'Select From Warehouse...');
+      this.populateSelect(this.transferTo, this.warehouses, 'Select To Warehouse...');
     } catch (err) {
       console.error('Failed to populate dropdown options:', err);
     }
@@ -121,7 +141,7 @@ export class InventoryPage {
       this.renderInventoryTable();
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
-      this.inventoryTableBody.innerHTML = '';
+      if (this.inventoryTableBody) this.inventoryTableBody.innerHTML = '';
       if (this.inventoryEmpty) {
         this.inventoryEmpty.textContent = 'Failed to load inventory levels.';
         this.inventoryEmpty.hidden = false;
@@ -132,6 +152,7 @@ export class InventoryPage {
   }
 
   renderInventoryTable() {
+    if (!this.inventoryTableBody) return;
     this.inventoryTableBody.innerHTML = '';
 
     if (!this.inventory || this.inventory.length === 0) {
@@ -173,7 +194,7 @@ export class InventoryPage {
       this.renderMovementsTable();
     } catch (error) {
       console.error('Failed to load stock movements:', error);
-      this.movementsTableBody.innerHTML = '';
+      if (this.movementsTableBody) this.movementsTableBody.innerHTML = '';
       if (this.movementsEmpty) {
         this.movementsEmpty.textContent = 'Failed to load stock movements.';
         this.movementsEmpty.hidden = false;
@@ -184,6 +205,7 @@ export class InventoryPage {
   }
 
   renderMovementsTable() {
+    if (!this.movementsTableBody) return;
     this.movementsTableBody.innerHTML = '';
 
     if (!this.movements || this.movements.length === 0) {
@@ -224,10 +246,10 @@ export class InventoryPage {
     this.setStatus('', '');
 
     const formData = {
-      productId: this.adjustProduct.value,
-      warehouseId: this.adjustWarehouse.value,
-      quantityChanged: this.adjustQuantity.value,
-      reason: this.adjustReason.value
+      productId: this.adjustProduct?.value,
+      warehouseId: this.adjustWarehouse?.value,
+      quantityChanged: this.adjustQuantity?.value,
+      reason: this.adjustReason?.value
     };
 
     const validation = validateStockAdjustment(formData);
@@ -239,18 +261,51 @@ export class InventoryPage {
     const payload = buildAdjustmentPayload(formData);
 
     try {
-      this.adjustSubmitBtn.disabled = true;
+      if (this.adjustSubmitBtn) this.adjustSubmitBtn.disabled = true;
       await inventoryService.adjustStock(payload);
       this.setStatus('Stock adjustment recorded successfully.', 'success');
       this.adjustForm.reset();
 
-      // Refresh inventory levels and movements table
       await Promise.all([this.loadInventoryData(), this.loadMovementsData()]);
     } catch (error) {
       console.error('Failed to record stock adjustment:', error);
       this.setStatus(error.message || 'Failed to record stock adjustment.', 'error');
     } finally {
-      this.adjustSubmitBtn.disabled = false;
+      if (this.adjustSubmitBtn) this.adjustSubmitBtn.disabled = false;
+    }
+  }
+
+  async handleTransferSubmit(event) {
+    event.preventDefault();
+    this.setTransferStatus('', '');
+
+    const formData = {
+      productId: this.transferProduct?.value,
+      fromId: this.transferFrom?.value,
+      toId: this.transferTo?.value,
+      quantity: this.transferQuantity?.value
+    };
+
+    const validation = validateStockTransfer(formData);
+    if (!validation.isValid) {
+      this.setTransferStatus(validation.errors.join(' | '), 'error');
+      return;
+    }
+
+    const payload = buildTransferPayload(formData);
+
+    try {
+      if (this.transferSubmitBtn) this.transferSubmitBtn.disabled = true;
+      await inventoryService.transferStock(payload);
+      this.setTransferStatus('Stock transferred successfully.', 'success');
+      this.transferForm.reset();
+
+      await Promise.all([this.loadInventoryData(), this.loadMovementsData()]);
+    } catch (error) {
+      console.error('Failed to transfer stock:', error);
+      this.setTransferStatus(error.message || 'Failed to transfer stock.', 'error');
+    } finally {
+      if (this.transferSubmitBtn) this.transferSubmitBtn.disabled = false;
     }
   }
 
@@ -258,6 +313,12 @@ export class InventoryPage {
     if (!this.adjustStatus) return;
     this.adjustStatus.textContent = message;
     this.adjustStatus.className = `form-status ${type}`;
+  }
+
+  setTransferStatus(message, type) {
+    if (!this.transferStatus) return;
+    this.transferStatus.textContent = message;
+    this.transferStatus.className = `form-status ${type}`;
   }
 }
 

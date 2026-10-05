@@ -43,3 +43,27 @@ export function buildAdjustmentPayload(formData) {
     referenceId: formData.referenceId ? parseInt(formData.referenceId, 10) : 0
   };
 }
+
+
+export function validateStockTransfer(data) {
+  const errors = [];
+  if (!data.productId) errors.push('Product is required.');
+  if (!data.fromId) errors.push('Source warehouse (From) is required.');
+  if (!data.toId) errors.push('Destination warehouse (To) is required.');
+  if (data.fromId === data.toId) errors.push('Source and destination warehouses must be different.');
+  if (!data.quantity || Number(data.quantity) <= 0) errors.push('Quantity must be greater than zero.');
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+export function buildTransferPayload(data) {
+  return {
+    fromId: Number(data.fromId),
+    toId: Number(data.toId),
+    productId: Number(data.productId),
+    quantity: Number(data.quantity)
+  };
+}
