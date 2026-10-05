@@ -95,6 +95,7 @@ namespace Application.Services
                 .Select(s => new TenantSubscriptionResponse(
                     s.Id,
                     s.BusinessId,
+                    s.PlanId,
                     s.Plan.Name,
                     s.Status,
                     s.StartDateUtc,
