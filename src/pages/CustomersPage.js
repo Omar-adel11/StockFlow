@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import * as customerService from '../services/CustomerService.js';
 import { validateCustomerForm, buildCustomerPayload } from '../validation/customerValidation.js';

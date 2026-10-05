@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { teamService } from '../services/teamService.js';
 import { showNotice } from '../utils/ui.js';
 import { clearSession } from '../sessions/session.js';

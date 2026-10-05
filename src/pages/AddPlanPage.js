@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { fetchPlans, createPlan, updatePlan } from '../services/planService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 

@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { warehouseService } from '../services/WarehouseService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 

@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { teamService } from '../services/teamService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import * as authService from '../services/authService.js';

@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import * as authService from '../services/authService.js';
 import { ValidateChangePasswordForm } from "../validation/authValidation.js";
 

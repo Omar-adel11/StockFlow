@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { inventoryService } from '../services/InventoryService.js';
 import { productService } from '../services/ProductService.js';
 import { warehouseService } from '../services/WarehouseService.js';

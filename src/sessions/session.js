@@ -1,18 +1,17 @@
+// sessions/session.js
+
 export function setSession(result) {
-    // Expects result to contain: { name, email, imgUrl, token, refreshToken }
-    sessionStorage.setItem('name', result.name || '');
-    sessionStorage.setItem('email', result.email || '');
-    sessionStorage.setItem('imgUrl', result.imgUrl || '');
-    sessionStorage.setItem('token', result.token || '');
-    sessionStorage.setItem('refreshToken', result.refreshToken || '');
+    // Expects result to contain: { name, email, imgUrl, token, role }
+    // Note: refreshToken is removed because it is managed via HttpOnly cookies
+    if (result.name) sessionStorage.setItem('name', result.name);
+    if (result.email) sessionStorage.setItem('email', result.email);
+    if (result.imgUrl) sessionStorage.setItem('imgUrl', result.imgUrl);
+    if (result.token) sessionStorage.setItem('token', result.token);
+    if (result.role) sessionStorage.setItem('role', result.role);
 }
 
 export function getAccessToken() {
     return sessionStorage.getItem('token');
-}
-
-export function getRefreshToken() {
-    return sessionStorage.getItem('refreshToken');
 }
 
 export function clearSession() {

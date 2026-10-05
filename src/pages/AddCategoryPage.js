@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { getAllCategories, createCategory, updateCategory } from '../services/categoryService.js';
 const id=new URLSearchParams(location.search).get('id');
 const form=document.getElementById('entity-form'); const status=document.getElementById('form-status'); const title=document.getElementById('form-title');

@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { validatePlanForm } from '../validation/planValidation.js';
 import { fetchPlans, createPlan, updatePlan, deletePlan } from '../services/planService.js';
 import { setPlans, getPlanById } from '../state/planState.js';

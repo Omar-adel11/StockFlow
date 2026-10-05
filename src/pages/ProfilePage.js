@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { clearSession } from '../sessions/session.js';
 import { getMyProfile, updateMyProfile } from '../services/profileService.js';

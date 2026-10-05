@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { supplierService } from '../services/SupplierService.js';
 const id=new URLSearchParams(location.search).get('id'); const form=document.getElementById('entity-form'), status=document.getElementById('form-status');
 async function init(){if(id){const x=await supplierService.getById(id); document.getElementById('supplier-name').value=x.name||'';document.getElementById('supplier-email').value=x.contactEmail||'';document.getElementById('supplier-phone').value=x.contactPhone||'';document.getElementById('supplier-address').value=x.address||'';document.getElementById('supplier-is-active').checked=x.isActive!==false;document.getElementById('form-title').textContent='Edit Supplier';}}
