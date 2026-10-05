@@ -26,5 +26,12 @@ namespace Application.DTOs
             string LocationAddress,
             bool IsActive
         );
+
+        public record WarehouseProductExchangeRequest(
+            int FromId,
+            int ToId,
+            int ProductId,
+            int Quantity
+        );
     }
 }

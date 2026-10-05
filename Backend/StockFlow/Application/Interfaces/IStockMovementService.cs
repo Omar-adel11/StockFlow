@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs;
 using static Application.DTOs.StockMovementDtos;
+using static Application.DTOs.WarehouseDtos;
 
 namespace Application.Interfaces
 {
@@ -17,6 +18,7 @@ namespace Application.Interfaces
 
         // Manual stock adjustment (e.g., damaged stock, audit correction)
         Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request,int businessId);
+        Task<string> TransferProductAsync(WarehouseProductExchangeRequest request, int businessId);
     }
 
 }

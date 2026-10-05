@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Entities.Enum;
+using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 using static Application.DTOs.StockMovementDtos;
 
@@ -14,6 +16,9 @@ namespace Application.Services
     public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService) : IStockMovementService
     {
         private DbSet<StockMovement> stockMovements => _context.StockMovements;
+        private DbSet<InventoryItem> InventoryItems => _context.InventoryItems;
+        private DbSet<Warehouse> Warehouses => _context.Warehouses;
+        private DbSet<Product> Products => _context.Products;
         public async Task<bool> CreateManualAdjustmentAsync(ManualAdjustmentRequest request,int businessId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync(CancellationToken.None);
@@ -170,6 +175,42 @@ namespace Application.Services
         //} 
         #endregion
 
+
+        public async Task<string> TransferProductAsync(WarehouseDtos.WarehouseProductExchangeRequest request,int businessId)
+        {
+            var product = await Products.Where(Products => Products.Id == request.ProductId).FirstOrDefaultAsync();
+            if (product == null) throw new ProductNotFoundException();
+
+            var fromWarehouse = await Warehouses.Where(Warehouses => Warehouses.Id == request.FromId).Include(w => w.InventoryItems).FirstOrDefaultAsync();
+            if (fromWarehouse == null) throw new WarehouseNotFoundException();
+            var toWarehouse = await Warehouses.Where(Warehouses => Warehouses.Id == request.ToId).FirstOrDefaultAsync();
+            if (toWarehouse == null) throw new WarehouseNotFoundException();
+
+            var inventoryItem = fromWarehouse.InventoryItems.Where(i => i.ProductId == request.ProductId).FirstOrDefault();
+
+            if (inventoryItem == null)
+            {
+                throw new InvalidOperationException($"Product '{product.Name}' is not available in warehouse '{fromWarehouse.Name}'.");
+            }
+            if (inventoryItem.QuantityOnHand < request.Quantity)
+            {
+                throw new InvalidOperationException($"Insufficient stock of product '{product.Name}' in warehouse '{fromWarehouse.Name}'. Available: {inventoryItem.QuantityOnHand}, Requested: {request.Quantity}.");
+            }
+            var manualAdjustmentRequestFrom = new ManualAdjustmentRequest(request.ProductId, request.FromId, -request.Quantity, StockMovementReason.Transfer, null);
+            var resultfrom = await CreateManualAdjustmentAsync(manualAdjustmentRequestFrom, businessId);
+            var manualAdjustmentRequestTo = new ManualAdjustmentRequest(request.ProductId, request.ToId, request.Quantity, StockMovementReason.Transfer, null);
+            var resultTo = await CreateManualAdjustmentAsync(manualAdjustmentRequestTo, businessId);
+
+            if(resultfrom && resultTo)
+            {
+                return $"Successfully transferred {request.Quantity} units of product '{product.Name}' from warehouse '{fromWarehouse.Name}' to warehouse '{toWarehouse?.Name ?? "Unknown"}'.";
+            }
+            else
+            {
+                throw new InvalidOperationException("Failed to transfer product between warehouses.");
+            }
+
+        }
         private StockMovementResponse MapToResponse(StockMovement stockMovement)
         {
             return new StockMovementResponse(stockMovement.Id,

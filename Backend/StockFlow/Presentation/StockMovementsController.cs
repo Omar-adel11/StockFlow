@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Application.DTOs;
 using Application.Interfaces;
 using Application.Services.Helper;
 using Domain.Helpers;
@@ -47,6 +48,15 @@ namespace WebAPI.Controllers
             return result
                 ? Ok(new { Message = "Stock adjustment executed successfully." })
                 : BadRequest(new { Message = "Failed to record stock adjustment." });
+        }
+
+        [HttpPost("transfer")]
+        public async Task<IActionResult> TransferBetweenWarehouses([FromBody] WarehouseDtos.WarehouseProductExchangeRequest request)
+        {
+            var businessId = User.GetBusinessId();
+
+            var result = await _serviceManager.StockMovementService.TransferProductAsync(request, businessId);
+            return Ok(result);
         }
     }
 }

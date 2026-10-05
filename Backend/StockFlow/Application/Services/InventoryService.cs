@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
@@ -13,6 +14,8 @@ namespace Application.Services
     public class InventoryService(IAppDbContext _context) : IInventoryService
     {
         private DbSet<InventoryItem> InventoryItems => _context.InventoryItems;
+        private DbSet<Warehouse> Warehouses => _context.Warehouses;
+        private DbSet<Product> Products => _context.Products;
 
         // Reusable Expression Tree for LINQ-to-SQL translation
         private static readonly Expression<Func<InventoryItem, InventoryDtos.InventoryResponse>> ToInventoryResponse =
@@ -93,8 +96,6 @@ namespace Application.Services
                 .ToListAsync();
         }
 
-        //move product across inventories
-
-
+       
     }
 }

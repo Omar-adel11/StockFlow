@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs;
 using static Application.DTOs.InventoryDtos;
+using static Application.DTOs.WarehouseDtos;
 
 namespace Application.Interfaces
 {
@@ -24,6 +25,6 @@ namespace Application.Interfaces
 
         Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryAsync(int? productId = null,int? warehouseId = null,bool lowStockOnly = false,string? searchTerm = null);
 
-
-}
+        
+    }
 }

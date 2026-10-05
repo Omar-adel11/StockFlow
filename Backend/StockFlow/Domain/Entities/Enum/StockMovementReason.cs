@@ -4,6 +4,7 @@ namespace Domain.Entities.Enum
     {
         Purchase,
         Sale,
-        Adjustment
+        Adjustment,
+        Transfer
     }
 }
