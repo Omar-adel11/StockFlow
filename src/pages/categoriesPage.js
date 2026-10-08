@@ -1,4 +1,5 @@
 // src/pages/CategoriesPage.js
+import '../sessions/authGuard.js';
 import * as categoryService from '../services/categoryService.js';
 import * as categoryValidation from '../validation/categoryValidation.js';
 import * as categoryState from '../state/categoryState.js';

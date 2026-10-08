@@ -50,75 +50,62 @@ namespace Application.Services
                 throw new KeyNotFoundException($"Active plan with ID {request.PlanId} was not found.");
             }
 
-
-           
-                string idempotencyKey = $"STOCKFLOW-{businessId}-{plan.Id}-{DateTime.UtcNow:yyyyMMddHHmm}";
-
-
-                // 4. Record Pending Payment Transaction in DB
-                var pendingTransaction = new PaymentTransaction
-                {
-                    BusinessId = businessId,
-                    ExternalTransactionId = idempotencyKey, // Used as lookup key during webhook
-                    Amount = plan.Price,
-                    Provider = request.Provider,
-                    Status = MyTransactionStatus.Pending, // Represents Pending
-                    CreatedAtUtc = DateTime.UtcNow
-                };
-
-                _dbContext.PaymentTransactions.Add(pendingTransaction);
-                await _dbContext.SaveChangesAsync(ct);
-
-
-            var subscription = await _dbContext.TenantSubscriptions
-    .IgnoreQueryFilters()
-    .AsNoTracking()
-    .Where(s => s.BusinessId == businessId)
-    .OrderByDescending(s => s.Id)
-    .FirstOrDefaultAsync(ct);
-
-            int extensionDays = plan.BillingCycle == 0 ? 30 : 365;
             DateTime now = DateTime.UtcNow;
 
-            if (subscription != null)
-            {
-                // Calculate prospective extended end date for the gateway payload
-                DateTime baseDate = (subscription.Status == SubscriptionStatus.Active && subscription.EndDateUtc > now)
-                    ? subscription.EndDateUtc
-                    : now;
 
-                subscription.PlanId = request.PlanId;
-                subscription.EndDateUtc = baseDate.AddDays(extensionDays);
-                subscription.AutoRenew = request.AutoRenew ?? false;
-            }
-            else
+            var currentActiveSub = await _dbContext.TenantSubscriptions
+                .Include(s => s.Plan)
+                .Where(s => s.BusinessId == businessId
+                         && s.Status == SubscriptionStatus.Active
+                         && s.EndDateUtc > now)
+                .FirstOrDefaultAsync(ct);
+
+            if (currentActiveSub != null && (currentActiveSub.Plan == null || !currentActiveSub.Plan.IsFreeTrial))
             {
-                // Standalone in-memory entity passed solely to the gateway strategy
-                subscription = new TenantSubscription
-                {
-                    BusinessId = businessId,
-                    PlanId = request.PlanId,
-                    StartDateUtc = now,
-                    EndDateUtc = now.AddDays(extensionDays),
-                    Status = SubscriptionStatus.Pending,
-                    AutoRenew = request.AutoRenew ?? false
-                };
+                throw new InvalidOperationException("You already have an active paid subscription. Please cancel your current subscription before purchasing a new plan.");
             }
+
+            string idempotencyKey = $"STOCKFLOW-{businessId}-{plan.Id}-{DateTime.UtcNow:yyyyMMddHHmm}";
+
+
+            // 4. Record Pending Payment Transaction in DB
+            var pendingTransaction = new PaymentTransaction
+            {
+                BusinessId = businessId,
+                ExternalTransactionId = idempotencyKey, // Used as lookup key during webhook
+                Amount = plan.Price,
+                Provider = request.Provider,
+                Status = MyTransactionStatus.Pending, // Represents Pending
+                CreatedAtUtc = DateTime.UtcNow
+            };
+
+            _dbContext.PaymentTransactions.Add(pendingTransaction);
+            await _dbContext.SaveChangesAsync(ct);
+
+
+            int extensionDays = plan.BillingCycle == 0 ? 30 : 365;
+
+            var checkoutSubscription = new TenantSubscription
+            {
+                BusinessId = businessId,
+                PlanId = request.PlanId,
+                StartDateUtc = now,
+                EndDateUtc = now.AddDays(extensionDays),
+                Status = SubscriptionStatus.Pending,
+                AutoRenew = request.AutoRenew ?? false
+            };
+            
 
             var gateway = _gatewayFactory.GetProvider(request.Provider);
 
-
-
             return await gateway.CreateCheckoutSessionAsync(
-                    subscription,
+                    checkoutSubscription,
                     plan.Price,
                     plan.Currency,
                     idempotencyKey,
                     request.SuccessUrl,
                     request.CancelUrl,
                     ct);
-
-
 
         }
 

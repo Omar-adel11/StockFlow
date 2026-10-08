@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { makeSearchableSelect } from '../utils/searchableSelect.js';
 import { productService } from '../services/ProductService.js';

@@ -27,9 +27,9 @@ namespace Application.Services
         
 
         public async Task<SubscriptionDto> StartFreeTrialAsync(
-     int businessId,
-     int planId,
-     CancellationToken ct = default)
+            int businessId,
+            int planId,
+            CancellationToken ct = default)
         {
             var business = await _dbContext.Business.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(b => b.Id == businessId, ct)
@@ -61,7 +61,7 @@ namespace Application.Services
             if(result)
             {
                 var subscription = await _dbContext.TenantSubscriptions
-                .FirstOrDefaultAsync(s => s.BusinessId == businessId, ct)
+                .FirstOrDefaultAsync(s => s.BusinessId == businessId && s.Status == SubscriptionStatus.Active)
                 ?? throw new SubscriptionNotFoundException();
 
 
@@ -95,6 +95,7 @@ namespace Application.Services
                 .Select(s => new TenantSubscriptionResponse(
                     s.Id,
                     s.BusinessId,
+                    s.PlanId,
                     s.Plan.Name,
                     s.Status,
                     s.StartDateUtc,
@@ -126,44 +127,45 @@ namespace Application.Services
             {
                 throw new PlanNotFoundException();
             }
+
+
             DateTime now = DateTime.UtcNow;
+
+
             var subscription = await _dbContext.TenantSubscriptions
                 .IgnoreQueryFilters()
-         .Where(s => s.BusinessId == businessId)
-         .OrderByDescending(s => s.Id)
-         .FirstOrDefaultAsync();
+                .Where(s => s.BusinessId == businessId
+                         && s.Status == SubscriptionStatus.Active
+                         && s.EndDateUtc > now)
+                .OrderByDescending(s => s.Id)
+                .ToListAsync();
 
-
-            if (subscription == null)
+            foreach (var activeSub in subscription)
             {
-                subscription = new TenantSubscription
+                if (activeSub.Plan != null && activeSub.Plan.IsFreeTrial)
                 {
-                    BusinessId = businessId,
-                    PlanId = planId,
-                    Status = SubscriptionStatus.Active,
-                    StartDateUtc = now,
-                    EndDateUtc = now.AddDays(days)
-                };
-                _dbContext.TenantSubscriptions.Add(subscription);
-            }
-            else
-            {
-                bool isActive = subscription.Status == SubscriptionStatus.Active
-                                 && subscription.EndDateUtc > now;
-
-                DateTime baseDate = isActive ? subscription.EndDateUtc : now;
-
-                // Only reset start date if subscription was previously inactive/expired
-                if (!isActive)
-                {
-                    subscription.StartDateUtc = now;
+                    // Cancel active free trial to make way for paid plan
+                    activeSub.Status = SubscriptionStatus.Cancelled;
+                    activeSub.EndDateUtc = now;
                 }
-
-                subscription.PlanId = plan.Id;
-                subscription.Status = SubscriptionStatus.Active;
-                subscription.EndDateUtc = baseDate.AddDays(days);
+                else
+                {
+                    // Active paid plan protection
+                    throw new InvalidOperationException("Business already has an active paid subscription. Cancel it before subscribing to a new plan.");
+                }
             }
 
+            var newSubscription = new TenantSubscription
+            {
+                BusinessId = businessId,
+                PlanId = planId,
+                Status = SubscriptionStatus.Active,
+                StartDateUtc = now,
+                EndDateUtc = now.AddDays(days)
+            };
+            _dbContext.TenantSubscriptions.Add(newSubscription);
+            
+            
             business.PlanId = plan.Id;
             business.IsActive = true;
 
@@ -174,18 +176,19 @@ namespace Application.Services
         public async Task<bool> DeactivateSubscription(int businessId, int planId)
         {
             var business = await _dbContext.Business
-        .IgnoreQueryFilters()
-        .FirstOrDefaultAsync(b => b.Id == businessId);
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(b => b.Id == businessId);
 
             if (business == null)
                 throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
 
             // Fetch the latest active (or active/trial) subscription record
             var subscription = await _dbContext.TenantSubscriptions
-                .IgnoreQueryFilters()
-                .Where(s => s.BusinessId == businessId && s.Status != SubscriptionStatus.Cancelled)
-                .OrderByDescending(s => s.Id)
-                .FirstOrDefaultAsync();
+                 .Where(s => s.BusinessId == businessId && s.PlanId == planId
+                          && s.Status == SubscriptionStatus.Active
+                          && s.EndDateUtc > DateTime.UtcNow)
+                 .OrderByDescending(s => s.Id)
+                 .FirstOrDefaultAsync();
 
             if (subscription == null)
             {
@@ -195,7 +198,6 @@ namespace Application.Services
             
             
             subscription.Status = SubscriptionStatus.Cancelled;
-            // Optionally cut off EndDateUtc to immediately lock access:
             subscription.EndDateUtc = DateTime.UtcNow;
             business.IsActive = false;
 

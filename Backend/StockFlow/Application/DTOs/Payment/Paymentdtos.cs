@@ -29,6 +29,7 @@ namespace Application.DTOs.Payment
         public record TenantSubscriptionResponse(
             int Id,
             int BusinessId,
+            int PlanId,
             string PlanName,
             SubscriptionStatus Status,
             DateTime StartDateUtc,
