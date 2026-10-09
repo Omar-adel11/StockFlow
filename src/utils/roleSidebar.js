@@ -1,4 +1,5 @@
-import { getAccessToken, clearSession } from '../sessions/session.js';
+import { getAccessToken } from '../sessions/session.js';
+import { logout } from '../services/authService.js';
 
 function getRole() {
   const token = getAccessToken();
@@ -69,10 +70,17 @@ function renderSidebar() {
   `;
   sidebar.appendChild(footer);
 
-  document.getElementById('logout-btn')?.addEventListener('click', () => {
-    clearSession();
-    location.href = 'index.html';
-  });
 }
+
+// Capture logout clicks before any page-level handlers can clear the session.
+document.addEventListener('click', event => {
+  const button = event.target.closest('#logout-btn, #profile-logout');
+  if (!button || button.dataset.logoutPending === 'true') return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  button.dataset.logoutPending = 'true';
+  void logout().finally(() => { button.dataset.logoutPending = 'false'; });
+}, true);
 
 document.addEventListener('DOMContentLoaded', renderSidebar);
