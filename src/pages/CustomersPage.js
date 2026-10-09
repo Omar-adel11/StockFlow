@@ -4,6 +4,7 @@ import * as customerService from '../services/CustomerService.js';
 import { validateCustomerForm, buildCustomerPayload } from '../validation/customerValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import {
+import { logout } from '../services/authService.js';
     setCustomers,
     getCustomers,
     addCustomerToState,
@@ -50,10 +51,7 @@ class CustomersPage {
 
     bindEvents() {
         if (this.logoutBtn) {
-            this.logoutBtn.addEventListener('click', () => {
-                clearSession();
-                window.location.href = 'index.html';
-            });
+            this.logoutBtn.addEventListener('click', () => { void logout(); });
         }
 
         if (this.form) {
