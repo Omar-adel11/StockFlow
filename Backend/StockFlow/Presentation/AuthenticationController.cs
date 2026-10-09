@@ -4,6 +4,7 @@ using Application.Interfaces;
 using Application.Interfaces.AuthInterfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -23,14 +24,14 @@ namespace Presentation
         ) : ControllerBase
     {
 
-        private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
+        private static readonly DateTime RefreshTokenLifetime = DateTime.UtcNow.AddDays(7);
 
         [HttpPost("login")]
         public async Task<IActionResult> login(LoginDTO loginDTO)
         {
-
-
             var result = await serviceManager.AuthService.LoginAsync(loginDTO);
+            SetRefreshTokenCookie(result.refreshToken, RefreshTokenLifetime);
+            result.refreshToken = null; // Clear the refresh token from the response body
             return Ok(result);
         }
 
@@ -38,6 +39,8 @@ namespace Presentation
         public async Task<IActionResult> signUp([FromForm] SignupDTO signupDTO)
         {
             var result = await serviceManager.AuthService.Signup(signupDTO);
+            SetRefreshTokenCookie(result.refreshToken, DateTime.UtcNow.AddDays(14));
+            result.refreshToken = null;
             return Ok(result);
         }
         [Authorize]
@@ -73,17 +76,46 @@ namespace Presentation
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshRequestDto request)
+        public async Task<IActionResult> Refresh()
         {
-            var result = await serviceManager.AuthService.refresh(request);
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized(new { message = "Refresh token is missing." });
+            }
+
+            var result = await serviceManager.AuthService.refresh(refreshToken);
+            SetRefreshTokenCookie(result.refreshToken, RefreshTokenLifetime);
             return Ok(result);
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout(RefreshRequestDto request)
+        public async Task<IActionResult> Logout()
         {
-            await serviceManager.AuthService.logout(request);
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                await serviceManager.AuthService.logout(refreshToken);
+                Response.Cookies.Delete("refreshToken");
+            }
+
+            Response.Cookies.Delete("refreshToken");
+           
+            await serviceManager.AuthService.logout(refreshToken);
             return NoContent();
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken, DateTime expiresAtUtc)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,                  // Prevents JS from reading the cookie
+                Secure = true,                    // Transmitted only over HTTPS ==> true (false for testing)
+                SameSite = SameSiteMode.None,   // Guards against CSRF attacks 
+                Expires = expiresAtUtc            // Matches refresh token expiration
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
     }

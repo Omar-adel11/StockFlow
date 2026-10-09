@@ -1,4 +1,4 @@
-
+import '../sessions/authGuard.js';
 import { getDashboardSummary } from '../services/dashboardService.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import { showNotice } from '../utils/ui.js';

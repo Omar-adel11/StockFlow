@@ -30,6 +30,8 @@ namespace Application.Interfaces.AuthInterfaces
         Task<string> ChangePasswordAsync(ChangePasswordDTO changePasswordDTO, string email);
 
         Task<UserDTO?> refresh(RefreshRequestDto refreshRequestDto);
+        Task<UserDTO?> refresh(string RefreshToken);
         Task logout(RefreshRequestDto refreshRequestDto);
+        Task logout(string RefreshToken);
     }
 }

@@ -133,6 +133,39 @@
               </div>
             </div>
 
+            <!-- Subscription Plan Section -->
+            <div id="subscription-section" class="subscription-block" hidden>
+              <h3 class="section-subheading">Subscription Details</h3>
+              <div class="profile-details subscription-details">
+                <div class="profile-field">
+                  <span>Current Plan</span>
+                  <strong id="sub-plan-name">Loading...</strong>
+                </div>
+                <div class="profile-field">
+                  <span>Billing Cycle</span>
+                  <strong id="sub-billing-cycle">-</strong>
+                </div>
+                <div class="profile-field">
+                  <span>Status</span>
+                  <strong id="sub-status" class="status-text">-</strong>
+                </div>
+                <div class="profile-field">
+                  <span>Renewal / Expiration Date</span>
+                  <strong id="sub-end-date">-</strong>
+                </div>
+              </div>
+
+              <div class="security-row subscription-actions">
+                <div>
+                  <strong>Cancel Subscription</strong>
+                  <p>Canceling will terminate active features at the end of your billing period.</p>
+                </div>
+                <button type="button" class="btn btn-danger" id="cancel-sub-btn">
+                  Cancel Subscription
+                </button>
+              </div>
+            </div>
+
             <div class="security-row">
               <div>
                 <strong>Password</strong>
@@ -158,4 +191,3 @@
     <script type="module" src="./src/utils/subscriptionGuard.js"></script>
   </body>
 </html>
-

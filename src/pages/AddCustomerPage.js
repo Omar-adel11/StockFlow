@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { getCustomerById, createCustomer, updateCustomer } from '../services/CustomerService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 

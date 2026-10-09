@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { getMySubscription } from '../services/planService.js';
 
 const details=document.getElementById('subscription-details');

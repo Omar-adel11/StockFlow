@@ -23,7 +23,13 @@ export const inventoryService = {
 
   async adjustStock(payload) {
     return postWithAuth(`${baseUrl}/api/StockMovements/adjust`, payload);
+  },
+
+  async transferStock(payload) {
+    return await postWithAuth(`${baseUrl}/api/StockMovements/transfer`, payload);
   }
 };
+
+
 
 export default inventoryService;

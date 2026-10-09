@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { supplierService } from '../services/SupplierService.js';
 import { validateSupplierForm, buildSupplierPayload } from '../validation/supplierValidation.js';

@@ -1,3 +1,4 @@
+import '../sessions/authGuard.js';
 import { getBusinessOwners, updateBusinessOwnerStatus, assignPlan } from '../services/saasAdminService.js';
 import { fetchPlans } from '../services/planService.js';
 import { showConfirm, showNotice } from '../utils/ui.js';

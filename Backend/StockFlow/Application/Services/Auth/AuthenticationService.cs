@@ -103,6 +103,36 @@ namespace Application.Services.Auth
             };
         }
 
+        public async Task<UserDTO?> refresh(string RefreshToken)
+        {
+            var userId = await _refreshTokenService.ValidateAndGetUserIdAsync(RefreshToken);
+            if (userId is null)
+            {
+                throw new InvalidCredentialsException();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId.Value.ToString());
+            if (user is null)
+            {
+                throw new InvalidCredentialsException();
+            }
+
+            // Rotation: the old token is revoked and a brand new one issued.
+
+            await _refreshTokenService.RevokeAsync(RefreshToken);
+            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+            var newAccessToken = await _tokenService.GenerateToken(user);
+
+            return new UserDTO
+            {
+                email = user.Email,
+                name = user.Name,
+                Token = newAccessToken,
+                ImgUrl = user.ImgUrl,
+                refreshToken = newRefreshToken
+            };
+        }
+
         public async Task<UserDTO?> Signup(SignupDTO signupDTO)
         {
 
@@ -239,6 +269,11 @@ namespace Application.Services.Auth
         public async Task logout(RefreshRequestDto refreshRequestDto)
         {
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
+        }
+
+        public async Task logout(string RefreshToken)
+        {
+            await _refreshTokenService.RevokeAsync(RefreshToken);
         }
 
         private async Task<User?> CheckEmailExistence(string email)
