@@ -4,6 +4,7 @@ import { warehouseService } from '../services/WarehouseService.js';
 import { validateWarehouseForm, buildWarehousePayload } from '../validation/warehouseValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import {
+import { logout } from '../services/authService.js';
   setWarehouses,
   getWarehouses,
   addWarehouseToState,
@@ -43,10 +44,7 @@ class WarehousesPage {
 
   bindEvents() {
     if (this.logoutBtn) {
-      this.logoutBtn.addEventListener('click', () => {
-        clearSession();
-        window.location.href = 'index.html';
-      });
+      this.logoutBtn.addEventListener('click', () => { void logout(); });
     }
 
     if (this.form) {
