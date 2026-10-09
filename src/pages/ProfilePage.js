@@ -1,6 +1,7 @@
 import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
-import { clearSession, getAccessToken } from '../sessions/session.js';
+import { getAccessToken } from '../sessions/session.js';
+import { logout } from '../services/authService.js';
 import { getMyProfile, updateMyProfile } from '../services/profileService.js';
 import { getWithAuth, postWithAuth, baseUrl } from '../api/apiClient.js';
 
@@ -229,7 +230,7 @@ async function init() {
   await loadSubscriptionInfo();
 }
 
-document.getElementById('logout-btn')?.addEventListener('click', () => { clearSession(); location.href = 'index.html'; });
-document.getElementById('profile-logout')?.addEventListener('click', () => { clearSession(); location.href = 'index.html'; });
+document.getElementById('logout-btn')?.addEventListener('click', () => { void logout(); });
+document.getElementById('profile-logout')?.addEventListener('click', () => { void logout(); });
 
 init();
