@@ -7,6 +7,7 @@ import { supplierService } from '../services/SupplierService.js';
 import { validateProductForm, buildProductPayload } from '../validation/productValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import {
+import { logout } from '../services/authService.js';
   productState,
   setProducts,
   getProducts,
@@ -51,10 +52,7 @@ class ProductsPage {
 
   bindEvents() {
     if (this.logoutBtn) {
-      this.logoutBtn.addEventListener('click', () => {
-        clearSession();
-        window.location.href = 'index.html';
-      });
+      this.logoutBtn.addEventListener('click', () => { void logout(); });
     }
 
     if (this.form) {
