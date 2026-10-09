@@ -1,15 +1,12 @@
 import '../sessions/authGuard.js';
 import { teamService } from '../services/teamService.js';
 import { showNotice } from '../utils/ui.js';
-import { clearSession } from '../sessions/session.js';
+import { logout } from '../services/authService.js';
 
 const form = document.getElementById('invite-form');
 const status = document.getElementById('status');
 
-document.getElementById('logout-btn')?.addEventListener('click', () => {
-  clearSession();
-  location.href = 'index.html';
-});
+document.getElementById('logout-btn')?.addEventListener('click', () => { void logout(); });
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
