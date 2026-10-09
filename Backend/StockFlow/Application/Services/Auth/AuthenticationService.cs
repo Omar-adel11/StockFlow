@@ -119,8 +119,10 @@ namespace Application.Services.Auth
 
             // Rotation: the old token is revoked and a brand new one issued.
 
+            int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
+
             await _refreshTokenService.RevokeAsync(RefreshToken);
-            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id,businessId, RefreshTokenLifetime);
             var newAccessToken = await _tokenService.GenerateToken(user);
 
             return new UserDTO
