@@ -3,8 +3,8 @@ import { showConfirm, showNotice } from '../utils/ui.js';
 import { supplierService } from '../services/SupplierService.js';
 import { validateSupplierForm, buildSupplierPayload } from '../validation/supplierValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
-import {
-import { logout } from '../services/authService.js';
+import {logout } from '../services/authService.js';
+import { 
   setSuppliers,
   getSuppliers,
   addSupplierToState,

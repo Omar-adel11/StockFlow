@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Application.DTOs.Team;
 using Application.Interfaces;
+using Application.Interfaces.AuthInterfaces;
 using Application.Services;
 using Application.Services.Auth;
 using Domain.Helpers;
@@ -19,10 +20,12 @@ namespace WebApi.Controllers
     public class TeamController : ControllerBase
     {
         private readonly ITeamService _teamService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public TeamController(ITeamService teamService)
+        public TeamController(ITeamService teamService,IRefreshTokenService refreshTokenService)
         {
             _teamService = teamService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost("invite")]
@@ -107,6 +110,9 @@ namespace WebApi.Controllers
         [Authorize(Roles = Roles.BusinessOwner)]
         public async Task<IActionResult> RemoveMember(int id)
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+            await _refreshTokenService.RevokeAsync(refreshToken!); 
+            Response.Cookies.Delete("refreshToken");
             var businessId = int.Parse(User.FindFirstValue(CustomClaimTypes.BusinessId)!);
             await _teamService.RemoveMemberAsync(id, businessId);
             return Ok(new { message = "Team member removed successfully." });

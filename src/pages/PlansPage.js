@@ -1,4 +1,3 @@
-import '../sessions/authGuard.js';
 import { fetchPlans, subscribeToPlan, startFreeTrial } from '../services/planService.js';
 import { getAccessToken } from '../sessions/session.js';
 import { showNotice } from '../utils/ui.js';

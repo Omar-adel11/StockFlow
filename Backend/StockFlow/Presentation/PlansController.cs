@@ -13,8 +13,7 @@ namespace Presentation
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = $"{Roles.SaasAdmin}")]
-
+   
     public class PlansController : ControllerBase
         {
             private readonly IPlanService _planService;
@@ -33,7 +32,8 @@ namespace Presentation
             }
 
             [HttpGet("{id}")]
-            public async Task<ActionResult<PlanResponseDto>> GetById(int id)
+            [Authorize]
+        public async Task<ActionResult<PlanResponseDto>> GetById(int id)
             {
                 var plan = await _planService.GetPlanByIdAsync(id);
                 if (plan is null)
@@ -44,6 +44,7 @@ namespace Presentation
             }
 
             [HttpPost]
+            [Authorize(Roles = $"{Roles.SaasAdmin}")]
             public async Task<ActionResult<PlanResponseDto>> Create([FromBody] PlanRequestDto request)
             {
                 var created = await _planService.CreatePlanAsync(request);
@@ -51,6 +52,7 @@ namespace Presentation
             }
 
             [HttpPut("{id}")]
+            [Authorize(Roles = $"{Roles.SaasAdmin}")]
             public async Task<ActionResult<PlanResponseDto>> Update(int id, [FromBody] PlanRequestDto request)
             {
                 var updated = await _planService.UpdatePlanAsync(id, request);
@@ -62,6 +64,7 @@ namespace Presentation
             }
 
             [HttpDelete("{id}")]
+            [Authorize(Roles = $"{Roles.SaasAdmin}")]
             public async Task<IActionResult> Delete(int id)
             {
                 var deleted = await _planService.DeletePlanAsync(id);

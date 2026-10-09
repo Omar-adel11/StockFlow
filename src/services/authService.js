@@ -69,7 +69,7 @@ export async function logout() {
         console.error('Server logout failed, clearing local session anyway:', error);
     } finally {
         session.clearSession();
-        window.location.href = 'Login.html';
+        window.location.href = 'index.html';
     }
 }
 

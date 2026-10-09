@@ -6,8 +6,8 @@ import { getAllCategories } from '../services/categoryService.js';
 import { supplierService } from '../services/SupplierService.js';
 import { validateProductForm, buildProductPayload } from '../validation/productValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
-import {
-import { logout } from '../services/authService.js';
+import {logout } from '../services/authService.js';
+import { 
   productState,
   setProducts,
   getProducts,

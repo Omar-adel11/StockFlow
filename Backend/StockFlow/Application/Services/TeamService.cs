@@ -279,7 +279,7 @@ namespace Application.Services
             var query =from user in _dbContext.Users
                        join userRole in _dbContext.UserRoles on user.Id equals userRole.UserId
                        join role in _dbContext.Roles on userRole.RoleId equals role.Id
-                       where user.BusinessId == businessId
+                       where user.BusinessId == businessId && role.Name != UserRole.BusinessOwner.ToString()
                        select new TeamMemberDto
                        {
                            Id = user.Id,
