@@ -208,6 +208,7 @@ namespace Application.Services
                 await _userManager.UpdateAsync(user);
             }
 
+             int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
             // 5. Assign role from the invitation record ("Manager" or "Staff")
             var roleResult = await _userManager.AddToRoleAsync(user, invite.Role);
             if (!roleResult.Succeeded)
@@ -226,7 +227,7 @@ namespace Application.Services
 
             // 8. Generate JWT & Refresh Tokens
             var token = await _tokenService.GenerateToken(user);
-                    var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+                    var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId,RefreshTokenLifetime);
 
             return new UserDTO
             {

@@ -21,7 +21,8 @@ namespace WebAPI.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var products = await _serviceManager.ProductService.GetAllProductsAsync(search);
+            var businessId = User.GetBusinessId();
+            var products = await _serviceManager.ProductService.GetAllProductsAsync(search,businessId);
             return Ok(products);
         }
 
@@ -51,14 +52,16 @@ namespace WebAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] ProductUpdateRequest updateRequest)
         {
-            var updatedProduct = await _serviceManager.ProductService.UpdateProductAsync(id, updateRequest);
+            var businessId = User.GetBusinessId();
+            var updatedProduct = await _serviceManager.ProductService.UpdateProductAsync(id, updateRequest,businessId);
             return Ok(updatedProduct);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _serviceManager.ProductService.DeleteProductAsync(id);
+            var businessId = User.GetBusinessId();
+            var result = await _serviceManager.ProductService.DeleteProductAsync(id, businessId);
             return result ? NoContent() : NotFound(new { Message = $"Product with ID {id} was not found." });
         }
     }

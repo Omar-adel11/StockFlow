@@ -21,7 +21,8 @@ namespace WebAPI.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var warehouses = await _serviceManager.WarehouseService.GetAllWarehousesAsync(search);
+            int businessId = User.GetBusinessId();
+            var warehouses = await _serviceManager.WarehouseService.GetAllWarehousesAsync(search, businessId);
             return Ok(warehouses);
         }
 
@@ -44,14 +45,16 @@ namespace WebAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] WarehouseUpdateRequest dto)
         {
-            var result = await _serviceManager.WarehouseService.UpdateWarehouseAsync(id, dto);
+            int businessId = User.GetBusinessId();
+            var result = await _serviceManager.WarehouseService.UpdateWarehouseAsync(id, dto,businessId);
             return Ok(result);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _serviceManager.WarehouseService.DeleteWarehouseAsync(id);
+            int businessId = User.GetBusinessId();
+            var result = await _serviceManager.WarehouseService.DeleteWarehouseAsync(id,businessId);
             return result ? NoContent() : NotFound(new { mesage = $"warehouse with ID {id} is not deleted" });
         }
     }

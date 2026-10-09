@@ -26,7 +26,7 @@ namespace Application.Services
                 w.IsActive
             );
 
-        public async Task<IReadOnlyCollection<WarehouseDtos.WarehouseResponse>> GetAllWarehousesAsync(string? search)
+        public async Task<IReadOnlyCollection<WarehouseDtos.WarehouseResponse>> GetAllWarehousesAsync(string? search, int businessId)
         {
             var query = WarehouseSet.AsNoTracking();
             if(!string.IsNullOrWhiteSpace(search))
@@ -74,7 +74,7 @@ namespace Application.Services
             return MapToResponse(warehouse);
         }
 
-        public async Task<WarehouseDtos.WarehouseResponse?> UpdateWarehouseAsync(int id, WarehouseDtos.WarehouseUpdateRequest updateRequest)
+        public async Task<WarehouseDtos.WarehouseResponse?> UpdateWarehouseAsync(int id, WarehouseDtos.WarehouseUpdateRequest updateRequest, int businessId)
         {
             var warehouse = await GetWarehouseEntityAsync(id);
 
@@ -93,7 +93,7 @@ namespace Application.Services
             return MapToResponse(warehouse);
         }
 
-        public async Task<bool> DeleteWarehouseAsync(int id)
+        public async Task<bool> DeleteWarehouseAsync(int id, int businessId)
         {
             var warehouse = await GetWarehouseEntityAsync(id);
            

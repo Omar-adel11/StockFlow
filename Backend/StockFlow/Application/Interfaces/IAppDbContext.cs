@@ -12,6 +12,7 @@ namespace Application.Interfaces
 {
     public interface IAppDbContext
     {
+        DbSet<RefreshToken> RefreshTokens { get;  }
         DbSet<User> Users { get; }
         DbSet<IdentityRole<int>> Roles { get; }
         DbSet<IdentityUserRole<int>> UserRoles { get; }

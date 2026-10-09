@@ -32,6 +32,7 @@ namespace Application.Services.Auth
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
         public async Task<UserDTO?> LoginAsync(LoginDTO loginDTO)
         {
+            
             var user = await _userManager.Users
                 .IgnoreQueryFilters()
                 .Include(u => u.Business)
@@ -47,7 +48,7 @@ namespace Application.Services.Auth
                 throw new UnauthorizedAccessException("Your account has been deactivated. Please contact your business owner or administrator.");
             }
 
-            
+            int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDTO.password);
             if (!isPasswordValid)
@@ -56,7 +57,7 @@ namespace Application.Services.Auth
             }
 
             var accessToken = await _tokenService.GenerateToken(user);
-            var refreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+            var refreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
 
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -84,10 +85,12 @@ namespace Application.Services.Auth
                 throw new InvalidCredentialsException();
             }
 
+            int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
+
             // Rotation: the old token is revoked and a brand new one issued.
 
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
-            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+            var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
             var newAccessToken = await _tokenService.GenerateToken(user);
 
             return new UserDTO
@@ -162,10 +165,12 @@ namespace Application.Services.Auth
                 // Commit transaction
                 await transaction.CommitAsync();
 
+                int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
+
                 // 3. Generate JWT Token
                 var roles = await _userManager.GetRolesAsync(user);
                 var token = await _tokenService.GenerateToken(user);
-                var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, RefreshTokenLifetime);
+                var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
 
                 return new UserDTO
                 {

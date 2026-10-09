@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var suppliers = await _serviceManager.SupplierService.GetAllSuppliersAsync(search);
+            int businessId = User.GetBusinessId();
+            var suppliers = await _serviceManager.SupplierService.GetAllSuppliersAsync(search,businessId);
             return Ok(suppliers);
         }
 
@@ -43,14 +44,16 @@ namespace WebAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] SupplierUpdateRequest dto)
         {
-            var result = await _serviceManager.SupplierService.UpdateSupplierAsync(id, dto);
+            int businessId = User.GetBusinessId();
+            var result = await _serviceManager.SupplierService.UpdateSupplierAsync(id, dto,businessId);
             return Ok(result);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _serviceManager.SupplierService.DeleteSupplierAsync(id);
+            int businessId = User.GetBusinessId();
+            var result = await _serviceManager.SupplierService.DeleteSupplierAsync(id, businessId);
             return result ? NoContent() : NotFound(new {message = $"Supplier with id {id} is not deleted."});
         }
     }

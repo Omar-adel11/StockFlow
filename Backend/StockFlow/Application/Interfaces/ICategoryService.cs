@@ -9,10 +9,10 @@ namespace Application.Interfaces
 {
     public interface ICategoryService
     {
-        Task<IReadOnlyCollection<Response>> GetAllCategoriesAsync(string? search);
+        Task<IReadOnlyCollection<Response>> GetAllCategoriesAsync(string? search,int businessId);
         Task<Response?> GetCategoryAsync(int id);
         Task<Response> CreateCategoryAsync(CreateRequest createRequest, int BusinessId);
-        Task<Response?> UpdateCategoryAsync(int Id, UpdateRequest updateRequest);
-        Task<bool> DeleteCategoryAsync(int id);
+        Task<Response?> UpdateCategoryAsync(int Id, UpdateRequest updateRequest, int businessId);
+        Task<bool> DeleteCategoryAsync(int id, int businessId);
     }
 }

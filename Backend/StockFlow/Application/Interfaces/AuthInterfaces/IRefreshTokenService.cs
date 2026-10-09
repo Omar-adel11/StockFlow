@@ -8,7 +8,7 @@ namespace Application.Interfaces.AuthInterfaces
 {
     public interface IRefreshTokenService
     {
-        Task<string> GenerateAndStoreAsync(int userId, TimeSpan lifetime);
+        Task<string> GenerateAndStoreAsync(int userId, int businessId,TimeSpan lifetime);
 
 
         Task<int?> ValidateAndGetUserIdAsync(string refreshToken);

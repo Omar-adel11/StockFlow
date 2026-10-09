@@ -22,11 +22,46 @@ namespace Application
             // Core Domain & Application Services
             services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
             services.AddScoped<ISalesOrderService, SaleOrderService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IWarehouseService, WarehouseService>();
-            services.AddScoped<ISupplierService, SupplierService>();
-            services.AddScoped<ICustomerService, CustomerService>();
+            // Register core service
+            services.AddScoped<CategoryService>();
+
+            // Register decorator wrapping the core service
+            services.AddScoped<ICategoryService>(provider =>
+                new CachedCategoryService(
+                    provider.GetRequiredService<CategoryService>(),
+                    provider.GetRequiredService<ICacheService>()
+                )
+            );
+            services.AddScoped<ProductService>();
+            services.AddScoped<IProductService>(provider =>
+               new CachedProductService(
+                   provider.GetRequiredService<ProductService>(),
+                   provider.GetRequiredService<ICacheService>()
+               )
+           );
+
+            services.AddScoped<WarehouseService>();
+            services.AddScoped<IWarehouseService>(provider =>
+              new CachedWarehouseService(
+                  provider.GetRequiredService<WarehouseService>(),
+                  provider.GetRequiredService<ICacheService>()
+              )
+          );
+
+            services.AddScoped<SupplierService>();
+            services.AddScoped<ISupplierService>(provider =>
+            new CachedSupplierService(
+                provider.GetRequiredService<SupplierService>(),
+                provider.GetRequiredService<ICacheService>()
+            )
+        );
+            services.AddScoped<CustomerService>();
+            services.AddScoped<ICustomerService>(provider =>
+           new CachedCustomerService(
+               provider.GetRequiredService<CustomerService>(),
+               provider.GetRequiredService<ICacheService>()
+           )
+       );
             services.AddScoped<IStockMovementService, StockMovementService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<ITeamService, TeamService>();

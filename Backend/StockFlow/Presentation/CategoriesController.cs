@@ -22,7 +22,8 @@ namespace WebAPI.Controllers
         [Authorize(Roles = $"{Roles.BusinessOwner},{Roles.Manager},{Roles.Staff}")]
         public async Task<IActionResult> GetAll([FromQuery] string? search)
         {
-            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync(search);
+            var businessId = User.GetBusinessId();
+            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync(search, businessId);
             return Ok(categories);
         }
 
@@ -44,14 +45,16 @@ namespace WebAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateRequest dto)
         {
-            var result = await _serviceManager.CategoryService.UpdateCategoryAsync(id, dto);
+            var businessId = User.GetBusinessId();
+            var result = await _serviceManager.CategoryService.UpdateCategoryAsync(id, dto,businessId);
             return Ok(result);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _serviceManager.CategoryService.DeleteCategoryAsync(id);
+            var businessId = User.GetBusinessId();
+            var result = await _serviceManager.CategoryService.DeleteCategoryAsync(id,businessId);
             return result ? NoContent() : NotFound(new { Message = $"Category with ID {id} is not deleted." });
         }
     }

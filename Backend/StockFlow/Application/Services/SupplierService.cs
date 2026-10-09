@@ -32,7 +32,7 @@ namespace Application.Services
             return MapToResponse(supplier);
         }
 
-        public async Task<bool> DeleteSupplierAsync(int id)
+        public async Task<bool> DeleteSupplierAsync(int id, int businessId)
         {
             var supplier = await GetSupplierEntityAsync(id);
             
@@ -43,7 +43,7 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<SuppliersDtos.SupplierResponse>> GetAllSuppliersAsync(string? search)
+        public async Task<IReadOnlyCollection<SuppliersDtos.SupplierResponse>> GetAllSuppliersAsync(string? search, int businessId)
         {
             var query = SupplierSet.AsNoTracking();
 
@@ -62,7 +62,7 @@ namespace Application.Services
             return MapToResponse(supplier);
         }
 
-        public async Task<SuppliersDtos.SupplierResponse?> UpdateSupplierAsync(int id, SuppliersDtos.SupplierUpdateRequest updateRequest)
+        public async Task<SuppliersDtos.SupplierResponse?> UpdateSupplierAsync(int id, SuppliersDtos.SupplierUpdateRequest updateRequest, int businessId)
         {
             var supplier = await GetSupplierEntityAsync(id);
 

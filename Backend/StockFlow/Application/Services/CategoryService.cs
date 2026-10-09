@@ -29,7 +29,7 @@ namespace Application.Services
             return new CategoryDtos.Response(category.Id, category.Name, category.Description);
         }
 
-        public async Task<bool> DeleteCategoryAsync(int id)
+        public async Task<bool> DeleteCategoryAsync(int id, int businessId)
         {
             var category = await GetCategory(id);
             var hasActiveProducts = await _context.Products
@@ -43,7 +43,7 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<CategoryDtos.Response>> GetAllCategoriesAsync(string? search)
+        public async Task<IReadOnlyCollection<CategoryDtos.Response>> GetAllCategoriesAsync(string? search,int businessId)
         {
             var query = CategorySet.AsNoTracking();
 
@@ -53,7 +53,8 @@ namespace Application.Services
                  query = query.Where(c=>c.Name.Contains(search) || c.Description.Contains(search));
             }
 
-            return await query.Select(c => new CategoryDtos.Response(c.Id, c.Name, c.Description)).ToListAsync();
+            var categories =  await query.Select(c => new CategoryDtos.Response(c.Id, c.Name, c.Description)).ToListAsync();
+            return categories;
 
         }
 
@@ -64,7 +65,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<CategoryDtos.Response?> UpdateCategoryAsync(int Id, CategoryDtos.UpdateRequest updateRequest)
+        public async Task<CategoryDtos.Response?> UpdateCategoryAsync(int Id, CategoryDtos.UpdateRequest updateRequest, int businessId)
         {
             var category = await GetCategory(Id);
 

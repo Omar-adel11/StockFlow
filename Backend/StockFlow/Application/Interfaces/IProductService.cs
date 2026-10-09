@@ -9,11 +9,11 @@ namespace Application.Interfaces
 {
     public interface IProductService
     {
-        Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync(string? search);
+        Task<IReadOnlyCollection<ProductResponse>> GetAllProductsAsync(string? search, int businessId);
         Task<ProductResponse?> GetProductByIdAsync(int id);
         Task<ProductResponse?> GetProductBySkuAsync(string sku);
         Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest,int businessId);
-        Task<ProductResponse?> UpdateProductAsync(int id, ProductUpdateRequest updateRequest);
-        Task<bool> DeleteProductAsync(int id);
+        Task<ProductResponse?> UpdateProductAsync(int id, ProductUpdateRequest updateRequest, int businessId);
+        Task<bool> DeleteProductAsync(int id, int businessId);
     }
 }

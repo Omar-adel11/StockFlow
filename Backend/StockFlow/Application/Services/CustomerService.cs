@@ -40,7 +40,7 @@ namespace Application.Services
             return MapToResponse(customer);
         }
 
-        public async Task<bool> DeleteCustomerAsync(int id)
+        public async Task<bool> DeleteCustomerAsync(int id, int businessId)
         {
             var customer = await CustomerSet.FirstOrDefaultAsync(c => c.Id == id);
             if (customer == null)
@@ -52,7 +52,7 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<CustomerDtos.CustomerResponse>> GetAllCustomersAsync(string? search)
+        public async Task<IReadOnlyCollection<CustomerDtos.CustomerResponse>> GetAllCustomersAsync(string? search, int businessId)
         {
             var query = CustomerSet.AsNoTracking();
 
@@ -75,13 +75,14 @@ namespace Application.Services
             return MapToResponse(customer);
         }
 
-        public async Task<CustomerDtos.CustomerResponse?> UpdateCustomerAsync(int id, CustomerDtos.CustomerUpdateRequest updateRequest)
+        public async Task<CustomerDtos.CustomerResponse?> UpdateCustomerAsync(int id, CustomerDtos.CustomerUpdateRequest updateRequest, int businessId)
         {
             var customer = await GetCustomerEntityAsync(id);
 
             customer.Name = updateRequest.Name;
             customer.Email = updateRequest.Email;
             customer.Phone = updateRequest.Phone;
+            
 
             await _context.SaveChangesAsync();
 
@@ -90,7 +91,7 @@ namespace Application.Services
 
         #region Address Operations
 
-        public async Task<CustomerDtos.CustomerResponse> AddAddressAsync(int customerId, CustomerDtos.AddressSaveRequest request)
+        public async Task<CustomerDtos.CustomerResponse> AddAddressAsync(int customerId, CustomerDtos.AddressSaveRequest request,int businessId)
         {
             var customer = await GetCustomerEntityAsync(customerId);
 
@@ -101,6 +102,8 @@ namespace Application.Services
 
             customer.Addresses.Add(new CustomerAddress
             {
+                CustomerId = customerId,
+                BusinessId = businessId,
                 Street = request.Street,
                 City = request.City,
                 State = request.State,
@@ -113,7 +116,7 @@ namespace Application.Services
             return MapToResponse(customer);
         }
 
-        public async Task<bool> UpdateAddressAsync(int customerId, int addressId, CustomerDtos.AddressSaveRequest request)
+        public async Task<bool> UpdateAddressAsync(int customerId, int addressId, CustomerDtos.AddressSaveRequest request,int businessId)
         {
             var customer = await GetCustomerEntityAsync(customerId);
             var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
@@ -138,7 +141,7 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteAddressAsync(int customerId, int addressId)
+        public async Task<bool> DeleteAddressAsync(int customerId, int addressId,int businessId)
         {
             var address = await AddressSet.FirstOrDefaultAsync(a => a.Id == addressId && a.CustomerId == customerId);
             if (address == null)

@@ -21,6 +21,7 @@ namespace Persistence
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<Business> Business => Set<Business>();
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
         public DbSet<Plan> Plans => Set<Plan>();

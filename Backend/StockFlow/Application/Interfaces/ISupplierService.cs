@@ -10,10 +10,10 @@ namespace Application.Interfaces
 {
     public interface ISupplierService
     {
-        Task<IReadOnlyCollection<SupplierResponse>> GetAllSuppliersAsync(string? search);
+        Task<IReadOnlyCollection<SupplierResponse>> GetAllSuppliersAsync(string? search,int businessId);
         Task<SupplierResponse?> GetSupplierAsync(int id);
         Task<SupplierResponse> CreateSupplierAsync(SupplierCreateRequest createRequest,int businessId);
-        Task<SupplierResponse?> UpdateSupplierAsync(int id, SupplierUpdateRequest updateRequest);
-        Task<bool> DeleteSupplierAsync(int id);
+        Task<SupplierResponse?> UpdateSupplierAsync(int id, SupplierUpdateRequest updateRequest, int businessId);
+        Task<bool> DeleteSupplierAsync(int id, int businessId);
     }
 }

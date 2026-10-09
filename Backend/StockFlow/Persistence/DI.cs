@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Persistence.BackgroundServices;
 using Persistence.Email;
 using Persistence.Interceptors;
 using Persistence.Payments;
@@ -36,7 +37,12 @@ namespace Persistence
 
 
             var redisConnectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+
+            var configurationOptions = ConfigurationOptions.Parse(redisConnectionString);
+            configurationOptions.AbortOnConnectFail = false;
+
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(configurationOptions));
 
             services.AddScoped<IPlanRepository, PlanRepository>();
             services.AddScoped<IContactRepository, ContactRepository>();
@@ -49,7 +55,7 @@ namespace Persistence
             services.AddScoped<IPaymentGatewayFactory, PaymentGatewayFactory>();
             services.AddSingleton<ILogger>(sp =>sp.GetRequiredService<ILoggerFactory>().CreateLogger("App"));
 
-
+            services.AddHostedService<TokenCleanupBackgroundService>();
 
 
 

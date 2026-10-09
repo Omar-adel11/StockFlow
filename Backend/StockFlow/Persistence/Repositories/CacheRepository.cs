@@ -1,38 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Interfaces.AuthInterfaces;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace Persistence.Repository
 {
-    public class CacheRepository(IConnectionMultiplexer connection) : ICacheRepository
+    public class CacheRepository(
+        IConnectionMultiplexer connection,
+        ILogger<CacheRepository> logger) : ICacheRepository
     {
-        private readonly IDatabase _database = connection.GetDatabase();
+        private IDatabase? GetDatabase()
+        {
+            try
+            {
+                if (connection.IsConnected)
+                {
+                    return connection.GetDatabase();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Redis connection is not active.");
+            }
+            return null;
+        }
+
         public async Task<string?> GetAsync(string Key)
         {
-            
-            var value = await _database.StringGetAsync(Key);
-            return value.HasValue ? value.ToString() : null;
+            try
+            {
+                var db = GetDatabase();
+                if (db == null) return null;
+
+                var value = await db.StringGetAsync(Key);
+                return value.HasValue ? value.ToString() : null;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Redis GetAsync failed for key '{Key}'. Falling back to DB.", Key);
+                return null;
+            }
         }
+
         public async Task SetAsync(string Key, object Value, TimeSpan? duration)
         {
-            var RedisValue = JsonSerializer.Serialize(Value);
-            await _database.StringSetAsync(Key, RedisValue, duration);
+            try
+            {
+                var db = GetDatabase();
+                if (db == null) return;
+
+                var RedisValue = JsonSerializer.Serialize(Value);
+                await db.StringSetAsync(Key, RedisValue, duration);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Redis SetAsync failed for key '{Key}'. Proceeding without caching.", Key);
+            }
         }
+
         public async Task RemoveAsync(string key)
         {
-            await _database.KeyDeleteAsync(key);
+            try
+            {
+                var db = GetDatabase();
+                if (db == null) return;
+
+                await db.KeyDeleteAsync(key);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Redis RemoveAsync failed for key '{Key}'.", key);
+            }
         }
 
         public Task RemoveAsyncByValue(string value)
         {
             throw new NotImplementedException();
         }
-
-       
     }
 }

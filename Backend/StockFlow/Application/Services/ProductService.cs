@@ -36,7 +36,7 @@ namespace Application.Services
             return MapToResponse(p);
         }
 
-        public async Task<bool> DeleteProductAsync(int id)
+        public async Task<bool> DeleteProductAsync(int id, int businessId)
         {
             var product = await GetProductEntityAsync(id);
            
@@ -48,7 +48,7 @@ namespace Application.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyCollection<ProductResponse>>GetAllProductsAsync(string? search)
+        public async Task<IReadOnlyCollection<ProductResponse>>GetAllProductsAsync(string? search, int businessId)
         {
             var query = _productSet.AsNoTracking();
 
@@ -88,7 +88,7 @@ namespace Application.Services
             return MapToResponse(product);
         }
 
-        public async Task<ProductResponse?> UpdateProductAsync(int id, ProductUpdateRequest updateRequest)
+        public async Task<ProductResponse?> UpdateProductAsync(int id, ProductUpdateRequest updateRequest, int businessId)
         {
             var product = await GetProductEntityAsync(id);
             product.Name = updateRequest.Name;
