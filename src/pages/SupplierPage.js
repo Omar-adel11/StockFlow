@@ -4,6 +4,7 @@ import { supplierService } from '../services/SupplierService.js';
 import { validateSupplierForm, buildSupplierPayload } from '../validation/supplierValidation.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import {
+import { logout } from '../services/authService.js';
   setSuppliers,
   getSuppliers,
   addSupplierToState,
@@ -43,10 +44,7 @@ class SuppliersPage {
 
   bindEvents() {
     if (this.logoutBtn) {
-      this.logoutBtn.addEventListener('click', () => {
-        clearSession();
-        window.location.href = 'index.html';
-      });
+      this.logoutBtn.addEventListener('click', () => { void logout(); });
     }
 
     if (this.form) {
