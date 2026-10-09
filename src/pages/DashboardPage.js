@@ -2,6 +2,7 @@ import '../sessions/authGuard.js';
 import { getDashboardSummary } from '../services/dashboardService.js';
 import { getAccessToken, clearSession } from '../sessions/session.js';
 import { showNotice } from '../utils/ui.js';
+import { logout } from '../services/authService.js';
 
 const money = value => '$' + Number(value || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc = value => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -48,7 +49,7 @@ function render(data) {
 async function init(){
   if(!getAccessToken()){location.href='Login.html';return;}
   if(getRole()==='SaasAdmin'){location.href='adminPanel.html';return;}
-  document.getElementById('logout-btn')?.addEventListener('click',()=>{clearSession();location.href='index.html';});
+  document.getElementById('logout-btn')?.addEventListener('click', () => { void logout(); });
   try { render(await getDashboardSummary()); }
   catch(e){ console.error(e); showNotice(e.message||'Failed to load dashboard.','error'); }
 }
