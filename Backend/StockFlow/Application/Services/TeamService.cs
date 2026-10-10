@@ -117,7 +117,7 @@ namespace Application.Services
 
             // 5. Send Email with invite URL
             var business = await _dbContext.Business.FindAsync(currentBusinessId);
-            var inviteLink = $"http://localhost:5500/accept-invite.html?token={token}";
+            var inviteLink = $"http://stockflow.runasp.net/accept-invite.html?token={token}";
 
             await _emailService.SendEmailAsync(
                 request.Email,
