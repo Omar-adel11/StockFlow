@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockFlow - Product Requirements Document</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1, h2, h3, h4 {
+            color: #0f172a;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: "Fira Code", Consolas, Monaco, "Andale Mono", monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        code {
+            background-color: #e2e8f0;
+            color: #b91c1c;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .highlight-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>1. Product Requirements Document — StockFlow</h1>
+    
+    <h2>1.1 Product Overview</h2>
+    <p><strong>Product Name:</strong> StockFlow<br>
+    <strong>Product Type:</strong> Inventory Management SaaS</p>
+    
+    <h3>Target Customers:</h3>
+    <ul>
+        <li>Small and medium businesses</li>
+        <li>Retail stores</li>
+        <li>Wholesalers</li>
+        <li>Distributors</li>
+        <li>E-commerce businesses</li>
+        <li>Businesses operating multiple warehouses</li>
+    </ul>
+    
+    <h3>Product Vision</h3>
+    <p>StockFlow helps businesses manage their inventory, purchases, sales, suppliers, and warehouses from one centralized platform.<br>
+    The goal is to replace spreadsheets and disconnected systems with a single source of truth.</p>
+
+    <h2>2. The Problem</h2>
+    <p>Many businesses manage inventory using:</p>
+    <p><code>Excel + Paper invoices + WhatsApp + Manual calculations + Multiple employees</code></p>
+    <p>This creates problems:</p>
+    <ul>
+        <li>They don't know the exact stock level.</li>
+        <li>Products run out unexpectedly.</li>
+        <li>Overstocking wastes money.</li>
+        <li>Employees make data-entry mistakes.</li>
+        <li>Supplier information is scattered.</li>
+        <li>Managers don't have real-time reports.</li>
+        <li>Multiple warehouses are difficult to manage.</li>
+    </ul>
+
+    <h2>3. The Solution</h2>
+    <p>StockFlow provides:</p>
+<pre>
+                    STOCKFLOW
+                       │
+       ┌───────────────┼───────────────┐
+       ↓               ↓               ↓
+   Products        Inventory       Warehouses
+       │               │               │
+       └───────────────┼───────────────┘
+                       ↓
+                  Transactions
+                       │
+             ┌─────────┴─────────┐
+             ↓                   ↓
+          Purchases            Sales
+             │                   │
+             └─────────┬─────────┘
+                       ↓
+                   Analytics
+</pre>
+
+    <h2>4. Users & Roles</h2>
+    <div class="highlight-box">
+        <p>This is important because it will eventually affect your authentication and authorization design.</p>
+    </div>
+
+    <h3>Owner</h3>
+    <p>Full access.</p>
+<pre>
+Owner
+ ├── Manage business
+ ├── Manage employees
+ ├── Manage warehouses
+ ├── Manage products
+ ├── View reports
+ └── Manage subscription
+</pre>
+
+    <h3>Admin</h3>
+    <p>Almost everything except critical account/billing operations.</p>
+
+    <h3>Manager</h3>
+    <ul>
+        <li>Products</li>
+        <li>Inventory</li>
+        <li>Purchases</li>
+        <li>Sales</li>
+        <li>Reports</li>
+    </ul>
+
+    <h3>Employee</h3>
+    <p>Limited operational access. For example:</p>
+    <ul>
+        <li>View Products</li>
+        <li>Create Sales</li>
+        <li>Update Inventory</li>
+    </ul>
+    <p>but cannot:</p>
+    <ul>
+        <li>Delete Business</li>
+        <li>Manage Users</li>
+        <li>Change Subscription</li>
+    </ul>
+
+    <h2>5. Core Modules</h2>
+    <p>Your eventual application can contain these modules.</p>
+
+    <h3>Module 1 — Authentication</h3>
+    <ul>
+        <li>Register</li>
+        <li>Login</li>
+        <li>Logout</li>
+        <li>Refresh Token</li>
+        <li>Forgot Password</li>
+        <li>Reset Password</li>
+        <li>Email Verification</li>
+    </ul>
+    <p><em>Later this can become your .NET JWT implementation.</em></p>
+
+    <h3>Module 2 — Dashboard</h3>
+    <p>The dashboard should answer: <strong>"What's happening in my business right now?"</strong></p>
+<pre>
+Total Products       12,450
+Low Stock Items          32
+Today's Sales          $8,430
+Pending Purchases         17
+</pre>
+    <p>Charts:</p>
+    <ul>
+        <li>Sales over time</li>
+        <li>Inventory distribution</li>
+        <li>Top-selling products</li>
+        <li>Low-stock products</li>
+    </ul>
+
+    <h2>6. Products</h2>
+    <p>A product could contain:</p>
+<pre>
+Product
+├── Id
+├── Name
+├── SKU
+├── Barcode
+├── Description
+├── Category
+├── Supplier
+├── Cost Price
+├── Selling Price
+├── Minimum Stock Level
+├── Quantity
+└── Status
+</pre>
+    <p><strong>Example:</strong></p>
+<pre>
+Wireless Mouse
+SKU: WM-001
+Cost: $12
+Price: $20
+Stock: 43
+Minimum Stock: 10
+</pre>
+
+    <h2>7. Inventory</h2>
+    <p>This is the heart of StockFlow. You should eventually track inventory movements, not just store a quantity. For example:</p>
+<pre>
+10:00
+Purchase
++100 Mouse
+
+12:30
+Sale
+-5 Mouse
+
+14:00
+Sale
+-3 Mouse
+
+16:00
+Adjustment
+-2 Mouse
+
+Current stock:
+100 - 5 - 3 - 2 = 90
+</pre>
+    <p>This gives you an inventory transaction history. That will be excellent backend practice.</p>
+
+    <h2>8. Warehouses</h2>
+    <p>Businesses can have:</p>
+    <ul>
+        <li>Main Warehouse</li>
+        <li>Alexandria Branch</li>
+        <li>Cairo Branch</li>
+        <li>Online Store Warehouse</li>
+    </ul>
+    <p>A product can exist in multiple warehouses. For example:</p>
+<pre>
+Wireless Mouse
+
+Main Warehouse       100
+Alexandria Branch     35
+Cairo Branch          20
+</pre>
+    <p>Eventually your database relationship becomes interesting here.</p>
+
+    <h2>9. Suppliers</h2>
+    <p>Supplier management:</p>
+<pre>
+Supplier
+├── Name
+├── Phone
+├── Email
+├── Address
+├── Tax Number
+└── Products
+</pre>
+    <p><strong>Example:</strong></p>
+    <p>Tech Distribution Co. provides:</p>
+    <ul>
+        <li>Keyboard</li>
+        <li>Mouse</li>
+        <li>Monitor</li>
+        <li>USB Cable</li>
+    </ul>
+
+    <h2>10. Purchase Orders</h2>
+    <p>Business workflow:</p>
+<pre>
+Manager notices stock is low
+          ↓
+Create Purchase Order
+          ↓
+Select Supplier
+          ↓
+Add Products
+          ↓
+Submit PO
+          ↓
+Supplier delivers
+          ↓
+Receive shipment
+          ↓
+Inventory increases
+</pre>
+    <p><strong>Example:</strong></p>
+<pre>
+PO-10025
+
+Supplier: Tech Distribution
+
+Mouse       × 100
+Keyboard    × 50
+USB Cable   × 200
+
+Total: $4,250
+Status: Pending
+</pre>
+
+    <h2>11. Sales</h2>
+    <p>Eventually:</p>
+<pre>
+Customer
+   ↓
+Sales Order
+   ↓
+Payment
+   ↓
+Inventory decreases
+   ↓
+Invoice
+</pre>
+    <p><strong>Example:</strong></p>
+<pre>
+Order #SO-1824
+
+Mouse       × 2
+Keyboard    × 1
+
+Total: $52
+Status: Completed
+</pre>
+
+    <h2>12. Alerts</h2>
+    <p>StockFlow should automatically detect:</p>
+    <p><code>Stock &lt;= MinimumStock</code></p>
+    <p>and generate:</p>
+    <p>⚠️ <em>Wireless Mouse is running low — only 5 units remaining.</em></p>
+    <p>Other possible alerts:</p>
+    <ul>
+        <li>Low stock</li>
+        <li>Out of stock</li>
+        <li>Purchase order received</li>
+        <li>Failed payment</li>
+        <li>Unusual inventory adjustment</li>
+    </ul>
+    <p>This eventually gives you an opportunity to use background jobs.</p>
+
+    <h2>13. Reports & Analytics</h2>
+    <p>Managers should be able to see:</p>
+    
+    <h3>Sales report</h3>
+    <ul>
+        <li>Today</li>
+        <li>This Week</li>
+        <li>This Month</li>
+        <li>Custom Range</li>
+    </ul>
+
+    <h3>Inventory report</h3>
+    <ul>
+        <li>Total Inventory Value</li>
+        <li>Low Stock</li>
+        <li>Out of Stock</li>
+        <li>Fast Moving Products</li>
+        <li>Slow Moving Products</li>
+    </ul>
+
+    <h3>Purchase report</h3>
+    <ul>
+        <li>Purchases by Supplier</li>
+        <li>Purchases by Month</li>
+        <li>Outstanding Orders</li>
+    </ul>
+
+    <h2>14. Notifications</h2>
+    <p>Eventually:</p>
+<pre>
+Notification Service
+       │
+       ├── Low Stock
+       ├── Purchase Received
+       ├── New Employee
+       └── Important System Events
+</pre>
+    <p>You could later experiment with:</p>
+    <ul>
+        <li>Email</li>
+        <li>In-app notifications</li>
+        <li>Background processing</li>
+    </ul>
+
+    <h2>15. Subscription Model</h2>
+    <p>Because we're designing this as a SaaS, you can eventually have:</p>
+    
+    <h3>Starter</h3>
+    <ul>
+        <li>1 Warehouse</li>
+        <li>1,000 Products</li>
+        <li>3 Users</li>
+        <li>Basic Reports</li>
+    </ul>
+
+    <h3>Business</h3>
+    <ul>
+        <li>5 Warehouses</li>
+        <li>10,000 Products</li>
+        <li>20 Users</li>
+        <li>Advanced Reports</li>
+    </ul>
+
+    <h3>Enterprise</h3>
+    <ul>
+        <li>Unlimited Warehouses</li>
+        <li>Unlimited Products</li>
+        <li>Unlimited Users</li>
+        <li>Advanced Analytics</li>
+        <li>Priority Support</li>
+    </ul>
+    <p>You don't need to implement payments now. But designing the product this way means you can add something like Stripe/Paymob later.</p>
+
+    <h2>16. High-Level Architecture</h2>
+    <p>Eventually I'd aim for something like:</p>
+<pre>
+                 ┌─────────────────┐
+                 │   StockFlow Web │
+                 │ React Frontend  │
+                 └────────┬────────┘
+                          │ HTTPS
+                          ↓
+                 ┌─────────────────┐
+                 │   ASP.NET API   │
+                 └────────┬────────┘
+                          │
+          ┌───────────────┼────────────────┐
+          ↓               ↓                ↓
+      Auth Service    Business Logic    Background Jobs
+          │               │                │
+          ↓               ↓                ↓
+       Identity       EF Core          Notifications
+                          │
+                    ┌─────┴─────┐
+                    ↓           ↓
+                SQL Server    Redis
+</pre>
+    <p>You don't need microservices. Start with a modular monolith. That's much more appropriate for this project.</p>
+
+    <h2>17. Suggested Backend Structure</h2>
+    <p>When you eventually build the backend:</p>
+<pre>
+StockFlow
+│
+├── StockFlow.API
+│
+├── StockFlow.Application
+│   ├── DTOs
+│   ├── Interfaces
+│   ├── Services
+│   └── Validators
+│
+├── StockFlow.Domain
+│   ├── Entities
+│   ├── Enums
+│   └── Exceptions
+│
+├── StockFlow.Infrastructure
+│   ├── Persistence
+│   ├── Repositories
+│   ├── Identity
+│   ├── Email
+│   └── Caching
+│
+└── StockFlow.Tests
+</pre>
+    <p>This fits very nicely with the Clean Architecture / .NET direction you've been studying.</p>
+
+    <h2>18. Important Database Entities</h2>
+    <p>Eventually you'll probably have something around:</p>
+    <ul>
+        <li>User / Role / Business / Subscription</li>
+        <li>Product / Category</li>
+        <li>Warehouse / InventoryItem / InventoryTransaction</li>
+        <li>Supplier / PurchaseOrder / PurchaseOrderItem</li>
+        <li>Customer / SalesOrder / SalesOrderItem</li>
+        <li>Payment / Invoice</li>
+        <li>Notification / AuditLog</li>
+    </ul>
+    
+    <div class="highlight-box">
+        <p>Don't implement all of these immediately. Start with the core:</p>
+        <p><strong>User, Business, Product, Category, Warehouse, Inventory, Supplier, PurchaseOrder, SalesOrder</strong></p>
+        <p>Then expand.</p>
+    </div>
+
+    <h2>19. The Internship Task vs Full Project</h2>
+    <p>This is the most important part.</p>
+
+    <h3>NOW — Internship Task</h3>
+    <p>Build: <strong>StockFlow Landing Page</strong> (Only).</p>
+    <p>You need:</p>
+    <ul>
+        <li>Navbar</li>
+        <li>Hero</li>
+        <li>Features</li>
+        <li>Solutions</li>
+        <li>Dashboard Preview</li>
+        <li>Stats</li>
+        <li>How It Works</li>
+        <li>Testimonials</li>
+        <li>Pricing</li>
+        <li>CTA</li>
+        <li>Footer</li>
+    </ul>
+
+    <h3>LATER — Full Stack Project</h3>
+    <p>Turn it into:</p>
+<pre>
+StockFlow
+│
+├── Marketing Website
+│
+└── Application
+     │
+     ├── Authentication
+     ├── Dashboard
+     ├── Products
+     ├── Inventory
+     ├── Warehouses
+     ├── Suppliers
+     ├── Purchases
+     ├── Sales
+     ├── Reports
+     ├── Notifications
+     └── Settings
+</pre>
+
+    <h2>20. Your Landing Page Design</h2>
+    <p>For the internship, I'd implement the generated design roughly like this:</p>
+<pre>
+┌─────────────────────────────────────────────────────┐
+│ StockFlow    Home Features Solutions Pricing About  │
+│                                      Login [Start]  │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  Inventory Management        ┌───────────────────┐  │
+│                              │                   │  │
+│  TAKE CONTROL OF             │    DASHBOARD      │  │
+│  YOUR INVENTORY              │                   │  │
+│                              │ Products  12,450  │  │
+│  Manage products...          │ Sales      $8.4K  │  │
+│                              │                   │  │
+│  [Start Free Trial]          │     📊 Chart      │  │
+│  [Request Demo]              │                   │  │
+│                              └───────────────────┘  │
+├─────────────────────────────────────────────────────┤
+│       10K+       500+       99.9%       35%         │
+│      Products   Businesses  Uptime     Less Waste   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│          EVERYTHING YOU NEED TO MANAGE              │
+│                   INVENTORY                         │
+│                                                     │
+│  [Inventory] [Warehouses] [Suppliers]               │
+│  [Purchases] [Sales]      [Analytics]               │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              HOW IT WORKS                           │
+│                                                     │
+│   01              02             03          04     │
+│ Create Account → Products → Suppliers → Grow        │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│              CUSTOMER TESTIMONIALS                  │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│                   PRICING                           │
+│                                                     │
+│       Starter       Business       Enterprise       │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│        READY TO TAKE CONTROL?                       │
+│              [Start Free Trial]                     │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│ StockFlow       Product   Company   Resources       │
+└─────────────────────────────────────────────────────┘
+</pre>
+
+    <h2>21. One thing I'd change from the generated mockup</h2>
+    <p>The generated design is intentionally quite dense because it's showing a concept. For your implementation, don't make everything visible at once. Use whitespace.</p>
+    <p>Your hierarchy should be:</p>
+    <p><code>Hero → Product visual → Features → Proof → How it works → Pricing → CTA</code></p>
+    <p>And make the dashboard mockup the main visual asset. That immediately communicates:</p>
+    <p><em>"This isn't just a website. This company actually has a software product."</em></p>
+
+    <h2>Your development strategy</h2>
+    <p>I recommend you do this in three stages:</p>
+
+    <h3>Stage 1 — Internship</h3>
+    <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+        <li>Responsive Design</li>
+        <li><strong>↓ StockFlow Landing Page</strong></li>
+    </ul>
+
+    <h3>Stage 2 — Application</h3>
+    <ul>
+        <li>React</li>
+        <li><strong>↓ StockFlow Dashboard</strong></li>
+        <li>ASP.NET Core Web API</li>
+        <li><strong>↓ SQL Server</strong></li>
+    </ul>
+
+    <h3>Stage 3 — Production Features</h3>
+    <ul>
+        <li>JWT + Refresh Tokens</li>
+        <li>Redis</li>
+        <li>Background Jobs</li>
+        <li>Email</li>
+        <li>Logging</li>
+        <li>Docker</li>
+        <li>CI/CD</li>
+        <li>Cloud Deployment</li>
+        <li>Payment</li>
+        <li>Monitoring</li>
+    </ul>
+
+</div>
+
+</body>
+</html>

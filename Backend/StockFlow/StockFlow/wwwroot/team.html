@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Members - StockFlow</title>
+
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/adminShell.css" />
+  <link rel="stylesheet" href="./css/teamLayout.css" />
+  <link rel="stylesheet" href="./css/uiEnhancements.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="dashboard.html"><span class="nav-icon">▦</span> Dashboard</a></li>
+        <li><a href="categories.html"><span class="nav-icon">📁</span> Categories</a></li>
+        <li><a href="products.html"><span class="nav-icon">📦</span> Products</a></li>
+        <li><a href="inventory.html"><span class="nav-icon">🏷️</span> Inventory</a></li>
+        <li><a href="warehouses.html"><span class="nav-icon">🏬</span> Warehouses</a></li>
+        <li><a href="suppliers.html"><span class="nav-icon">🤝</span> Suppliers</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="purchase-orders.html"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+        <li><a href="sales-orders.html"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+        <li><a href="team.html" class="active"><span class="nav-icon">♙</span> Team Members</a></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="profile.html">Profile</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <p class="topbar-eyebrow">Business Management</p>
+          <h1>Team Members</h1>
+          <p>Invite teammates and manage their roles within your business.</p>
+        </div>
+
+        <a href="addTeamMember.html" class="btn btn-primary">+ Invite Member</a>
+      </header>
+
+      <main class="admin-main">
+
+        <!-- ==================== TEAM SUMMARY ==================== -->
+        <section class="team-section">
+          <div class="stats-grid">
+            <article class="card stat-card">
+              <span class="stat-icon">♙</span>
+              <div>
+                <p class="stat-label">Team Members</p>
+                <strong class="stat-value" id="team-member-count">—</strong>
+              </div>
+            </article>
+
+            <article class="card stat-card">
+              <span class="stat-icon">M</span>
+              <div>
+                <p class="stat-label">Managers</p>
+                <strong class="stat-value" id="manager-count">—</strong>
+              </div>
+            </article>
+
+            <article class="card stat-card">
+              <span class="stat-icon">S</span>
+              <div>
+                <p class="stat-label">Staff</p>
+                <strong class="stat-value" id="staff-count">—</strong>
+              </div>
+            </article>
+
+            <article class="card stat-card">
+              <span class="stat-icon">✉</span>
+              <div>
+                <p class="stat-label">Pending Invites</p>
+                <strong class="stat-value" id="pending-invite-count">—</strong>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- ==================== MEMBERS ==================== -->
+        <section class="team-section ">
+          <div class="section-heading section-heading-row">
+            <div>
+              <span class="section-label">Your team</span>
+              <h2>Members</h2>
+              <p>Manage the users who have access to this business.</p>
+            </div>
+          </div>
+
+          <div class="list-toolbar"><div><p>Search by member name or email.</p></div><input id="team-search" type="search" placeholder="Search team members..." /></div>
+          <div class="card table-card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th class="actions-column">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody id="team-members-list"></tbody>
+              </table>
+            </div>
+
+            <p id="team-empty" class="empty-state" hidden>No team members found.</p>
+            <p id="team-loading" class="empty-state" hidden>Loading team members...</p>
+          </div>
+        </section>
+
+        <!-- ==================== PENDING INVITATIONS ==================== -->
+        <section class="team-section">
+          <div class="section-heading">
+            <span class="section-label">Invitations</span>
+            <h2>Pending Invitations</h2>
+            <p>Invitations that have not been accepted yet.</p>
+          </div>
+
+          <div class="card table-card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Sent</th>
+                    <th>Expires</th>
+                    <th class="actions-column">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody id="pending-invites-list"></tbody>
+              </table>
+            </div>
+
+            <p id="invites-empty" class="empty-state" hidden>No pending invitations.</p>
+            <p id="invites-loading" class="empty-state" hidden>Loading invitations...</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== ROLE MODAL ==================== -->
+  <dialog id="role-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="section-label">Permissions</span>
+          <h2>Change Role</h2>
+          <p id="role-member-name">Update this team member's role.</p>
+        </div>
+        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+
+      <form id="role-form">
+        <div class="form-group">
+          <label for="member-role">Role</label>
+          <select id="member-role" name="newRole">
+            <option value="Staff">Staff</option>
+            <option value="Manager">Manager</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Role</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script type="module" src="./src/pages/TeamPage.js"></script>
+  <script type="module" src="./src/utils/roleSidebar.js"></script>
+</body>
+</html>

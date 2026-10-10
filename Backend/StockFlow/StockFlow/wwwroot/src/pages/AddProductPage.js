@@ -1,0 +1,83 @@
+import '../sessions/authGuard.js';
+import { productService } from '../services/ProductService.js';
+import { getAllCategories } from '../services/categoryService.js';
+import { supplierService } from '../services/SupplierService.js';
+import { makeSearchableSelect } from '../utils/searchableSelect.js';
+
+const id = new URLSearchParams(location.search).get('id');
+const form = document.getElementById('entity-form');
+const status = document.getElementById('form-status');
+
+async function init() {
+	const [cats, sups] = await Promise.all([
+		getAllCategories(),
+		supplierService.getAll(),
+	]);
+	const cs = document.getElementById('product-category');
+	const ss = document.getElementById('product-supplier');
+
+	cs.innerHTML = '<option value="">Select Category</option>' +
+		cats.map(x => `<option value="${x.id}">${x.name}</option>`).join('');
+	ss.innerHTML = '<option value="">None</option>' +
+		sups.map(x => `<option value="${x.id}">${x.name}</option>`).join('');
+	makeSearchableSelect(cs);
+	makeSearchableSelect(ss);
+
+	if (id) {
+		const x = await productService.getById(id);
+		document.getElementById('product-sku').value = x.itemSKU || x.sku || '';
+		document.getElementById('product-name').value = x.name || '';
+		cs.value = x.categoryId || x.category?.id || '';
+		ss.value = x.preferredSupplierId || x.preferredSupplier?.id || '';
+		document.getElementById('product-unit-price').value =
+			x.unitPrice ?? x.UnitPrice ?? '';
+		document.getElementById('product-unit-selling-price').value =
+			x.unitSellingPrice ?? x.UnitSellingPrice ?? '';
+		document.getElementById('product-reorder-level').value = x.reorderLevel ?? 0;
+		document.getElementById('product-is-active').checked = x.isActive !== false;
+		cs.dispatchEvent(new Event('change'));
+		ss.dispatchEvent(new Event('change'));
+		document.getElementById('form-title').textContent = 'Edit Product';
+	}
+}
+
+form.addEventListener('submit', async e => {
+	e.preventDefault();
+	const p = {
+		ItemSKU: document.getElementById('product-sku').value.trim(),
+		name: document.getElementById('product-name').value.trim(),
+		categoryId: parseInt(document.getElementById('product-category').value),
+		preferredSupplierId: document.getElementById('product-supplier').value
+			? parseInt(document.getElementById('product-supplier').value)
+			: null,
+		UnitPrice: parseFloat(document.getElementById('product-unit-price').value),
+		UnitSellingPrice: parseFloat(
+			document.getElementById('product-unit-selling-price').value,
+		),
+		reorderLevel: parseInt(
+			document.getElementById('product-reorder-level').value || 0,
+		),
+		isActive: document.getElementById('product-is-active').checked,
+	};
+
+	if (
+		!p.ItemSKU ||
+		!p.name ||
+		!p.categoryId ||
+		Number.isNaN(p.UnitPrice) ||
+		Number.isNaN(p.UnitSellingPrice)
+	) {
+		status.textContent =
+			'SKU, name, category, unit price and unit selling price are required.';
+		return;
+	}
+
+	try {
+		await (id ? productService.update(id, p) : productService.create(p));
+		location.href = 'products.html';
+	} catch (err) {
+		status.textContent = err.message;
+	}
+});
+
+init().catch(e => status.textContent = e.message);

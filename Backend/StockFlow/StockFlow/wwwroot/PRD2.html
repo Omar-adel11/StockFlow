@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFlow — PRD Phase 2</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f8fafc;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      color: #0b1b2f;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .document {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+      padding: 2.5rem 2.8rem;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 1rem 0.5rem; }
+      .document { padding: 1.8rem 1.4rem; border-radius: 16px; }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+    }
+
+    /* typography */
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+      color: #0a1e3a;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 2.2rem 0 0.8rem;
+      color: #0a1e3a;
+      border-bottom: 1px solid #e3e9f2;
+      padding-bottom: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.8rem 0 0.6rem;
+      color: #1a2e4a;
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1.2rem 0 0.4rem;
+      color: #1e3a5f;
+    }
+
+    p {
+      margin-bottom: 0.9rem;
+      font-size: 0.98rem;
+      color: #1e2a3a;
+    }
+
+    .subhead {
+      color: #5f6c80;
+      font-size: 1.05rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    /* tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0 1.8rem;
+      font-size: 0.9rem;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    th {
+      background: #eef3fa;
+      font-weight: 600;
+      text-align: left;
+      padding: 0.8rem 1rem;
+      color: #0b1b2f;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 2px solid #d9e1ec;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e7edf5;
+      vertical-align: top;
+      color: #1e2a3a;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #fafcff;
+    }
+
+    /* lists */
+    ul, ol {
+      margin: 0.6rem 0 1.2rem 1.6rem;
+      font-size: 0.98rem;
+      color: #1e2a3a;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    /* special blocks */
+    .badge-done {
+      display: inline-block;
+      background: #dff5e6;
+      color: #0c6b3e;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 40px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .status-table td:first-child {
+      font-weight: 500;
+    }
+
+    .highlight-box {
+      background: #f2f7ff;
+      border-left: 4px solid #2563eb;
+      padding: 1rem 1.4rem;
+      border-radius: 0 12px 12px 0;
+      margin: 1.4rem 0;
+      font-size: 0.95rem;
+      color: #13294b;
+    }
+
+    .highlight-box strong {
+      color: #0a1e3a;
+    }
+
+    .callout {
+      background: #fefbf0;
+      border-left: 4px solid #e6a817;
+      padding: 1rem 1.4rem;
+      border-radius: 0 12px 12px 0;
+      margin: 1.4rem 0;
+      font-size: 0.95rem;
+    }
+
+    .callout strong {
+      color: #8a6100;
+    }
+
+    .small-note {
+      font-size: 0.88rem;
+      color: #5f6c80;
+      margin-top: 0.3rem;
+      font-style: italic;
+    }
+
+    .role-grid {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0.6rem 0 1rem;
+    }
+
+    .role-pill {
+      background: #e9eef6;
+      padding: 0.25rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1e3a5f;
+    }
+
+    code {
+      background: #eef2f7;
+      padding: 0.15rem 0.5rem;
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85em;
+      color: #1e3a5f;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #e3e9f2;
+      margin: 2rem 0;
+    }
+
+    .soft-delete-note {
+      background: #f9fbfe;
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.4rem 0;
+      border: 1px solid #e3e9f2;
+    }
+
+    .soft-delete-note ul {
+      margin-bottom: 0;
+    }
+
+    .decision-yes {
+      color: #0c6b3e;
+      font-weight: 500;
+    }
+
+    .spacer {
+      height: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="document">
+
+    <!-- Header -->
+    <h1>StockFlow — Product Requirements Document</h1>
+    <p class="subhead">Phase 2: Core Application, Data Model &amp; Role-Based Access</p>
+
+    <!-- Section 1 -->
+    <h2>1. Background</h2>
+    <p>StockFlow's marketing site and admin foundation are built. This PRD scopes the next phase: turning StockFlow from a marketing site with an admin CMS into the actual inventory management product it advertises — the dashboard, products, warehouses, suppliers, purchases, and sales screens shown in the landing page's own product preview.</p>
+
+    <!-- Section 2 -->
+    <h2>2. Completed to Date (Phase 1)</h2>
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Landing page (marketing site)</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Contact form (frontend + backend + DB)</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Admin CMS — Plans CRUD (frontend + backend + DB)</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Authentication — signup, login, logout</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Authentication — forgot password, OTP verification, reset password</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Authentication — change password</td><td><span class="badge-done">✅ Done</span></td></tr>
+        <tr><td>Refresh token issuance + rotation</td><td><span class="badge-done">✅ Done</span></td></tr>
+      </tbody>
+    </table>
+    <p>Phase 1 proved out the architecture (Onion layers on the backend, shared CSS + modular vanilla JS on the frontend) and the auth system that everything else in Phase 2 will sit behind.</p>
+
+    <!-- Section 3 -->
+    <h2>3. Goal of Phase 2</h2>
+    <p>Ship the <strong>Manager Console</strong> — the actual day-to-day application a business owner or manager uses to run their inventory operation, matching the sidebar shown in the product preview: Dashboard, Products, Inventory, Warehouses, Suppliers, Purchases, Sales, Reports, Settings.</p>
+    <p>Phase 2 is split into three parts, in build order:</p>
+    <ol>
+      <li><strong>Data model</strong> — define every entity the core app needs and migrate the database once, rather than piecemeal per screen.</li>
+      <li><strong>Manager Console features</strong> — the actual CRUD/workflow screens built on that data model.</li>
+      <li><strong>Roles &amp; permissions</strong> — restrict who can do what, now that there's more than one kind of user and more than one kind of action to protect.</li>
+    </ol>
+
+    <!-- Section 4 -->
+    <h2>4. Part A — Data Model</h2>
+
+    <h3>4.1 New entities</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Entity</th>
+          <th>Purpose</th>
+          <th>Key fields</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Category</strong></td><td>Groups products for organization and reporting</td><td>Name, Description</td></tr>
+        <tr><td><strong>Product</strong></td><td>A sellable/stockable item</td><td>Name, SKU, CategoryId, PreferredSupplierId, UnitPrice, ReorderLevel, IsActive</td></tr>
+        <tr><td><strong>Warehouse</strong></td><td>A physical stock location</td><td>Name, Location, IsActive</td></tr>
+        <tr><td><strong>InventoryItem</strong></td><td>Stock quantity of one product at one warehouse (junction table)</td><td>ProductId, WarehouseId, QuantityOnHand</td></tr>
+        <tr><td><strong>Supplier</strong></td><td>A vendor products are purchased from</td><td>Name, ContactEmail, ContactPhone, Address, IsActive</td></tr>
+        <tr><td><strong>PurchaseOrder</strong></td><td>An order placed to a supplier</td><td>SupplierId, Status, OrderDate, ExpectedDate, CreatedByUserId, TotalAmount</td></tr>
+        <tr><td><strong>PurchaseOrderItem</strong></td><td>Line item on a purchase order</td><td>PurchaseOrderId, ProductId, Quantity, UnitCost</td></tr>
+        <tr><td><strong>Customer</strong></td><td>Who a sale is made to</td><td>Name, Email, Phone</td></tr>
+        <tr><td><strong>SalesOrder</strong></td><td>An order placed by a customer</td><td>CustomerId, WarehouseId, Status, OrderDate, CreatedByUserId, TotalAmount</td></tr>
+        <tr><td><strong>SalesOrderItem</strong></td><td>Line item on a sales order</td><td>SalesOrderId, ProductId, Quantity, UnitPrice</td></tr>
+        <tr><td><strong>StockMovement</strong></td><td>Audit log of every stock change</td><td>ProductId, WarehouseId, ChangeQuantity, Reason (Purchase/Sale/Adjustment), ReferenceId, CreatedAtUtc</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Relationships:</h4>
+    <ul>
+      <li>Product → Category (many-to-one)</li>
+      <li>Product → Supplier (many-to-one, optional — the preferred supplier for reordering; a purchase order can still be placed with a different supplier when needed)</li>
+      <li>Product → InventoryItem → Warehouse (many-to-many via InventoryItem)</li>
+      <li>PurchaseOrder → Supplier (many-to-one), → PurchaseOrderItem (one-to-many) → Product</li>
+      <li>SalesOrder → Customer (many-to-one), → SalesOrderItem (one-to-many) → Product</li>
+      <li><strong>StockMovement</strong> is the single source of truth for stock history — both receiving a purchase order and completing a sales order write a row here, rather than only mutating <code>InventoryItem.QuantityOnHand</code> directly. This is what makes "Recent Activities" and "Low Stock Alert" on the dashboard buildable as simple queries instead of separate hand-maintained state.</li>
+    </ul>
+
+    <div class="highlight-box">
+      <strong>📊 Dashboard metrics are not their own entity</strong> — Total Products, Total Orders, Total Revenue, Sales Overview, Inventory by Category are all computed on read from the tables above, not stored redundantly.
+    </div>
+
+    <h4>Soft-delete convention</h4>
+    <p>Product, Supplier, and Warehouse are never hard-deleted once they have order history — "Delete" in the UI sets <code>IsActive = false</code> instead of removing the row. Inactive records:</p>
+    <div class="soft-delete-note">
+      <ul>
+        <li>Are excluded from dropdowns/selectors when creating a new purchase order, sales order, or product.</li>
+        <li>Still render correctly on historical orders that already reference them (an old sales order still shows the discontinued product's name).</li>
+        <li>Can be "restored" (<code>IsActive = true</code>) from a dedicated view if needed later — not required for MVP, but the flag makes it trivial to add.</li>
+      </ul>
+    </div>
+    <p>A record with no order history at all (e.g. a product created by mistake and never ordered) can still be hard-deleted safely, since nothing else references it — worth a quick existence check in the delete endpoint (if referenced anywhere → soft-delete; if not → hard-delete) rather than always soft-deleting everything.</p>
+
+    <h3>4.2 Migration plan</h3>
+    <ul>
+      <li>Add all entities above to <code>Domain/Entities/</code>, following the same onion structure as Plan/Contact.</li>
+      <li>Configure relationships in <code>AppDbContext.OnModelCreating</code> (foreign keys, cascade rules — e.g. deleting a Product should probably be blocked or soft-deleted if it has order history, not cascade-deleted).</li>
+      <li>One migration for the full schema: <code>dotnet ef migrations add CoreDomainModel</code>, then <code>dotnet ef database update</code>.</li>
+      <li>Seed reference data that screens need immediately to be usable: a couple of Category rows, one default Warehouse, so Products/Inventory aren't empty on first login.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>❓ Open question to confirm before migrating:</strong> should Product support multiple suppliers, or one preferred supplier per product? The table above assumes suppliers are only linked through PurchaseOrder, not directly on Product — confirm this matches intent before locking the schema.
+    </div>
+
+    <!-- Section 5 -->
+    <h2>5. Part B — Manager Console Features</h2>
+    <p>Build order follows the dependency chain — later screens need data from earlier ones to be meaningful:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Module</th>
+          <th>Core actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Categories &amp; Warehouses</td><td>CRUD — simplest, needed before Products can be created</td></tr>
+        <tr><td>2</td><td>Products</td><td>CRUD, assign category, set reorder level</td></tr>
+        <tr><td>3</td><td>Inventory</td><td>View stock per product per warehouse, manual stock adjustment (writes a StockMovement with Reason = Adjustment)</td></tr>
+        <tr><td>4</td><td>Suppliers</td><td>CRUD</td></tr>
+        <tr><td>5</td><td>Purchases</td><td>Create purchase order → mark received (writes StockMovement with Reason = Purchase, increments InventoryItem)</td></tr>
+        <tr><td>6</td><td>Sales</td><td>Create sales order → mark fulfilled (writes StockMovement with Reason = Sale, decrements InventoryItem)</td></tr>
+        <tr><td>7</td><td>Dashboard</td><td>Aggregate queries over the above: totals, low-stock list, recent activity feed, inventory-by-category breakdown</td></tr>
+        <tr><td>8</td><td>Reports</td><td>Basic filtering/export over sales and inventory data — scope narrowly for MVP (e.g. date-range sales report) rather than a full BI tool</td></tr>
+        <tr><td>9</td><td>Team Management</td><td>List users, invite/create, assign role (depends on Part C being done first)</td></tr>
+        <tr><td>10</td><td>Settings</td><td>Business profile info, low-stock threshold defaults — lowest priority, last</td></tr>
+      </tbody>
+    </table>
+    <p>Each module follows the same shape already established for Plans: Domain entity → DTOs → repository/service interfaces → service → controller → admin-style CRUD page → JS module (service/validation/page files).</p>
+
+    <!-- Section 6 -->
+    <h2>6. Part C — Roles &amp; Permissions</h2>
+
+    <h3>6.1 Why now, not earlier</h3>
+    <p>Phase 1 only needed "authenticated or not" — one admin, one set of permissions. Phase 2 introduces real operational differences: an owner shouldn't want every staff member able to delete purchase orders or manage other users' accounts.</p>
+
+    <h3>6.2 Proposed roles (MVP scope)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Can do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Owner</strong></td><td>Everything, including Team Management and Settings. Exactly one per business in MVP — the seeded admin account.</td></tr>
+        <tr><td><strong>Manager</strong></td><td>Full access to Products, Inventory, Warehouses, Suppliers, Purchases, Sales, Reports. Cannot manage Team or Settings.</td></tr>
+        <tr><td><strong>Staff</strong></td><td>Read access to Inventory and Products; can create Sales Orders. Cannot delete anything, cannot access Purchases, Suppliers, Reports, Team, or Settings.</td></tr>
+      </tbody>
+    </table>
+    <p>This is intentionally simple (3 fixed roles, not a granular permission-editor) to ship something usable quickly. A fine-grained, admin-configurable permission system is a reasonable Phase 3 idea, not part of this scope.</p>
+
+    <h3>6.3 Implementation approach</h3>
+    <ul>
+      <li><code>User.Role</code> already exists as a string — formalize it as an enum (Owner, Manager, Staff) at the database/DTO level.</li>
+      <li>Enforce with ASP.NET Core's built-in <code>[Authorize(Roles = "Owner,Manager")]</code> on controllers/actions — no custom permission engine needed for 3 fixed roles.</li>
+      <li>The JWT already carries a role claim (set up in Phase 1's TokenService) — this phase mostly wires existing claims into new <code>[Authorize]</code> attributes, it doesn't require new auth infrastructure.</li>
+      <li><strong>Frontend:</strong> hide nav links/buttons the current user's role can't use (convenience, not security — the backend <code>[Authorize]</code> check is what actually protects anything). A small <code>authState.js</code> helper (<code>hasRole(role)</code>) can drive this.</li>
+    </ul>
+
+    <!-- Section 7 -->
+    <h2>7. Suggested Milestones</h2>
+    <ul>
+      <li><strong>Milestone 1</strong> — Data model migrated, seed data in place, Categories + Warehouses + Products CRUD live.</li>
+      <li><strong>Milestone 2</strong> — Inventory view + manual adjustments working; Suppliers CRUD live.</li>
+      <li><strong>Milestone 3</strong> — Purchases and Sales workflows live, StockMovement correctly updates InventoryItem on both.</li>
+      <li><strong>Milestone 4</strong> — Dashboard built entirely from real data (no more static mockup numbers).</li>
+      <li><strong>Milestone 5</strong> — Roles enforced across every controller; Team Management screen live.</li>
+      <li><strong>Milestone 6</strong> — Reports + Settings; polish pass.</li>
+    </ul>
+
+    <!-- Section 8 -->
+    <h2>8. Out of Scope for Phase 2</h2>
+    <ul>
+      <li>Multi-tenancy (multiple separate businesses using one deployment)</li>
+      <li>Granular, admin-configurable permissions beyond the 3 fixed roles</li>
+      <li>Barcode scanning / hardware integration</li>
+      <li>Automated reordering from suppliers when stock is low (flagging low stock is in scope; auto-ordering is not)</li>
+    </ul>
+
+    <!-- Section 9 -->
+    <h2>9. Decisions Confirmed</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Product–Supplier relationship</td><td>Direct <code>PreferredSupplierId</code> field on Product (optional FK to Supplier), not only inferred via purchase order history.</td></tr>
+        <tr><td>Sales customer</td><td>Real <strong>Customer</strong> entity, not a free-text name field on SalesOrder.</td></tr>
+        <tr><td>Deleting records with order history</td><td>Soft-delete (<code>IsActive = false</code>) for Product, Supplier, Warehouse. Records with no history at all may still be hard-deleted.</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+    <p class="small-note" style="text-align: center; margin-top: 1.5rem;">StockFlow PRD — Phase 2 · version 1.0</p>
+
+  </div>
+</body>
+</html>

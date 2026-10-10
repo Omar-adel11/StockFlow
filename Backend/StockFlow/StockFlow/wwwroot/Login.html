@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In - StockFlow</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/authLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <main class="auth-page">
+    <div class="card auth-card">
+
+      <a href="index.html" class="auth-back-link">&larr; Back to Site</a>
+
+      <div class="auth-header">
+        <span class="badge">Welcome Back</span>
+        <h1>Log In</h1>
+        <p>Log in to manage your StockFlow account.</p>
+      </div>
+
+      <form id="login-form" novalidate>
+
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" name="email" placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" placeholder="Your password" />
+        </div>
+
+        <div class="auth-links-row">
+          <a href="forgot-password.html">Forgot password?</a>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-block">Log In</button>
+
+        <p id="form-status" class="form-status" aria-live="polite"></p>
+      </form>
+
+      <p class="auth-switch">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+
+    </div>
+  </main>
+
+  <script type="module" src="./src/pages/LoginPage.js"></script>
+</body>
+</html>

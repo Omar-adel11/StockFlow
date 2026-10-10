@@ -1,0 +1,62 @@
+/* Shared centered CRUD forms */
+.entity-form-card,.order-form-card{width:85%;max-width:none!important;margin:0 auto}.admin-main>.card,.admin-main>.entity-list-section{width:85%;margin-left:auto;margin-right:auto}@media(max-width:900px){.entity-form-card,.order-form-card,.admin-main>.card,.admin-main>.entity-list-section{width:95%}}
+/* Order line controls */
+.line-items-table .po-item-product,.line-items-table .so-item-product{min-width:240px}.line-items-table .po-item-qty,.line-items-table .so-item-qty{width:110px;min-width:100px}.line-items-table .po-item-price,.line-items-table .so-item-price{width:140px;min-width:120px;background:#f3f4f6;font-weight:600}.line-items-table td{vertical-align:middle;padding:12px}.line-items-table .form-control{height:42px;border:1px solid var(--color-border);border-radius:8px;padding:0 12px;box-sizing:border-box}.line-items-table .po-item-qty:focus,.line-items-table .so-item-qty:focus{outline:2px solid rgba(39,122,81,.18);border-color:var(--color-primary)}
+.searchable-select{position:relative;width:100%;min-width:180px}.searchable-select input{width:100%;height:42px;box-sizing:border-box;border:1px solid var(--color-border);border-radius:8px;padding:0 12px;background:#fff}.searchable-select input:focus{outline:2px solid rgba(39,122,81,.15);border-color:var(--color-primary)}.searchable-select-menu{position:fixed;z-index:100000;max-height:240px;overflow:auto;background:#fff;border:1px solid var(--color-border);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.12);display:none}.searchable-select-menu.open{display:block}.searchable-select-option,.searchable-select-empty{padding:10px 12px}.searchable-select-option{cursor:pointer}.searchable-select-option:hover{background:#f0f7f3}
+/* centered confirmations/notices */
+.ui-overlay{position:fixed!important;inset:0!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(15,23,42,.48)!important;padding:20px;box-sizing:border-box}.ui-dialog-card{position:relative!important;z-index:100000!important;width:min(480px,92vw);background:#fff;border-radius:14px;padding:26px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
+
+.page-notice-host{position:fixed;inset:0;z-index:99998;pointer-events:none}.confirmation-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.52);padding:20px;box-sizing:border-box;pointer-events:auto}.confirmation-card{width:min(500px,94vw);background:#fff;border-radius:16px;padding:26px;box-shadow:0 25px 80px rgba(0,0,0,.28)}.confirmation-content{display:flex;gap:15px;align-items:flex-start}.confirmation-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff3cd;font-weight:800}.confirmation-content h3{margin:0 0 6px}.confirmation-content p{margin:0;color:var(--color-text-muted);line-height:1.5}.confirmation-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}.page-notice{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;background:#fff;padding:20px 24px;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);min-width:min(420px,90vw);pointer-events:auto}.page-notice-content{display:flex;flex-direction:column;gap:5px}.page-notice-close{position:absolute;right:10px;top:8px;border:0;background:none;font-size:22px;cursor:pointer}
+.searchable-select-source{display:none!important}.searchable-select{width:100%;min-width:0}.searchable-select input{display:block;width:100%;height:42px;box-sizing:border-box}.searchable-select-menu{width:100%;box-sizing:border-box}
+
+.searchable-select-menu{background:#fff;border:1px solid var(--color-border);border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.18);overflow-y:auto}.searchable-select-option{font-size:.92rem;color:var(--color-text);background:#fff}.searchable-select-empty{color:var(--color-text-muted)}
+.confirmation-overlay{
+  position:fixed!important;
+  top:0!important;right:0!important;bottom:0!important;left:0!important;
+  width:100vw!important;height:100vh!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  transform:none!important;
+}
+.confirmation-card{
+  position:relative!important;
+  left:auto!important;top:auto!important;
+  margin:0!important;
+}
+
+/* Force shared feedback UI to be viewport-centered even when page shells have layout positioning. */
+#page-notice-host{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  z-index:2147483000!important;
+  pointer-events:none!important;
+}
+#page-notice-host .confirmation-overlay{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  transform:none!important;
+  pointer-events:auto!important;
+}
+#page-notice-host .confirmation-card{
+  position:relative!important;
+  margin:0!important;
+  left:auto!important;
+  top:auto!important;
+  transform:none!important;
+}
+#page-notice-host .page-notice{
+  position:absolute!important;
+  top:50%!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  margin:0!important;
+  transform:translate(-50%,-50%)!important;
+}

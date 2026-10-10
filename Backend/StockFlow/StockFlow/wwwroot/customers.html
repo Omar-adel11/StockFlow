@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customers - StockFlow Admin</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/adminShell.css" />
+<link rel="stylesheet" href="css/entityCrud.css" />
+  <link rel="stylesheet" href="css/uiEnhancements.css" />
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="images/logo.jpg" alt="StockFlow" />
+        StockFlow
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="categories.html" data-min-role="Manager"><span class="nav-icon">📁</span> Categories</a></li>
+        <li><a href="products.html" data-min-role="Manager"><span class="nav-icon">📦</span> Products</a></li>
+        <li><a href="inventory.html" data-min-role="Staff"><span class="nav-icon">🏷️</span> Inventory</a></li>
+        <li><a href="warehouses.html" data-min-role="Manager"><span class="nav-icon">🏬</span> Warehouses</a></li>
+        <li><a href="suppliers.html" data-min-role="Manager"><span class="nav-icon">🤝</span> Suppliers</a></li>
+        <li><a href="customers.html" class="active" data-min-role="Staff"><span class="nav-icon">👥</span> Customers</a></li>
+        <li><a href="purchase-orders.html" data-min-role="Manager"><span class="nav-icon">🧾</span> Purchase Orders</a></li>
+        <li><a href="sales-orders.html" data-min-role="Staff"><span class="nav-icon">🛒</span> Sales Orders</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="profile.html">profile</a>
+        <button type="button" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <div class="admin-content">
+
+      <header class="admin-topbar">
+        <div>
+          <h1>Customers</h1>
+          <p>Manage the customers sales orders are linked to.</p>
+        </div>
+        <a href="addCustomer.html" class=" btn btn-primary">+ Add customer</a>
+      </header>
+
+      <main class="admin-main">
+
+          
+
+        <section class="entity-list-section">
+          
+          
+          <section class="entity-list-section"><div class="list-toolbar"><div><h2>Existing Customers</h2><p>Search Customers by name or Email.</p></div><input id="customers-search" type="search" placeholder="Search customers..." /></div>
+          <div id="customers-list" class="entity-grid"></div>
+          <p id="customers-empty" class="empty-state" hidden>No customers yet. Add your first one above.</p>
+          <p id="customers-loading" class="empty-state">Loading customers...</p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./src/pages/CustomersPage.js"></script>
+  <script type="module" src="./src/utils/subscriptionGuard.js"></script>
+  <script type="module" src="./src/utils/roleSidebar.js"></script>
+</body>
+</html>

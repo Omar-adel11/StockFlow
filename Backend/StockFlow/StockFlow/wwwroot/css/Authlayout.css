@@ -1,0 +1,169 @@
+/* Centers the auth card on the page - same centering pattern as
+   the contact page, reused here since every auth page is a single
+   narrow card too. */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  padding: 48px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.auth-header {
+  margin-bottom: 28px;
+}
+
+.auth-header h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+/* Small link row above/below the submit button - e.g. "Forgot password?" */
+.auth-links-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  margin-top: -8px;
+}
+
+.auth-links-row a,
+.field-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.auth-links-row a:hover,
+.field-link:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Centered text below the card's own border, e.g.
+   "Don't have an account? Sign up" */
+.auth-switch {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.auth-switch a {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.auth-switch a:hover {
+  color: var(--color-primary-dark);
+}
+
+.auth-back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.auth-back-link:hover {
+  color: var(--color-primary);
+}
+
+/* ============ AVATAR UPLOAD (signup page) ============ */
+
+.avatar-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The real file input is visually hidden - the styled label acts as
+   the clickable "button" instead, since a native file input can't be
+   restyled directly across browsers. */
+.avatar-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.avatar-upload-label {
+  cursor: pointer;
+}
+
+/* ============ OTP INPUT ============ */
+
+.otp-input {
+  text-align: center;
+  font-size: 1.6rem;
+  letter-spacing: 10px;
+  font-family: "Inter", monospace;
+}
+
+.resend-row {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
+
+.resend-row button {
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+}
+
+.resend-row button:hover {
+  color: var(--color-primary-dark);
+}
+
+.resend-row button:disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 24px;
+  }
+}

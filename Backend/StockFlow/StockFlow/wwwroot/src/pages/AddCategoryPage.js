@@ -1,0 +1,6 @@
+import '../sessions/authGuard.js';
+import { getAllCategories, createCategory, updateCategory } from '../services/categoryService.js';
+const id=new URLSearchParams(location.search).get('id');
+const form=document.getElementById('entity-form'); const status=document.getElementById('form-status'); const title=document.getElementById('form-title');
+async function init(){ if(id){ const items=await getAllCategories(); const x=items.find(i=>String(i.id)===String(id)); if(!x) throw new Error('Category not found'); document.getElementById('category-name').value=x.name||''; document.getElementById('category-description').value=x.description||''; title.textContent='Edit Category'; } }
+form.addEventListener('submit',async e=>{e.preventDefault(); const payload={name:document.getElementById('category-name').value.trim(),description:document.getElementById('category-description').value.trim()}; if(!payload.name){status.textContent='Category name is required.';return;} try{await(id?updateCategory(id,payload):createCategory(payload)); location.href='categories.html';}catch(err){status.textContent=err.message;}}); init().catch(e=>status.textContent=e.message);

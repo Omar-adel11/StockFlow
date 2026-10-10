@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plans - StockFlow</title>
+
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/indexLayout.css" />
+  <link rel="stylesheet" href="./css/plansLayout.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+
+      <a href="index.html" class="logo">
+        <img src="images/logo.jpg" alt="StockFlow logo" class="logo-img" />
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="plans.html" class="active">Pricing</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+
+      <div class="navbar-actions">
+        <a href="Login.html" class="link-btn">Log In</a>
+        <a href="#" class="btn btn-primary">Start Free Trial</a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="plans-page">
+    <section class="plans-hero">
+      <div class="container">
+        <span class="badge">Simple Pricing</span>
+        <h1>Choose the right plan for your business</h1>
+        <p>Get the tools you need to manage inventory, warehouses, purchases, and sales.</p>
+      </div>
+    </section>
+
+    <section class="plans-section">
+      <div class="container">
+        <div id="plans-list" class="public-plans-grid"></div>
+
+        <p id="plans-empty" class="empty-state" hidden>No plans are currently available.</p>
+        <p id="plans-loading" class="empty-state" hidden>Loading plans...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 StockFlow. All rights reserved.</p>
+    </div>
+  </footer>
+
+<script type="module" src="./src/pages/PlansPage.js"></script></body>
+</html>
