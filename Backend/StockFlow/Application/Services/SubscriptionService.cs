@@ -183,11 +183,11 @@ namespace Application.Services
                 throw new KeyNotFoundException($"Business with ID {businessId} was not found.");
 
             // Fetch the latest active (or active/trial) subscription record
-            var subscription = await _dbContext.TenantSubscriptions
+            var subscription = await _dbContext.TenantSubscriptions.IgnoreQueryFilters()
                  .Where(s => s.BusinessId == businessId && s.PlanId == planId
                           && s.Status == SubscriptionStatus.Active
                           && s.EndDateUtc > DateTime.UtcNow)
-                 .OrderByDescending(s => s.Id)
+                 .OrderByDescending(s=>s.Id)
                  .FirstOrDefaultAsync();
 
             if (subscription == null)

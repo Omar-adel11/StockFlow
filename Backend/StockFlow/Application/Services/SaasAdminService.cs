@@ -107,9 +107,9 @@ namespace Application.Services
             {
                 // Deactivate the business tenant and clear the plan assignment
                 business.IsActive = false;
-                business.PlanId = null; // Assigns null (or a new plan if explicitly provided)
                 //end subscription
                 var result = await subscriptionService.DeactivateSubscription(business.Id, plan.Id);
+                business.PlanId = null; // Assigns null (or a new plan if explicitly provided)
                 return result;
             }
 

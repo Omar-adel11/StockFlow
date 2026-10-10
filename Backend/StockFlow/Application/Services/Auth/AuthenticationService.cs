@@ -48,7 +48,7 @@ namespace Application.Services.Auth
                 throw new UnauthorizedAccessException("Your account has been deactivated. Please contact your business owner or administrator.");
             }
 
-            int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
+            int businessId = user.BusinessId ?? 0;
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDTO.password);
             if (!isPasswordValid)
