@@ -7,6 +7,7 @@ using Application.Services.Auth;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Persistence.Interceptors;
@@ -125,8 +126,13 @@ namespace StockFlow
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<AppDbContext>();
+
+                // This applies all pending migrations automatically on cloud startup!
+                await context.Database.MigrateAsync();
 
                 await DbSeeder.SeedAsync(services);
+
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
