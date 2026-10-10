@@ -22,7 +22,7 @@ form.addEventListener('submit', async (event) => {
     try {
         const result = await authService.register(formData);
         session.setSession(result);
-        window.location.href = 'home.html';
+        window.location.href = 'index.html';
     } catch (error) {
         console.error(error);
         formStatus.textContent = error.message;

@@ -1,6 +1,7 @@
 // api/apiClient.js
 import { getAccessToken, setSession, clearSession } from '../sessions/session.js';
 
+// export const baseUrl = 'https://localhost:7203';
 export const baseUrl = '';
 
 // Helper options to ensure cookies are included in every fetch request
