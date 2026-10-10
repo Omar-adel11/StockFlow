@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Security.Claims;
 
 namespace Presentation.Attributes
 {
@@ -22,6 +23,14 @@ namespace Presentation.Attributes
                 return; // Let standard [Authorize] handle 401 Unauthenticated
             }
 
+            bool isSaasAdmin = user.IsInRole("SaasAdmin") || 
+                               user.HasClaim(ClaimTypes.Role, "SaasAdmin");
+
+            if (isSaasAdmin)
+            {
+                return; // SaasAdmin doesn't need a business/tenant ID
+            }
+            
             var businessIdClaim = user.FindFirst("business_id")?.Value;
 
             if (string.IsNullOrEmpty(businessIdClaim) || !int.TryParse(businessIdClaim, out int businessId) || businessId <= 0)

@@ -44,8 +44,8 @@ export function ValidateRegisterForm(formData) {
         ['email', email, 200],
         ['password', password, 100],
         ['confirmPassword', confirmPassword, 100],
-        ['PhoneNumber', phoneNumber, 20],
-        ['BusinessName', businessName, 200]
+        ['PhoneNumber', PhoneNumber, 20],
+        ['BusinessName', BusinessName, 200]
     ];
 
     fields.forEach(([field, value, maxLength]) => {
