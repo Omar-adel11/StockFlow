@@ -77,41 +77,36 @@ namespace Application.Services
 
             var business = user.Business;
 
-            var plan = await _context.Plans
-                  .IgnoreQueryFilters()
-                  .FirstOrDefaultAsync(p => p.Id == request.PlanId);
-
-            if (plan is null)
-            {
-                throw new PlanNotFoundException();
-            }
-
-
             if (request.IsActive)
             {
-                // 1. If activating, a valid plan is mandatory
                 if (!request.PlanId.HasValue)
-                {
                     throw new ArgumentException("A subscription plan must be assigned when activating a business owner.");
-                }
 
-              
-                business.PlanId = request.PlanId.Value;
+                var plan = await _context.Plans.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(p => p.Id == request.PlanId.Value)
+                    ?? throw new PlanNotFoundException();
+
+                business.PlanId = plan.Id;
                 business.IsActive = true;
-                //add tenant subscription
-                var result = await subscriptionService.ActivateSubscription(business.Id, plan.Id, plan.BillingCycle == 0 ? 30 : 365);
-                return result;
+                return await subscriptionService.ActivateSubscription(
+                    business.Id, plan.Id, plan.BillingCycle == 0 ? 30 : 365);
+            }
 
-            }
-            else
-            {
-                // Deactivate the business tenant and clear the plan assignment
-                business.IsActive = false;
-                //end subscription
-                var result = await subscriptionService.DeactivateSubscription(business.Id, plan.Id);
-                business.PlanId = null; // Assigns null (or a new plan if explicitly provided)
-                return result;
-            }
+            // Deactivation must work even if the UI sends a null planId.
+            var activeSubscription = await _context.TenantSubscriptions.IgnoreQueryFilters()
+                .Where(s => s.BusinessId == business.Id
+                    && s.Status == Domain.Entities.Enum.SubscriptionStatus.Active
+                    && s.EndDateUtc > DateTime.UtcNow)
+                .OrderByDescending(s => s.Id)
+                .FirstOrDefaultAsync();
+
+            if (activeSubscription != null)
+                await subscriptionService.DeactivateSubscription(business.Id, activeSubscription.PlanId);
+
+            business.IsActive = false;
+            business.PlanId = null;
+            await _context.SaveChangesAsync();
+            return true;
 
            
         }
