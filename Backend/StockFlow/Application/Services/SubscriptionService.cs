@@ -200,6 +200,7 @@ namespace Application.Services
             subscription.Status = SubscriptionStatus.Cancelled;
             subscription.EndDateUtc = DateTime.UtcNow;
             business.IsActive = false;
+            business.PlanId = null;
 
             return await _dbContext.SaveChangesAsync() > 0;
         }

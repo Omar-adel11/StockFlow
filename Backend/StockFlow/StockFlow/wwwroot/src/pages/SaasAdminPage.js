@@ -32,7 +32,7 @@ function setupSectionNavigation() {
       else link.removeAttribute('aria-current');
     });
   }
-  links.forEach(link => link.addEventListener('click', () => activate(link.getAttribute('href').slice(1)));
+  links.forEach(link => link.addEventListener('click', () => activate(link.getAttribute('href').slice(1))));
   window.addEventListener('hashchange', () => activate());
   activate();
 }

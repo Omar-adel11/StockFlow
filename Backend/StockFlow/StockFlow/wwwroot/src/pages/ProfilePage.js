@@ -1,4 +1,3 @@
-import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { getAccessToken } from '../sessions/session.js';
 import { logout } from '../services/authService.js';

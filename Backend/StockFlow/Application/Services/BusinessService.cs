@@ -75,6 +75,7 @@ namespace Application.Services
 
             // 5. Sync Business.PlanId reference
             business.PlanId = plan.Id;
+            business.IsActive = true;
 
             // 6. Save changes atomically
             await _dbContext.SaveChangesAsync();
