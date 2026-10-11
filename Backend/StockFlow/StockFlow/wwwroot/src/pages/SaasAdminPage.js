@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('DOMContentLoaded', setupSectionNavigation);
 
 function setupSectionNavigation() {
-  const links = document.querySelectorAll('.admin-sidebar .sidebar-nav a[href^="#"]');
-  const sections = document.querySelectorAll('.saas-section');
-  function activate() {
-    const id = (location.hash || '#business-owners').slice(1);
+  const links = [...document.querySelectorAll('.admin-sidebar .sidebar-nav a[href^="#"]')];
+  const sections = [...document.querySelectorAll('.saas-section')];
+  function activate(id = location.hash.slice(1) || 'overview') {
+    if (!sections.some(section => section.id === id)) id = 'overview';
     sections.forEach(section => { section.hidden = section.id !== id; });
     links.forEach(link => {
       const active = link.getAttribute('href') === '#' + id;
@@ -33,10 +33,10 @@ function setupSectionNavigation() {
     });
   }
   links.forEach(link => link.addEventListener('click', () => {
-    const hash = link.getAttribute('href');
-    if (location.hash === hash) activate();
+    const id = link.getAttribute('href').slice(1);
+    activate(id);
   }));
-  window.addEventListener('hashchange', activate);
+  window.addEventListener('hashchange', () => activate());
   activate();
 }
 
