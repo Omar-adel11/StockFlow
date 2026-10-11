@@ -36,9 +36,8 @@ function renderSidebar() {
         StockFlow
       </div>
       <ul class="sidebar-nav">
-        <li><a href="adminPanel.html#overview" class="${page === 'adminpanel.html' ? 'active' : ''}"><span class="nav-icon">▦</span> Overview</a></li>
-        <li><a href="adminPanel.html#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
-        <li><a href="adminPanel.html#plans"><span class="nav-icon">◆</span> Plans</a></li>
+        <li><a href="adminPanel.html#business-owners" class="${page === 'adminpanel.html' && location.hash !== '#plans' ? 'active' : ''}"><span class="nav-icon">♙</span> Business Owners</a></li>
+        <li><a href="adminPanel.html#plans" class="${page === 'adminpanel.html' && location.hash === '#plans' ? 'active' : ''}"><span class="nav-icon">◆</span> Plans</a></li>
       </ul>
     `;
   } else {
