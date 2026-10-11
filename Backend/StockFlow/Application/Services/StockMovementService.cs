@@ -13,7 +13,7 @@ using static Application.DTOs.StockMovementDtos;
 
 namespace Application.Services
 {
-    public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService) : IStockMovementService
+    public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService, IEmailService emailService) : IStockMovementService
     {
         private DbSet<StockMovement> stockMovements => _context.StockMovements;
         private DbSet<InventoryItem> InventoryItems => _context.InventoryItems;
@@ -72,6 +72,43 @@ namespace Application.Services
                 // 4. Save changes and commit transaction
                 await _context.SaveChangesAsync(CancellationToken.None);
                 await transaction.CommitAsync(CancellationToken.None);
+
+                // Notify the business owner when an adjustment leaves stock at/below its reorder point.
+                try
+                {
+                    var product = await Products.AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.Id == request.ProductId);
+                    if (product != null && inventoryItem.QuantityOnHand <= product.ReorderLevel)
+                    {
+                        var ownerEmail = await (
+                            from user in _context.Users
+                            join userRole in _context.UserRoles on user.Id equals userRole.UserId
+                            join role in _context.Roles on userRole.RoleId equals role.Id
+                            where user.BusinessId == businessId && role.Name == "BusinessOwner"
+                            select user.Email
+                        ).FirstOrDefaultAsync();
+
+                        if (!string.IsNullOrWhiteSpace(ownerEmail))
+                        {
+                            var warehouseName = await Warehouses.AsNoTracking()
+                                .Where(w => w.Id == request.WarehouseId)
+                                .Select(w => w.Name)
+                                .FirstOrDefaultAsync() ?? $"Warehouse #{request.WarehouseId}";
+                            var subject = $"StockFlow low-stock alert: {product.Name}";
+                            var body = $@"<h2>Low-stock alert</h2>
+                                <p><strong>Product:</strong> {System.Net.WebUtility.HtmlEncode(product.Name)}</p>
+                                <p><strong>SKU:</strong> {System.Net.WebUtility.HtmlEncode(product.SKU)}</p>
+                                <p><strong>Warehouse:</strong> {System.Net.WebUtility.HtmlEncode(warehouseName)}</p>
+                                <p><strong>Current quantity:</strong> {inventoryItem.QuantityOnHand}</p>
+                                <p><strong>Reorder level:</strong> {product.ReorderLevel}</p>";
+                            await emailService.SendEmailAsync(ownerEmail, subject, body);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Email delivery must not undo a successfully committed stock adjustment.
+                }
 
                 return true;
             }
