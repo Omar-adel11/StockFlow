@@ -23,6 +23,14 @@ function fill(x) {
   document.getElementById('customer-address-state').value = a.state || a.State || '';
   document.getElementById('customer-address-postal-code').value = a.zipCode || a.ZipCode || '';
   document.getElementById('customer-address-country').value = a.country || a.Country || 'Egypt';
+  ['customer-address-street','customer-address-city','customer-address-state','customer-address-postal-code','customer-address-country'].forEach(fieldId => {
+    const input = document.getElementById(fieldId);
+    if (input) (input.closest('.form-row') || input.closest('.form-group')).hidden = true;
+  });
+  const addressActions = document.createElement('div');
+  addressActions.className = 'form-actions customer-address-actions';
+  addressActions.innerHTML = '<a class="btn btn-secondary" href="customers.html?addresses=' + encodeURIComponent(x.id || x.Id) + '">Manage Addresses</a>';
+  form.querySelector('.form-actions')?.before(addressActions);
 
   document.getElementById('page-title').textContent = 'Edit Customer';
   document.getElementById('form-title').textContent = 'Edit Customer';
@@ -46,7 +54,7 @@ form?.addEventListener('submit', async e => {
   }
 
   const address = {
-    Id: existingAddressId,
+    Id: null,
     Street: val('customer-address-street'),
     City: val('customer-address-city'),
     State: val('customer-address-state') || 'NA',
@@ -55,7 +63,11 @@ form?.addEventListener('submit', async e => {
     IsDefault: true
   };
 
-  const payload = { Name, Email, Phone, Addresses: [address] };
+  if (!id && (!address.Street || !address.City || !address.ZipCode || !address.Country)) {
+    status.textContent = 'Please complete the default address: street, city, postal code and country.';
+    return;
+  }
+  const payload = id ? { Name, Email, Phone } : { Name, Email, Phone, Addresses: [address] };
 
   try {
     const confirmed = id
