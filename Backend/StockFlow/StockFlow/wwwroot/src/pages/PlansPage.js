@@ -49,7 +49,10 @@ init().then(() => {
       .find(card => card.querySelector('.trial-note'));
     if (trialCard) {
       trialCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      trialCard.querySelector('.subscribe-btn')?.focus({ preventScroll: true });
+      const autoStart = new URLSearchParams(location.search).get('autostart') === '1';
+      const trialButton = trialCard.querySelector('.subscribe-btn');
+      if (autoStart && trialButton && !trialButton.disabled) trialButton.click();
+      else trialButton?.focus({ preventScroll: true });
     } else {
       showNotice('No free-trial plan is currently available.', 'error');
     }
