@@ -152,7 +152,8 @@ async function handleCancelSubscription() {
     showNotice('Subscription canceled successfully.');
 
     // Refresh subscription details, but always restore the button if the refresh fails.
-    await loadSubscriptionInfo();
+    // Subscription data is optional. A missing/expired subscription must not prevent profile access.
+  void loadSubscriptionInfo();
     if (cancelSubBtn.textContent === 'Canceling...') {
       cancelSubBtn.disabled = false;
       cancelSubBtn.textContent = 'Cancel Subscription';
