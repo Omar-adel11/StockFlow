@@ -560,3 +560,14 @@ main:has(#business-owners:target) .admin-tab[href="#business-owners"] {
   }
 }
 .trial-plan-label{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:999px;background:#e7f7ef;color:#18794e;font-size:11px;font-weight:700;}
+
+/* SaaS admin navigation uses the selected sidebar section. */
+#overview[hidden], #plans[hidden], #business-owners[hidden] { display: none !important; }
+.admin-sidebar .sidebar-nav a.active {
+  color: var(--color-primary);
+  background: var(--color-success-bg);
+  border-radius: 10px;
+  font-weight: 800;
+}
+.admin-sidebar .sidebar-nav a { transition: background-color .18s ease, color .18s ease; }
+.admin-sidebar .sidebar-nav a:hover { background: var(--color-success-bg); color: var(--color-primary-dark); }
