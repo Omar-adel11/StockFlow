@@ -46,7 +46,7 @@ form?.addEventListener('submit', async e => {
   }
 
   const address = {
-    Id: existingAddressId,
+    Id: null,
     Street: val('customer-address-street'),
     City: val('customer-address-city'),
     State: val('customer-address-state') || 'NA',
@@ -55,7 +55,7 @@ form?.addEventListener('submit', async e => {
     IsDefault: true
   };
 
-  const payload = { Name, Email, Phone, Addresses: [address] };
+  const payload = id ? { Name, Email, Phone } : { Name, Email, Phone, Addresses: [address] };
 
   try {
     const confirmed = id
