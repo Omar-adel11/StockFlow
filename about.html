@@ -29,8 +29,8 @@
         <a href="contact.html">Contact Us</a>
       </nav>
 
-      <div class="navbar-actions" id="about-navbar-actions">
-        <a href="Login.html" class="link-btn" id="about-auth-btn">Log In</a>
+      <div class="navbar-actions">
+        <a href="Login.html" class="link-btn">Log In</a>
         <a href="plans.html?trial=1&autostart=1#plans-list" class="btn btn-primary">Start Free Trial</a>
       </div>
 
@@ -64,18 +64,5 @@
   <section class="about-cta"><div class="container"><h2>Ready to take control of your inventory?</h2><p>Start building a more organized operation with StockFlow.</p><a href="Signup.html" class="btn btn-primary">Get Started</a></div></section>
 </main>
 <footer><div class="container footer-inner"><span>© 2026 StockFlow</span><a href="index.html">Back to site</a></div></footer>
-  <script type="module">
-    import { getAccessToken } from './src/sessions/session.js';
-    import * as authService from './src/services/authService.js';
-    const authButton = document.getElementById('about-auth-btn');
-    if (authButton && getAccessToken()) {
-      authButton.textContent = 'Log Out';
-      authButton.href = '#';
-      authButton.addEventListener('click', event => {
-        event.preventDefault();
-        authService.logout();
-      });
-    }
-  </script>
 </body>
 </html>
