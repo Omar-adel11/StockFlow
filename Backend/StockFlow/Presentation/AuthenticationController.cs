@@ -110,7 +110,7 @@ namespace Presentation
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,                  // Prevents JS from reading the cookie
-                Secure = true,                    // Transmitted only over HTTPS ==> true (false for testing)
+                Secure = false,                    // Transmitted only over HTTPS ==> true (false for testing)
                 SameSite = SameSiteMode.None,   // Guards against CSRF attacks 
                 Expires = expiresAtUtc            // Matches refresh token expiration
             };
