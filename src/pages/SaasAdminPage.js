@@ -23,7 +23,7 @@ function setupSectionNavigation() {
   const links = document.querySelectorAll('.admin-sidebar .sidebar-nav a[href^="#"]');
   const sections = document.querySelectorAll('.saas-section');
   function activate() {
-    const id = (location.hash || '#overview').slice(1);
+    const id = (location.hash || '#business-owners').slice(1);
     sections.forEach(section => { section.hidden = section.id !== id; });
     links.forEach(link => {
       const active = link.getAttribute('href') === '#' + id;
