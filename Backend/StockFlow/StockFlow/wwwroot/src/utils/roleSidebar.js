@@ -30,15 +30,18 @@ function renderSidebar() {
   const page = currentPage();
 
   if (isSaasAdmin) {
+    // Use relative hash links so it triggers the tab switching without reloading the page
+    const businessActive = location.hash !== '#plans' ? 'active' : '';
+    const plansActive = location.hash === '#plans' ? 'active' : '';
+
     sidebar.innerHTML = `
       <div class="sidebar-logo">
         <img src="images/logo.jpg" alt="StockFlow">
         StockFlow
       </div>
       <ul class="sidebar-nav">
-        <li><a href="adminPanel.html#overview" class="${page === 'adminpanel.html' ? 'active' : ''}"><span class="nav-icon">▦</span> Overview</a></li>
-        <li><a href="adminPanel.html#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
-        <li><a href="adminPanel.html#plans"><span class="nav-icon">◆</span> Plans</a></li>
+        <li><a href="#business-owners" class="${businessActive}"><span class="nav-icon">♙</span> Business Owners</a></li>
+        <li><a href="#plans" class="${plansActive}"><span class="nav-icon">◆</span> Plans</a></li>
       </ul>
     `;
   } else {

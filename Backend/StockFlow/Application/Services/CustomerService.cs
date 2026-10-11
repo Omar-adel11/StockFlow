@@ -23,8 +23,9 @@ namespace Application.Services
                 Phone = createRequest.Phone,
                 BusinessId = businessId,
                 IsActive = true,
-                Addresses = createRequest.Addresses.Select(a => new CustomerAddress
+                Addresses = (createRequest.Addresses ?? new List<CustomerDtos.AddressCreateRequest>()).Select(a => new CustomerAddress
                 {
+                    BusinessId = businessId,
                     Street = a.Street,
                     City = a.City,
                     State = a.State,

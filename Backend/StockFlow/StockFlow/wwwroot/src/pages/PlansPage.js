@@ -1,8 +1,12 @@
 import { fetchPlans, subscribeToPlan, startFreeTrial } from '../services/planService.js';
 import { getAccessToken } from '../sessions/session.js';
 import { showNotice } from '../utils/ui.js';
+import * as authService from '../services/authService.js';
 
 const list=document.getElementById('plans-list'), empty=document.getElementById('plans-empty'), loading=document.getElementById('plans-loading');
+const navbarActions = document.getElementById('pricing-navbar-actions');
+if (navbarActions && getAccessToken()) navbarActions.innerHTML = '<a href="profile.html" class="btn btn-secondary">Profile</a><button type="button" class="btn btn-primary" id="pricing-logout-btn">Log Out</button>';
+if (navbarActions && getAccessToken()) document.getElementById('pricing-logout-btn')?.addEventListener('click', () => authService.logout());
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function cycle(v){return v===1||String(v).toLowerCase()==='yearly'?'Yearly':'Monthly';}
 function featureText(f){if(typeof f==='string')return f;const name=f?.name||f?.featureKey||'Feature';const value=f?.value;if(!value||String(value).toLowerCase()==='true')return name;if(String(value).toLowerCase()==='false')return '';return `${name}: ${value}`;}
@@ -43,4 +47,18 @@ async function startSubscription(plan,button){
   location.href=result.paymentUrl;
  }catch(error){showNotice(error.message||'Unable to start subscription.','error');button.disabled=false;button.textContent=plan.isFreeTrial?'Start Free Trial':'Subscribe';}
 }
-init();
+init().then(() => {
+  if (new URLSearchParams(location.search).get('trial') === '1') {
+    const trialCard = [...(list?.querySelectorAll('.public-plan-card') || [])]
+      .find(card => card.querySelector('.trial-note'));
+    if (trialCard) {
+      trialCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const autoStart = new URLSearchParams(location.search).get('autostart') === '1';
+      const trialButton = trialCard.querySelector('.subscribe-btn');
+      if (autoStart && trialButton && !trialButton.disabled) trialButton.click();
+      else trialButton?.focus({ preventScroll: true });
+    } else {
+      showNotice('No free-trial plan is currently available.', 'error');
+    }
+  }
+});

@@ -33,6 +33,8 @@ class CustomersPage {
       return;
     }
     await this.loadCustomers();
+    const addressCustomerId = new URLSearchParams(location.search).get('addresses');
+    if (addressCustomerId) await this.openAddresses(addressCustomerId);
   }
 
   async loadCustomers(search = null) {

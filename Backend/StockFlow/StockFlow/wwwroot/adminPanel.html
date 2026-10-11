@@ -26,7 +26,6 @@
       </div>
 
       <ul class="sidebar-nav">
-        <li><a href="#overview" class="active"><span class="nav-icon">▦</span> Overview</a></li>
         <li><a href="#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
         <li><a href="#plans"><span class="nav-icon">◆</span> Plans</a></li>
       </ul>
@@ -51,23 +50,6 @@
 
       <main class="admin-main">
 
-        <section id="overview" class="saas-section overview-section">
-          <div class="section-heading">
-            <div>
-              <span class="section-label">Overview</span>
-              <h2>Platform at a glance</h2>
-              <p>Monitor the businesses and subscription plans using StockFlow.</p>
-            </div>
-          </div>
-
-          
-        </section>
-
-        <nav class="admin-tabs" aria-label="SaaS administration sections">
-          <a href="#plans" class="admin-tab">Plans</a>
-          <a href="#business-owners" class="admin-tab">Business Owners</a>
-        </nav>
-
         <section id="plans" class="saas-section tab-section">
           <div class="section-heading">
   <div class="section-heading-row">
@@ -80,60 +62,7 @@
   </div>
 </div>
 
-          <div id="plans-list" class="plans-grid">
-
-            <!-- Future planPage.js will replace these cards with API data. -->
-            <article class="card plan-card">
-              <div class="plan-card-header">
-                <div>
-                  <span class="plan-kicker">Example</span>
-                  <h3>Starter</h3>
-                </div>
-                <span class="badge badge-active">Active</span>
-              </div>
-
-              <p class="plan-price">$19 <span>/ Monthly</span></p>
-              <p class="plan-description">For small businesses getting started with inventory management.</p>
-
-              <ul class="plan-features">
-                <li>1 Warehouse</li>
-                <li>1,000 Products</li>
-                <li>3 Team Members</li>
-                <li>Basic Reports</li>
-              </ul>
-
-              <div class="plan-card-actions">
-                <button type="button" class="btn btn-secondary">Edit</button>
-                <button type="button" class="btn btn-danger">Delete</button>
-              </div>
-            </article>
-
-            <article class="card plan-card">
-              <div class="plan-card-header">
-                <div>
-                  <span class="plan-kicker">Example</span>
-                  <h3>Business</h3>
-                </div>
-                <span class="badge badge-active">Active</span>
-              </div>
-
-              <p class="plan-price">$49 <span>/ Monthly</span></p>
-              <p class="plan-description">For growing businesses that need more users and warehouses.</p>
-
-              <ul class="plan-features">
-                <li>5 Warehouses</li>
-                <li>10,000 Products</li>
-                <li>20 Team Members</li>
-                <li>Advanced Reports</li>
-              </ul>
-
-              <div class="plan-card-actions">
-                <button type="button" class="btn btn-secondary">Edit</button>
-                <button type="button" class="btn btn-danger">Delete</button>
-              </div>
-            </article>
-
-          </div>
+          <div id="plans-list" class="plans-grid"></div>
 
           <p id="plans-empty" class="empty-state" hidden>No plans available.</p>
           <p id="plans-loading" class="empty-state" hidden>Loading plans...</p>
@@ -171,56 +100,7 @@
                   </tr>
                 </thead>
 
-                <tbody id="business-owners-list">
-                  <!-- Future SaaSAdminPage.js will populate this table. -->
-                  <tr>
-                    <td>
-                      <div class="person-cell">
-                        <span class="avatar">OA</span>
-                        <div>
-                          <strong>Omar Adel</strong>
-                          <span>omar@example.com</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>StockFlow Demo</td>
-                    <td><span class="plan-badge">Business</span></td>
-                    <td>
-                      <label class="switch">
-                        <input type="checkbox" checked aria-label="Toggle Omar Adel status" />
-                        <span class="switch-slider"></span>
-                        <span class="switch-label">Active</span>
-                      </label>
-                    </td>
-                    <td class="table-actions">
-                      <button type="button" class="btn btn-secondary btn-small">Assign Plan</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="person-cell">
-                        <span class="avatar avatar-alt">MA</span>
-                        <div>
-                          <strong>Mohamed Ali</strong>
-                          <span>mohamed@example.com</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Retail Hub</td>
-                    <td><span class="plan-badge plan-badge-muted">No Plan</span></td>
-                    <td>
-                      <label class="switch">
-                        <input type="checkbox" aria-label="Toggle Mohamed Ali status" />
-                        <span class="switch-slider"></span>
-                        <span class="switch-label">Inactive</span>
-                      </label>
-                    </td>
-                    <td class="table-actions">
-                      <button type="button" class="btn btn-secondary btn-small">Assign Plan</button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="business-owners-list"></tbody>
               </table>
             </div>
 
@@ -265,7 +145,7 @@
     </div>
   </dialog>
 
-  <script type="module" src="./src/pages/SaasAdminPage.js"></script>
   <script type="module" src="./src/utils/roleSidebar.js"></script>
+  <script type="module" src="./src/pages/SaasAdminPage.js"></script>
 </body>
 </html>

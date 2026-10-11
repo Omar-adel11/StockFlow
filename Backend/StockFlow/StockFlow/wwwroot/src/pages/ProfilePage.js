@@ -1,4 +1,3 @@
-import '../sessions/authGuard.js';
 import { showConfirm, showNotice } from '../utils/ui.js';
 import { getAccessToken } from '../sessions/session.js';
 import { logout } from '../services/authService.js';
@@ -151,8 +150,12 @@ async function handleCancelSubscription() {
 
     showNotice('Subscription canceled successfully.');
 
-    // Refresh subscription details
+    // Refresh subscription details, but always restore the button if the refresh fails.
     await loadSubscriptionInfo();
+    if (cancelSubBtn.textContent === 'Canceling...') {
+      cancelSubBtn.disabled = false;
+      cancelSubBtn.textContent = 'Cancel Subscription';
+    }
   } catch (error) {
     cancelSubBtn.disabled = false;
     cancelSubBtn.textContent = 'Cancel Subscription';

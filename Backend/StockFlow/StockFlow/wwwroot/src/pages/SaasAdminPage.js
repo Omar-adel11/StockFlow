@@ -17,6 +17,25 @@ let searchTimer;
 let selectedOwner=null;
 
 document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', setupSectionNavigation);
+
+function setupSectionNavigation() {
+  const links = [...document.querySelectorAll('.admin-sidebar .sidebar-nav a[href^="#"]')];
+  const sections = [...document.querySelectorAll('.saas-section')];
+  function activate(id = location.hash.slice(1) || 'business-owners') {
+    if (!sections.some(section => section.id === id)) id = 'business-owners';
+    sections.forEach(section => { section.hidden = section.id !== id; });
+    links.forEach(link => {
+      const active = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  links.forEach(link => link.addEventListener('click', () => activate(link.getAttribute('href').slice(1))));
+  window.addEventListener('hashchange', () => activate());
+  activate();
+}
 
 async function init() {
   setupAssignPlanModal();

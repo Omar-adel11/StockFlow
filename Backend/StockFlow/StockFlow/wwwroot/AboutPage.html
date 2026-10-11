@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Learn about StockFlow and our mission to make inventory management simpler for growing businesses." />
+  <title>About StockFlow</title>
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/indexLayout.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .about-hero { padding: 76px 0 88px; }
+    .about-hero-grid { display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:64px; }
+    .about-hero h1 { font-size:clamp(2.4rem, 4vw, 3.6rem); line-height:1.08; font-weight:800; margin:18px 0; }
+    .about-hero .lead { max-width:590px; color:var(--color-text-muted); font-size:1.08rem; line-height:1.8; margin-bottom:28px; }
+    .about-art { background:linear-gradient(145deg,#e0f2e8,#f7fbf8); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:28px; min-height:340px; display:flex; flex-direction:column; justify-content:center; gap:16px; }
+    .about-art-card { background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:22px; box-shadow:0 16px 36px rgba(14,42,34,.07); }
+    .about-art-card strong { display:block; font-size:1.1rem; margin-bottom:8px; }
+    .about-art-card p { color:var(--color-text-muted); font-size:.92rem; }
+    .about-art-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .about-art-stat { background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:18px; }
+    .about-art-stat strong { display:block; color:var(--color-primary); font-size:1.55rem; }
+    .about-art-stat span { color:var(--color-text-muted); font-size:.82rem; }
+    .about-section { padding:76px 0; }
+    .about-section.alt { background:var(--color-white); border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border); }
+    .about-section-heading { max-width:720px; margin:0 auto 40px; text-align:center; }
+    .about-section-heading h2 { font-size:clamp(1.8rem,3vw,2.4rem); font-weight:800; margin:14px 0; }
+    .about-section-heading p { color:var(--color-text-muted); line-height:1.75; }
+    .about-values { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+    .about-value { padding:26px; height:100%; }
+    .about-value .value-icon { display:grid; place-items:center; width:46px; height:46px; border-radius:12px; background:#dcf0e4; font-size:1.35rem; margin-bottom:18px; }
+    .about-value h3 { font-size:1.1rem; margin-bottom:10px; }
+    .about-value p { color:var(--color-text-muted); font-size:.94rem; line-height:1.7; }
+    .about-cta { padding:68px 24px; background:#12372b; color:#fff; text-align:center; }
+    .about-cta h2 { font-size:clamp(1.8rem,3vw,2.5rem); color:#fff; font-weight:800; margin-bottom:14px; }
+    .about-cta p { color:#d2e2da; max-width:620px; margin:0 auto 26px; line-height:1.7; }
+    .about-cta .btn-secondary { background:#fff; border-color:#fff; color:#176f4b; }
+    @media(max-width:900px) { .about-hero-grid { grid-template-columns:1fr; gap:36px; } .about-values { grid-template-columns:1fr 1fr; } }
+    @media(max-width:560px) { .about-hero { padding:48px 0 58px; } .about-art { padding:18px; min-height:0; } .about-values { grid-template-columns:1fr; } .about-section { padding:54px 0; } }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="./index.html" class="logo" aria-label="StockFlow home">
+        <img src="images/logo.jpg" alt="StockFlow logo" class="logo-img" />
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="./index.html">Home</a>
+        <a href="./index.html#features">Features</a>
+        <a href="./plans.html">Pricing</a>
+        <a href="./AboutPage.html" class="active" aria-current="page">About</a>
+        <a href="./contact.html">Contact Us</a>
+      </nav>
+      <div class="navbar-actions">
+        <a href="./Login.html" class="link-btn" id="about-auth-btn">Log In</a>
+        <a href="./plans.html?trial=1&autostart=1#plans-list" class="btn btn-primary">Start Free Trial</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="about-hero">
+      <div class="container about-hero-grid">
+        <div>
+          <span class="badge">About StockFlow</span>
+          <h1>Making inventory management <span class="accent">simpler.</span></h1>
+          <p class="lead">StockFlow helps growing businesses bring their products, warehouses, purchasing, and sales together in one clear, reliable workspace.</p>
+          <a href="./plans.html?trial=1&autostart=1#plans-list" class="btn btn-primary">Explore StockFlow &rarr;</a>
+        </div>
+        <div class="about-art" aria-label="Illustration of connected inventory operations">
+          <div class="about-art-card">
+            <strong>One workspace. Better visibility.</strong>
+            <p>Keep track of stock, coordinate teams, and make informed decisions with your operations in one place.</p>
+          </div>
+          <div class="about-art-row">
+            <div class="about-art-stat"><strong>Inventory</strong><span>Know what is in stock</span></div>
+            <div class="about-art-stat"><strong>Operations</strong><span>Keep work connected</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section alt">
+      <div class="container">
+        <div class="about-section-heading">
+          <span class="badge">What Guides Us</span>
+          <h2>Built around the way businesses work</h2>
+          <p>Managing inventory should not mean juggling disconnected spreadsheets and tools. StockFlow brings everyday workflows together so teams can work with greater clarity.</p>
+        </div>
+        <div class="about-values">
+          <article class="card about-value">
+            <span class="value-icon" aria-hidden="true">📦</span>
+            <h3>Clarity in every movement</h3>
+            <p>Make it easier to understand stock levels and follow inventory as it moves through your business.</p>
+          </article>
+          <article class="card about-value">
+            <span class="value-icon" aria-hidden="true">🤝</span>
+            <h3>Connected teamwork</h3>
+            <p>Help business owners and team members coordinate their work through shared processes and role-based access.</p>
+          </article>
+          <article class="card about-value">
+            <span class="value-icon" aria-hidden="true">📈</span>
+            <h3>Confident decisions</h3>
+            <p>Bring useful operational information together to support smarter planning and day-to-day decisions.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="container about-hero-grid">
+        <div>
+          <span class="badge">One Connected Platform</span>
+          <h2>From stockroom to sale, keep the details connected.</h2>
+        </div>
+        <div>
+          <p class="lead">From product and warehouse tracking to supplier relationships, purchase orders, sales, and reporting, StockFlow is designed to help teams manage essential inventory workflows without losing sight of the bigger picture.</p>
+          <a href="./plans.html" class="btn btn-secondary">View Plans</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-cta">
+      <div class="container">
+        <h2>Ready to bring your inventory into focus?</h2>
+        <p>Explore StockFlow and find a plan that fits the way your business operates.</p>
+        <a href="./plans.html?trial=1&autostart=1#plans-list" class="btn btn-secondary">Start Your Free Trial &rarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container"><p>&copy; 2026 StockFlow. All rights reserved.</p></div>
+  </footer>
+
+  <script type="module">
+    import { getAccessToken } from './src/sessions/session.js';
+    import * as authService from './src/services/authService.js';
+    const authButton = document.getElementById('about-auth-btn');
+    if (authButton && getAccessToken()) {
+      authButton.textContent = 'Log Out';
+      authButton.href = '#';
+      authButton.addEventListener('click', event => {
+        event.preventDefault();
+        authService.logout();
+      });
+    }
+  </script>
+</body>
+</html>

@@ -261,3 +261,14 @@
 @media(max-width:800px){
   .entity-list-section .entity-grid:not(#categories-list){grid-template-columns:1fr!important}
 }
+
+/* Keep the address-management action visually separated from customer form actions. */
+.customer-address-actions {
+  margin-top: 18px;
+  margin-bottom: 22px;
+  padding-top: 4px;
+}
+.customer-address-actions .btn {
+  min-height: 48px;
+  padding: 0 24px;
+}
