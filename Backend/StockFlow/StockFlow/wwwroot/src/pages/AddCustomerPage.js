@@ -67,7 +67,7 @@ form?.addEventListener('submit', async e => {
     status.textContent = 'Please complete the default address: street, city, postal code and country.';
     return;
   }
-  const payload = id ? { Name, Email, Phone } : { Name, Email, Phone, Addresses: [address] };
+  const payload = id ? { Name, Email, Phone, Addresses: [] } : { Name, Email, Phone, Addresses: [address] };
 
   try {
     const confirmed = id
