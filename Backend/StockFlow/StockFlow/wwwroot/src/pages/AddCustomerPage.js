@@ -25,7 +25,7 @@ function fill(x) {
   document.getElementById('customer-address-country').value = a.country || a.Country || 'Egypt';
   ['customer-address-street','customer-address-city','customer-address-state','customer-address-postal-code','customer-address-country'].forEach(fieldId => {
     const input = document.getElementById(fieldId);
-    if (input) (input.closest('.form-row') || input.closest('.form-group')).hidden = true;
+    if (input) { input.readOnly = true; input.setAttribute('aria-readonly', 'true'); }
   });
   const addressActions = document.createElement('div');
   addressActions.className = 'form-actions customer-address-actions';
