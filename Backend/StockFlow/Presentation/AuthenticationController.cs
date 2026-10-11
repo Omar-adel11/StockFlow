@@ -111,7 +111,7 @@ namespace Presentation
             {
                 HttpOnly = true,                  // Prevents JS from reading the cookie
                 Secure = false,                    // Transmitted only over HTTPS ==> true (false for testing)
-                SameSite = SameSiteMode.None,   // Guards against CSRF attacks 
+                SameSite = SameSiteMode.Strict,   // Guards against CSRF attacks 
                 Expires = expiresAtUtc            // Matches refresh token expiration
             };
 
