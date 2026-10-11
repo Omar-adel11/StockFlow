@@ -3,7 +3,7 @@ import { inventoryService } from '../services/InventoryService.js';import { prod
 import { initializeAuth } from '../services/authService.js';
 const p=document.getElementById('product'),w=document.getElementById('warehouse'),form=document.getElementById('adjust-form'),status=document.getElementById('status');
 document.getElementById('logout-btn')?.addEventListener('click',()=>{void logout();});
-async function init(){const [ps,ws]=await Promise.all([productService.getAll(),warehouseService.getAll()]);p.innerHTML='<option value="">Select Product</option>'+ps.map(x=>`<option value="${x.id}">${x.productName || x.name || x.Name || ('Product #' + x.id)}</option>`).join('');w.innerHTML='<option value="">Select Warehouse</option>'+ws.map(x=>`<option value="${x.id}">${x.warehouseName || x.name || x.Name || ('Warehouse #' + x.id)}</option>`).join('');}
+async function init(){const [productsResult,warehousesResult]=await Promise.all([productService.getAll(),warehouseService.getAll()]);const ps=Array.isArray(productsResult)?productsResult:(productsResult?.items||productsResult?.data||[]);const ws=Array.isArray(warehousesResult)?warehousesResult:(warehousesResult?.items||warehousesResult?.data||[]);p.innerHTML='<option value="">Select Product</option>'+ps.map(x=>`<option value="${x.id}">${x.productName || x.name || x.Name || ('Product #' + x.id)}</option>`).join('');w.innerHTML='<option value="">Select Warehouse</option>'+ws.map(x=>`<option value="${x.id}">${x.warehouseName || x.name || x.Name || ('Warehouse #' + x.id)}</option>`).join('');}
 document.addEventListener('DOMContentLoaded', async () => {
     // Check/restore authentication session
     const isAuthenticated = await initializeAuth();
