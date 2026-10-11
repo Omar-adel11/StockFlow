@@ -43,4 +43,15 @@ async function startSubscription(plan,button){
   location.href=result.paymentUrl;
  }catch(error){showNotice(error.message||'Unable to start subscription.','error');button.disabled=false;button.textContent=plan.isFreeTrial?'Start Free Trial':'Subscribe';}
 }
-init();
+init().then(() => {
+  if (new URLSearchParams(location.search).get('trial') === '1') {
+    const trialCard = [...(list?.querySelectorAll('.public-plan-card') || [])]
+      .find(card => card.querySelector('.trial-note'));
+    if (trialCard) {
+      trialCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      trialCard.querySelector('.subscribe-btn')?.focus({ preventScroll: true });
+    } else {
+      showNotice('No free-trial plan is currently available.', 'error');
+    }
+  }
+});
