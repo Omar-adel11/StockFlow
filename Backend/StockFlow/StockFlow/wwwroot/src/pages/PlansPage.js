@@ -3,6 +3,8 @@ import { getAccessToken } from '../sessions/session.js';
 import { showNotice } from '../utils/ui.js';
 
 const list=document.getElementById('plans-list'), empty=document.getElementById('plans-empty'), loading=document.getElementById('plans-loading');
+const navbarActions = document.getElementById('pricing-navbar-actions');
+if (navbarActions && getAccessToken()) navbarActions.innerHTML = '<a href="profile.html" class="btn btn-primary">Profile</a>';
 const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function cycle(v){return v===1||String(v).toLowerCase()==='yearly'?'Yearly':'Monthly';}
 function featureText(f){if(typeof f==='string')return f;const name=f?.name||f?.featureKey||'Feature';const value=f?.value;if(!value||String(value).toLowerCase()==='true')return name;if(String(value).toLowerCase()==='false')return '';return `${name}: ${value}`;}
