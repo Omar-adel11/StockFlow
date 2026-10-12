@@ -19,8 +19,9 @@
     />
   </head>
   <body>
+<div class="mobile-sidebar-backdrop" id="mobile-sidebar-backdrop" aria-hidden="true"></div>
     <div class="admin-shell">
-      <aside class="admin-sidebar">
+      <aside class="admin-sidebar" id="app-sidebar">
         <a href="index.html" class="sidebar-logo" aria-label="StockFlow home">
           <img src="images/logo.jpg" alt="StockFlow" />
           StockFlow
@@ -43,6 +44,7 @@
 
       <div class="admin-content">
         <header class="admin-topbar">
+<button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation menu"><span aria-hidden="true">☰</span> Menu</button>
           <div>
             <p class="topbar-eyebrow">Account</p>
             <h1>Profile</h1>
@@ -190,5 +192,6 @@
     <script type="module" src="./src/pages/ProfilePage.js"></script>
     <script type="module" src="./src/utils/roleSidebar.js"></script>
     <script type="module" src="./src/utils/subscriptionGuard.js"></script>
-  </body>
+  <script src="js/mobile-sidebar-drawer.js" defer></script>
+</body>
 </html>
