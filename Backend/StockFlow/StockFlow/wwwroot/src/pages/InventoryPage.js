@@ -1,3 +1,15 @@
+// API DateTime values are UTC. Some SQL-backed DateTime values arrive without a Z suffix;
+// explicitly mark those as UTC, then let the browser render them in the client's local timezone.
+function formatClientDateTime(value) {
+  if (!value) return '—';
+  const normalized = typeof value === 'string' &&
+    !/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)
+      ? value + 'Z'
+      : value;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+}
+
 import '../sessions/authGuard.js';
 import { inventoryService } from '../services/InventoryService.js';
 import { productService } from '../services/ProductService.js';
@@ -220,7 +232,7 @@ export class InventoryPage {
 
     this.movements.forEach(m => {
       const rawDate = m.timestampUtc || m.createdOn || m.date;
-      const dateStr = rawDate ? new Date(rawDate).toLocaleString() : '-';
+      const dateStr = rawDate ? formatClientDateTime(rawDate) : '-';
 
       const qty = m.quantityChanged ?? m.quantityChange ?? 0;
       const changeClass = qty > 0 ? 'text-success' : (qty < 0 ? 'text-danger' : '');

@@ -1,3 +1,15 @@
+// API DateTime values are UTC. Some SQL-backed DateTime values arrive without a Z suffix;
+// explicitly mark those as UTC, then let the browser render them in the client's local timezone.
+function formatClientDateTime(value) {
+  if (!value) return '—';
+  const normalized = typeof value === 'string' &&
+    !/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)
+      ? value + 'Z'
+      : value;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+}
+
 import '../sessions/authGuard.js';
 import { salesOrderService } from '../services/salesOrderService.js';
 import { makeSearchableSelect } from '../utils/searchableSelect.js';
@@ -288,7 +300,7 @@ productOptions += `<option value="${p.id}" data-cost="${cost}" ${isSelected}>${p
             <p class="order-meta">
               Customer: <strong>${order.customerName || 'ID: ' + order.customerId}</strong> |
               Warehouse: <strong>${order.warehouseName || 'ID: ' + order.warehouseId}</strong> |
-              Date: ${new Date(order.orderDate).toLocaleDateString()}
+              Date: ${formatClientDateTime(order.orderDate)}
             </p>
           </div>
           <div class="order-header-right">
