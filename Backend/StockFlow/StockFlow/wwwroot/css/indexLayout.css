@@ -347,3 +347,52 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================
+   RESPONSIVE LAYOUT OVERRIDES
+   ========================================================== */
+html { scroll-behavior: smooth; }
+body { min-width: 320px; }
+.container { width: 100%; }
+
+@media (max-width: 1100px) {
+  .nav-links { gap: 18px; }
+  .navbar-inner { gap: 18px; }
+  .hero-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .hero-text h1 { font-size: clamp(2.2rem, 4vw, 3rem); }
+  .features-grid, .feature-grid, .stats-grid { gap: 18px; }
+}
+
+@media (max-width: 900px) {
+  .navbar { padding: 14px 0; }
+  .navbar-inner { flex-wrap: wrap; }
+  .logo-img { height: 58px; }
+  .nav-links { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px 22px; }
+  .navbar-actions { margin-left: auto; flex-wrap: wrap; }
+  .hero { padding: 36px 0 60px; }
+  .hero-grid, .hero-content, .about-grid { grid-template-columns: 1fr; }
+  .hero-grid { gap: 34px; }
+  .hero-text h1 { font-size: clamp(2rem, 6vw, 2.8rem); }
+  .hero-image, .hero-visual, .hero-media { max-width: 680px; width: 100%; margin-inline: auto; }
+  .features-grid, .feature-grid, .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .section { padding-block: 56px; }
+}
+
+@media (max-width: 600px) {
+  .container { padding-inline: 16px; }
+  .navbar-inner { gap: 12px; }
+  .logo-img { height: 46px; }
+  .nav-links { justify-content: flex-start; gap: 8px 16px; font-size: .9rem; }
+  .navbar-actions { width: 100%; margin-left: 0; }
+  .navbar-actions > a, .navbar-actions > button { flex: 1 1 auto; text-align: center; }
+  .hero { padding: 28px 0 44px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .hero-text h1 { font-size: clamp(1.9rem, 9vw, 2.5rem); }
+  .hero-description { font-size: .98rem; }
+  .hero-buttons { flex-direction: column; align-items: stretch; gap: 10px; }
+  .hero-buttons .btn { width: 100%; text-align: center; }
+  .features-grid, .feature-grid, .stats-grid { grid-template-columns: minmax(0, 1fr); }
+  .section, .features, .how-it-works { padding-block: 44px; }
+  .section-heading h2, .section-title { font-size: clamp(1.6rem, 7vw, 2rem); }
+  .footer .container { padding-inline: 16px; }
+}
