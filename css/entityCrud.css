@@ -353,3 +353,19 @@ button, .btn, input[type="submit"] { touch-action: manipulation; }
   .modal-actions button, .modal-footer button { flex: 1 1 120px; }
   .line-items-table { min-width: 680px; }
 }
+
+
+/* Categories and other entity cards: prevent fixed-width card grids from overflowing phones. */
+.entity-list-section, .entity-grid, .list-toolbar { min-width: 0; max-width: 100%; }
+.entity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+.entity-grid > *, .entity-card, .category-card { min-width: 0; max-width: 100%; }
+.entity-card p, .category-card p { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .entity-list-section { padding: 20px 16px; }
+  .list-toolbar { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+  .list-toolbar > div { width: 100%; }
+  .list-toolbar input, .list-toolbar input[type="search"] { width: 100%; max-width: 100%; }
+  .entity-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 14px; width: 100%; }
+  .entity-grid > *, .entity-card, .category-card { width: 100%; }
+  .entity-grid button, .entity-grid .btn { min-width: 0; }
+}
