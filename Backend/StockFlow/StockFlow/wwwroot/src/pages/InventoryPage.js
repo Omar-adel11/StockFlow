@@ -3,7 +3,7 @@
 function formatClientDateTime(value) {
   if (!value) return '—';
   const normalized = typeof value === 'string' &&
-    !/(?:Z|[+-]\\d{2}:?\\d{2})$/i.test(value)
+    !/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value)
       ? value + 'Z'
       : value;
   const date = new Date(normalized);
