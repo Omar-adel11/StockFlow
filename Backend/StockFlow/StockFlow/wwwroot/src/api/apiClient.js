@@ -2,8 +2,8 @@
 import { getAccessToken, setSession, clearSession } from '../sessions/session.js';
 
 
-export const baseUrl = 'https://localhost:7203';
-// export const baseUrl = 'http://stockflow.runasp.net';
+// export const baseUrl = 'https://localhost:7203';
+export const baseUrl = 'http://stockflow.runasp.net';
 
 
 // Helper options to ensure cookies are included in every fetch request
