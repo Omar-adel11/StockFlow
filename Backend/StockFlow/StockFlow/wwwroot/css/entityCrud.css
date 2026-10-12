@@ -272,3 +272,286 @@
   min-height: 48px;
   padding: 0 24px;
 }
+
+
+/* ==========================================================
+   RESPONSIVE APP SHELL — desktop, tablet and mobile
+   Shared by inventory, customers, orders, profile, SaaS Admin
+   and all other authenticated pages.
+   ========================================================== */
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 320px; }
+*, *::before, *::after { box-sizing: border-box; }
+img, video, canvas, svg { max-width: 100%; }
+.admin-shell { width: 100%; min-width: 0; }
+.admin-main { flex: 1 1 auto; min-width: 0; width: calc(100% - 240px); }
+.admin-content, .admin-main > main, .admin-page-content { min-width: 0; max-width: 100%; }
+.admin-topbar { min-width: 0; flex-wrap: wrap; gap: 12px; }
+.admin-topbar > *, .section-heading-row > * { min-width: 0; }
+.admin-content table { width: 100%; }
+.table-responsive, .table-wrapper, .table-container, .data-table-wrapper { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.admin-content table:not(.line-items-table), .table-responsive table, .table-wrapper table { min-width: 640px; }
+.modal, .modal-dialog, .modal-content, .confirmation-modal, .custom-modal, .toast, .notice-modal { max-width: calc(100vw - 32px); }
+.modal, .modal-dialog, .confirmation-modal, .custom-modal { max-height: calc(100dvh - 32px); overflow-y: auto; }
+input, select, textarea, button { max-width: 100%; }
+input, select, textarea { min-width: 0; }
+button, .btn, input[type="submit"] { touch-action: manipulation; }
+.card, .entity-form-card, .order-form-card, .profile-card, .entity-list-section { min-width: 0; }
+.form-row, .form-grid, .grid-2, .grid-3 { min-width: 0; }
+.field-group, .form-group { min-width: 0; }
+.field-group input, .form-group input, .field-group select, .form-group select, .field-group textarea, .form-group textarea { width: 100%; min-width: 0; }
+.sidebar-logo { text-decoration: none; color: inherit; }
+.sidebar-logo img { flex: 0 0 auto; object-fit: contain; }
+
+@media (max-width: 1100px) {
+  .admin-sidebar { width: 220px; flex-basis: 220px; }
+  .admin-main { width: calc(100% - 220px); }
+  .admin-content { padding-left: 22px; padding-right: 22px; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-grid { grid-template-columns: minmax(0, 1fr); }
+  .section-heading-row { align-items: flex-start; flex-wrap: wrap; }
+}
+
+@media (max-width: 800px) {
+  .admin-shell { display: block; }
+  .admin-sidebar { position: relative; top: auto; width: 100%; height: auto; max-height: none; min-height: 0; overflow: visible; padding: 12px 14px; }
+  .sidebar-logo { padding: 4px 8px 12px; margin: 0; }
+  .sidebar-nav, .admin-sidebar nav, .sidebar-menu { width: 100%; }
+  .sidebar-nav ul, .admin-sidebar nav ul, .sidebar-menu ul { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sidebar-nav li, .admin-sidebar nav li, .sidebar-menu li { flex: 0 0 auto; }
+  .sidebar-nav a, .admin-sidebar nav a, .sidebar-menu a { padding: 10px 12px; white-space: normal; }
+  .sidebar-footer, .sidebar-bottom { position: static; margin-top: 10px; }
+  .admin-main { width: 100%; max-width: 100%; }
+  .admin-topbar { padding: 18px 20px; }
+  .admin-content { padding: 22px 18px 32px; }
+  .entity-form-card, .order-form-card, .admin-main > .card, .admin-main > .entity-list-section { width: 100%; max-width: 100% !important; margin-left: 0; margin-right: 0; }
+  .entity-form-card, .order-form-card, .profile-card { padding: 22px; }
+  .form-row, .form-grid, .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr) !important; }
+  .section-heading-row { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+  .section-heading-row .btn, .section-heading-row button { align-self: flex-start; }
+  .line-items-table { min-width: 700px; }
+  .modal, .modal-dialog, .modal-content { width: auto; }
+}
+
+@media (max-width: 520px) {
+  .admin-sidebar { padding: 10px; }
+  .sidebar-logo { font-size: 1rem; padding: 4px 6px 10px; }
+  .sidebar-logo img { max-height: 36px; width: auto; }
+  .sidebar-nav ul, .admin-sidebar nav ul, .sidebar-menu ul { gap: 4px; }
+  .sidebar-nav a, .admin-sidebar nav a, .sidebar-menu a { font-size: .84rem; padding: 9px 10px; }
+  .admin-topbar { padding: 15px 14px; align-items: flex-start; }
+  .admin-content { padding: 16px 12px 24px; }
+  .admin-topbar h1, .admin-topbar h2 { font-size: 1.25rem; }
+  .entity-form-card, .order-form-card, .profile-card { padding: 16px; }
+  .stats-grid { grid-template-columns: minmax(0, 1fr); }
+  .profile-card-heading { align-items: flex-start; flex-wrap: wrap; }
+  .profile-actions, .form-actions, .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .profile-actions .btn, .form-actions .btn, .button-row .btn { flex: 1 1 auto; }
+  .admin-content .card, .admin-content .entity-list-section { border-radius: 12px; }
+  .modal, .modal-dialog, .modal-content, .confirmation-modal, .custom-modal { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px); padding: 18px; }
+  .modal-actions, .modal-footer { display: flex; flex-wrap: wrap; gap: 8px; }
+  .modal-actions button, .modal-footer button { flex: 1 1 120px; }
+  .line-items-table { min-width: 680px; }
+}
+
+
+/* Categories and other entity cards: prevent fixed-width card grids from overflowing phones. */
+.entity-list-section, .entity-grid, .list-toolbar { min-width: 0; max-width: 100%; }
+.entity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+.entity-grid > *, .entity-card, .category-card { min-width: 0; max-width: 100%; }
+.entity-card p, .category-card p { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .entity-list-section { padding: 20px 16px; }
+  .list-toolbar { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+  .list-toolbar > div { width: 100%; }
+  .list-toolbar input, .list-toolbar input[type="search"] { width: 100%; max-width: 100%; }
+  .entity-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 14px; width: 100%; }
+  .entity-grid > *, .entity-card, .category-card { width: 100%; }
+  .entity-grid button, .entity-grid .btn { min-width: 0; }
+}
+
+
+/* MOBILE LOGO ONLY: keep the linked brand mark and hide the text label. */
+@media (max-width: 800px) {
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
+    text-decoration: none;
+  }
+  .sidebar-logo img {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 38px;
+    max-height: 34px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .sidebar-logo span,
+  .sidebar-logo .brand-name,
+  .sidebar-logo .logo-text {
+    display: none !important;
+  }
+}
+
+
+/* MOBILE SIDEBAR DRAWER: logo stays in the top bar; navigation opens on demand. */
+.mobile-menu-toggle { display:none; }
+.mobile-sidebar-backdrop { display:none; }
+@media (max-width:800px) {
+  .admin-shell { display:block !important; }
+  .admin-sidebar {
+    position:fixed !important; z-index:1200 !important; top:0 !important; bottom:0 !important; left:0 !important;
+    width:min(300px, 84vw) !important; height:100dvh !important; max-height:100dvh !important;
+    overflow-y:auto !important; transform:translateX(-105%); transition:transform .22s ease;
+    padding:14px !important; box-shadow:0 12px 40px rgba(0,0,0,.22);
+  }
+  body.mobile-sidebar-open .admin-sidebar { transform:translateX(0); }
+  .mobile-menu-toggle {
+    display:inline-flex !important; align-items:center; justify-content:center; gap:8px;
+    min-height:42px; padding:9px 13px; border:1px solid #d4e3dc; border-radius:10px;
+    background:#fff; color:#12352a; font:inherit; font-weight:650; cursor:pointer;
+  }
+  .mobile-sidebar-backdrop {
+    display:block; position:fixed; inset:0; z-index:1190; background:rgba(5,24,18,.48);
+    opacity:0; visibility:hidden; transition:opacity .22s ease;
+  }
+  body.mobile-sidebar-open .mobile-sidebar-backdrop { opacity:1; visibility:visible; }
+  .admin-topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .admin-topbar .mobile-menu-toggle { order:0; }
+  .sidebar-logo { display:flex !important; align-items:center; gap:0 !important; }
+  .sidebar-logo img { display:block !important; max-width:38px; max-height:34px; object-fit:contain; }
+  .sidebar-logo .brand-name, .sidebar-logo span { display:none !important; }
+  .admin-sidebar .sidebar-nav { display:block; }
+  .admin-sidebar .sidebar-nav ul { display:flex; flex-direction:column; align-items:stretch; gap:5px; }
+  .admin-sidebar .sidebar-nav li { width:100%; }
+  .admin-sidebar .sidebar-nav a { display:flex; width:100%; }
+  .admin-sidebar .sidebar-footer, .admin-sidebar .sidebar-bottom {
+    display:flex !important; flex-direction:column; gap:8px; margin-top:20px !important; position:static !important;
+  }
+  .admin-sidebar .sidebar-footer a, .admin-sidebar .sidebar-footer button,
+  .admin-sidebar .sidebar-bottom a, .admin-sidebar .sidebar-bottom button { width:100%; text-align:left; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .admin-sidebar, .mobile-sidebar-backdrop { transition:none !important; }
+}
+
+/* Mobile navigation drawer: keep only the home logo and menu control in the top bar. */
+.mobile-brand { display:none; }
+.mobile-menu-toggle { display:none; }
+.mobile-sidebar-backdrop { display:none; }
+@media (max-width:800px) {
+  .admin-shell { display:block !important; min-height:100vh; }
+  .admin-content { min-width:0; width:100%; }
+  .admin-sidebar {
+    display:flex !important; position:fixed !important; inset:0 auto 0 0 !important;
+    z-index:1200 !important; width:min(290px, 84vw) !important; height:100vh !important;
+    height:100dvh !important; max-height:100dvh !important; overflow-x:hidden !important;
+    overflow-y:auto !important; box-sizing:border-box; padding:18px 14px !important;
+    background:var(--color-dark, #0c2c22) !important; box-shadow:0 16px 48px rgba(0,0,0,.28);
+    transform:translateX(-110%) !important; visibility:hidden; pointer-events:none;
+    transition:transform .22s ease, visibility .22s ease;
+  }
+  body.mobile-sidebar-open .admin-sidebar {
+    transform:translateX(0) !important; visibility:visible; pointer-events:auto;
+  }
+  .admin-sidebar .sidebar-logo { display:flex !important; padding:4px 8px 18px !important; margin:0 0 12px !important; }
+  .admin-sidebar .sidebar-logo .brand-name { display:inline !important; }
+  .admin-sidebar .sidebar-nav {
+    display:flex !important; flex-direction:column !important; align-items:stretch !important;
+    width:100%; gap:4px; margin:0; padding:0; list-style:none;
+  }
+  .admin-sidebar .sidebar-nav li { display:block !important; width:100%; margin:0; }
+  .admin-sidebar .sidebar-nav a {
+    display:flex !important; align-items:center; gap:10px; width:100%; min-height:44px;
+    box-sizing:border-box; padding:10px 12px; border-radius:9px; white-space:normal;
+    line-height:1.35; text-decoration:none;
+  }
+  .admin-sidebar .sidebar-nav a .nav-icon { flex:0 0 20px; text-align:center; }
+  .admin-sidebar .sidebar-nav a.active { background:#d9f0e4; color:#087448; font-weight:700; }
+  .admin-sidebar .sidebar-footer {
+    display:flex !important; flex-direction:column !important; gap:7px; width:100%;
+    margin-top:auto !important; padding-top:18px; border-top:1px solid rgba(255,255,255,.12);
+  }
+  .admin-sidebar .sidebar-footer a, .admin-sidebar .sidebar-footer button {
+    display:flex !important; align-items:center; width:100%; min-height:44px; box-sizing:border-box;
+    padding:10px 12px; border:0; border-radius:9px; background:transparent; color:inherit;
+    text-decoration:none; font:inherit; text-align:left; cursor:pointer;
+  }
+  .mobile-sidebar-backdrop {
+    display:block; position:fixed; inset:0; z-index:1190; background:rgba(5,24,18,.52);
+    opacity:0; visibility:hidden; pointer-events:none; transition:opacity .22s ease, visibility .22s ease;
+  }
+  body.mobile-sidebar-open .mobile-sidebar-backdrop {
+    opacity:1; visibility:visible; pointer-events:auto;
+  }
+  .admin-topbar {
+    display:flex !important; align-items:center; flex-wrap:wrap; justify-content:flex-start !important;
+    gap:10px 12px !important; min-width:0; padding:12px 14px !important;
+  }
+  .mobile-brand {
+    display:inline-flex !important; align-items:center; justify-content:center; flex:0 0 auto;
+    min-width:38px; min-height:38px; text-decoration:none;
+  }
+  .mobile-brand img { display:block; width:38px; height:34px; object-fit:contain; }
+  .mobile-menu-toggle {
+    display:inline-flex !important; align-items:center; justify-content:center; gap:7px; flex:0 0 auto;
+    min-height:40px; padding:8px 11px; border:1px solid #d4e3dc; border-radius:9px;
+    background:#fff; color:#12352a; font:inherit; font-weight:650; cursor:pointer;
+  }
+  .admin-topbar > div:first-of-type { flex:1 1 150px; min-width:0; }
+  .admin-topbar h1 { overflow-wrap:anywhere; }
+  .admin-topbar > div:last-child { max-width:100%; }
+  .admin-main { min-width:0; padding:18px 14px !important; }
+  .entity-list-section, .list-toolbar, .entity-grid { min-width:0; }
+  .entity-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .entity-grid > * { min-width:0; width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .admin-sidebar, .mobile-sidebar-backdrop { transition:none !important; }
+}
+
+/* Fix mobile drawer: restore the full navigation list and keep account actions at the bottom. */
+@media (max-width:800px) {
+  body.mobile-sidebar-open .admin-sidebar,
+  .admin-sidebar {
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
+    color:#dce9e4 !important;
+  }
+  .admin-sidebar > .sidebar-logo { flex:0 0 auto !important; min-height:42px; }
+  .admin-sidebar > .sidebar-nav {
+    display:flex !important; flex:1 1 auto !important; flex-direction:column !important;
+    align-items:stretch !important; justify-content:flex-start !important;
+    gap:4px !important; width:100% !important; height:auto !important;
+    min-height:0 !important; margin:0 !important; padding:0 !important;
+    overflow:visible !important; list-style:none !important;
+  }
+  .admin-sidebar > .sidebar-nav > li {
+    display:list-item !important; flex:0 0 auto !important; position:static !important;
+    width:100% !important; height:auto !important; margin:0 !important; padding:0 !important;
+    visibility:visible !important; opacity:1 !important;
+  }
+  .admin-sidebar > .sidebar-nav > li > a {
+    display:flex !important; align-items:center !important; justify-content:flex-start !important;
+    width:100% !important; min-height:44px !important; height:auto !important;
+    padding:10px 12px !important; box-sizing:border-box !important;
+    color:#dce9e4 !important; background:transparent !important;
+    font-size:14px !important; line-height:1.35 !important; white-space:normal !important;
+    visibility:visible !important; opacity:1 !important;
+  }
+  .admin-sidebar > .sidebar-nav > li > a.active {
+    color:#087448 !important; background:#d9f0e4 !important;
+  }
+  .admin-sidebar .sidebar-footer {
+    flex:0 0 auto !important; margin-top:18px !important; padding-top:12px !important;
+    border-top:1px solid rgba(255,255,255,.12) !important;
+  }
+  .admin-sidebar .sidebar-footer a,
+  .admin-sidebar .sidebar-footer button {
+    color:#dce9e4 !important; background:transparent !important; font-size:14px !important;
+  }
+}

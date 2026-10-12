@@ -16,14 +16,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="mobile-sidebar-backdrop" id="mobile-sidebar-backdrop" aria-hidden="true"></div>
 
   <div class="admin-shell">
 
-    <aside class="admin-sidebar">
-      <div class="sidebar-logo">
+    <aside class="admin-sidebar" id="app-sidebar">
+      <a href="index.html" class="sidebar-logo" aria-label="StockFlow home">
         <img src="images/logo.jpg" alt="StockFlow" />
         StockFlow
-      </div>
+      </a>
 
       <ul class="sidebar-nav">
         <li><a href="#business-owners"><span class="nav-icon">♙</span> Business Owners</a></li>
@@ -39,6 +40,7 @@
     <div class="admin-content">
 
       <header class="admin-topbar">
+<button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation menu"><span aria-hidden="true">☰</span> Menu</button>
         <div>
           <p class="topbar-eyebrow">Platform Administration</p>
           <h1>SaaS Admin</h1>
@@ -145,7 +147,8 @@
     </div>
   </dialog>
 
-  <script type="module" src="./src/utils/roleSidebar.js"></script>
   <script type="module" src="./src/pages/SaasAdminPage.js"></script>
+  <script type="module" src="./src/utils/roleSidebar.js"></script>
+<script src="js/mobile-sidebar-drawer.js" defer></script>
 </body>
 </html>
