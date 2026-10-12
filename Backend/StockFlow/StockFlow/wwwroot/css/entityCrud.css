@@ -369,3 +369,29 @@ button, .btn, input[type="submit"] { touch-action: manipulation; }
   .entity-grid > *, .entity-card, .category-card { width: 100%; }
   .entity-grid button, .entity-grid .btn { min-width: 0; }
 }
+
+
+/* MOBILE LOGO ONLY: keep the linked brand mark and hide the text label. */
+@media (max-width: 800px) {
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
+    text-decoration: none;
+  }
+  .sidebar-logo img {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 38px;
+    max-height: 34px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .sidebar-logo span,
+  .sidebar-logo .brand-name,
+  .sidebar-logo .logo-text {
+    display: none !important;
+  }
+}
