@@ -16,6 +16,7 @@ using Domain.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 namespace Application.Services.Auth
@@ -27,7 +28,8 @@ namespace Application.Services.Auth
         IOTPService _oTPService,
         IEmailService _emailService,
         IHostingEnvironment _env,
-        IAppDbContext _dbContext) : IAuthenticationService
+        IAppDbContext _dbContext,
+        ILogger _logger) : IAuthenticationService
     {
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
         public async Task<UserDTO?> LoginAsync(LoginDTO loginDTO)
@@ -47,7 +49,7 @@ namespace Application.Services.Auth
             {
                 throw new UnauthorizedAccessException("Your account has been deactivated. Please contact your business owner or administrator.");
             }
-
+            
             int businessId = user.BusinessId ?? 0;
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDTO.password);
@@ -60,7 +62,7 @@ namespace Application.Services.Auth
             var refreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
 
             var roles = await _userManager.GetRolesAsync(user);
-
+            _logger.LogInformation("User with Id {userId} logged in successfully with roles: {Roles}", user.Id, string.Join(", ", roles));
             return new UserDTO
             {
                 email = user.Email,

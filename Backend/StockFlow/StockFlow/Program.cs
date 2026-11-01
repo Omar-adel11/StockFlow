@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Persistence.Interceptors;
 using Persistence.Seed;
+using Serilog;
 using StockFlow.Middlewares;
 
 
@@ -21,141 +22,159 @@ namespace StockFlow
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            Log.Logger = new LoggerConfiguration()
+                            .WriteTo.Console()
+                            .CreateBootstrapLogger();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            builder.Services.AddApplicationServices();
-            builder.Services.AddInfrastructureServices(builder.Configuration);
-            // 3. Register ApplicationDbContext with Interceptors
-           
-
-            builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+            try
             {
+                Log.Information("Starting StockFlow API");
 
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
-            })
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+                var builder = WebApplication.CreateBuilder(args);
 
-            IWebHostEnvironment env = builder.Environment;
-            //JWT
-            builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.SaveToken = true;
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                //Add support to logging with serilog
+                builder.Host.UseSerilog((context, services, configuration) =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-
-                    ValidIssuer = builder.Configuration["JWT:Issuer"],
-                    ValidAudience = builder.Configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                                        Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
-                };
-            });
-
-
-            builder.Services.AddRateLimiter(options =>
-            {
-                // Return standard HTTP 429 instead of default 503
-                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-
-                // Define a Sliding Window policy partitioned by user IP address
-                options.AddPolicy("sliding-by-ip", context =>
-                {
-                    string clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-
-                    return RateLimitPartition.GetSlidingWindowLimiter(clientIp, _ =>
-                        new SlidingWindowRateLimiterOptions
-                        {
-                            PermitLimit = 10,                              // Max 5 requests
-                            Window = TimeSpan.FromMinutes(1),             // Per 1 minute
-                            SegmentsPerWindow = 6,
-                            QueueLimit = 0                                // Reject immediately if limit is hit
-                        });
+                    configuration.ReadFrom.Configuration(context.Configuration); 
                 });
 
-                options.OnRejected = async (context, cancellationToken) =>
-                {
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                    context.HttpContext.Response.ContentType = "application/json";
+                // Add services to the container.
 
-                    var errorResponse = new
+                builder.Services.AddControllers();
+                // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
+
+                builder.Services.AddApplicationServices();
+                builder.Services.AddInfrastructureServices(builder.Configuration);
+                // 3. Register ApplicationDbContext with Interceptors
+
+
+                builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+                {
+
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+                })
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
+                //JWT
+                builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
-                        success = false,
-                        statusCode = StatusCodes.Status429TooManyRequests,
-                        ErrorMessage = "Too many requests. Please try again later."
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = builder.Configuration["JWT:Issuer"],
+                        ValidAudience = builder.Configuration["JWT:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                                            Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
                     };
-
-                    var json = JsonSerializer.Serialize(errorResponse);
-                    await context.HttpContext.Response.WriteAsync(json, cancellationToken);
-                };
-            });
-
-
-
-            const string FrontendCorsPolicy = "FrontendCorsPolicy";
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(FrontendCorsPolicy, policy =>
-                {
-                    policy.WithOrigins("http://127.0.0.1:5501", "http://localhost:5501")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                         .AllowCredentials();
                 });
-            });
 
 
-            var app = builder.Build();
+                builder.Services.AddRateLimiter(options =>
+                {
+                    // Return standard HTTP 429 instead of default 503
+                    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<AppDbContext>();
 
-                // This applies all pending migrations automatically on cloud startup!
-                await context.Database.MigrateAsync();
+                    // Define a Sliding Window policy partitioned by user IP address
+                    options.AddPolicy("sliding-by-ip", context =>
+                    {
+                        string clientIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-                await DbSeeder.SeedAsync(services);
+                        return RateLimitPartition.GetSlidingWindowLimiter(clientIp, _ =>
+                            new SlidingWindowRateLimiterOptions
+                            {
+                                PermitLimit = 10,                              // Max 10 requests
+                                Window = TimeSpan.FromMinutes(1),             // Per 1 minute
+                                SegmentsPerWindow = 6,
+                                QueueLimit = 0                                // Reject immediately if limit is hit
+                            });
+                    });
 
+                    options.OnRejected = async (context, cancellationToken) =>
+                    {
+                        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                        context.HttpContext.Response.ContentType = "application/json";
+
+                        var errorResponse = new
+                        {
+                            success = false,
+                            statusCode = StatusCodes.Status429TooManyRequests,
+                            ErrorMessage = "Too many requests. Please try again later."
+                        };
+
+                        var json = JsonSerializer.Serialize(errorResponse);
+                        await context.HttpContext.Response.WriteAsync(json, cancellationToken);
+                    };
+                });
+
+
+
+                const string FrontendCorsPolicy = "FrontendCorsPolicy";
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy(FrontendCorsPolicy, policy =>
+                    {
+                        policy.WithOrigins("http://127.0.0.1:5501", "http://localhost:5501")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                             .AllowCredentials();
+                    });
+                });
+
+
+                var app = builder.Build();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+                    var context = services.GetRequiredService<AppDbContext>();
+
+                    // This applies all pending migrations automatically on cloud startup!
+                    await context.Database.MigrateAsync();
+
+                    await DbSeeder.SeedAsync(services);
+
+                }
+                // Configure the HTTP request pipeline.
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.UseSerilogRequestLogging();
+                app.UseMiddleware<GlobalErrorHandlingMiddleware>();
+                app.UseCors(FrontendCorsPolicy);
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
+                app.UseRateLimiter();
+                app.UseAuthentication();
+                app.UseAuthorization();
+                app.MapControllers();
+                app.Run();
             }
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            catch (Exception ex)
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                Log.Fatal(ex, "StockFlow API terminated unexpectedly");
             }
-
-            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
-
-            app.UseCors(FrontendCorsPolicy);
-            app.UseStaticFiles();
-
-            app.UseRateLimiter();
-            app.UseHttpsRedirection();
-
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }
