@@ -25,6 +25,10 @@ namespace Application.Services
 
             try
             {
+                if (request.QuantityChanged <= 0)
+                {
+                    throw new InvalidOperationException("Transfer quantity must be greater than zero.");
+                }
                 // 1. Fetch or create the inventory item for this product/warehouse combination
                 var inventoryItem = await _context.InventoryItems
                     .FirstOrDefaultAsync(i => i.ProductId == request.ProductId && i.WarehouseId == request.WarehouseId);
