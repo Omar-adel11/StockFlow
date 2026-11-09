@@ -10,10 +10,11 @@ using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class UserService(UserManager<User> userManager, IHostingEnvironment  env) : IUserService
+    public class UserService(UserManager<User> userManager, IHostingEnvironment  env, ILogger<UserService> logger) : IUserService
     {
         public async Task<UserProfileDto> GetUserProfileAsync(int userId)
         {
@@ -24,6 +25,7 @@ namespace Application.Services
             }
 
             var roles = await userManager.GetRolesAsync(user);
+            logger.LogDebug("User profile retrieved. UserId: {UserId}", userId);
 
             return new UserProfileDto
             {
@@ -89,6 +91,7 @@ namespace Application.Services
                 throw new InvalidOperationException($"Failed to update profile: {errors}");
             }
 
+            logger.LogInformation("User profile updated. UserId: {UserId}", userId);
             return await GetUserProfileAsync(userId);
         }
     }
