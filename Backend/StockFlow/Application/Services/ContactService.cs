@@ -41,6 +41,7 @@ namespace Application.Services
             // 1. Persist first. Storing the inquiry is the actual requirement -
             // this must succeed for the response to say "success".
             await _contactRepository.AddAsync(entity);
+            _logger.LogInformation("Contact inquiry saved. ContactMessageId: {ContactMessageId}", entity.Id);
 
             // 2. Email is a bonus notification, not the requirement itself.
             // If Gmail/SMTP has a hiccup, the user's message is still safely
