@@ -8,10 +8,11 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class InventoryService(IAppDbContext _context) : IInventoryService
+    public class InventoryService(IAppDbContext _context, ILogger<InventoryService> _logger) : IInventoryService
     {
         private DbSet<InventoryItem> InventoryItems => _context.InventoryItems;
         private DbSet<Warehouse> Warehouses => _context.Warehouses;
@@ -65,9 +66,9 @@ namespace Application.Services
                     i.Product.SKU.Contains(searchTerm));
             }
 
-            return await query
-                .Select(ToInventoryResponse)
-                .ToListAsync();
+            var items = await query.Select(ToInventoryResponse).ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} inventory records. ProductFilterApplied: {ProductFilterApplied}, WarehouseFilterApplied: {WarehouseFilterApplied}, LowStockOnly: {LowStockOnly}, SearchApplied: {SearchApplied}", items.Count, productId.HasValue, warehouseId.HasValue, lowStockOnly, !string.IsNullOrWhiteSpace(searchTerm));
+            return items;
         }
 
         public async Task<IReadOnlyCollection<InventoryDtos.InventoryResponse>> GetInventoryByProductAsync(int productId)
@@ -81,7 +82,7 @@ namespace Application.Services
 
         public async Task<IReadOnlyCollection<InventoryDtos.LowStockResponse>> GetLowStockItemsAsync()
         {
-            return await InventoryItems
+            var items = await InventoryItems
                 .AsNoTracking()
                 .Where(i => i.QuantityOnHand <= (i.Product != null ? i.Product.ReorderLevel : 0))
                 .Select(i => new InventoryDtos.LowStockResponse(
@@ -94,6 +95,8 @@ namespace Application.Services
                     i.Product != null ? i.Product.ReorderLevel : 0
                 ))
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} low-stock inventory records", items.Count);
+            return items;
         }
 
        
