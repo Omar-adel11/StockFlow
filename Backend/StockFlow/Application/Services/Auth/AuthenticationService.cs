@@ -63,7 +63,6 @@ namespace Application.Services.Auth
 
             var roles = await _userManager.GetRolesAsync(user);
             _logger.LogInformation("User with Id {userId} logged in successfully with roles: {Roles}", user.Id, string.Join(", ", roles));
-            _logger.LogInformation("User authenticated successfully. UserId: {UserId}, Roles: {Roles}", user.Id, roles);
             return new UserDTO
             {
                 email = user.Email,
@@ -93,7 +92,7 @@ namespace Application.Services.Auth
             // Rotation: the old token is revoked and a brand new one issued.
 
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
-            _logger.LogInformation("User logged out and refresh token revoked. UserId: {UserId}", await ResolveUserIdForLogAsync(refreshRequestDto.RefreshToken));
+            _logger.LogInformation("User logged out and refresh token revoked.");
             var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
             var newAccessToken = await _tokenService.GenerateToken(user);
             _logger.LogInformation("Access and refresh tokens renewed. UserId: {UserId}", user.Id);
