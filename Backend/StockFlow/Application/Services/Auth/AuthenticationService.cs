@@ -29,7 +29,7 @@ namespace Application.Services.Auth
         IEmailService _emailService,
         IHostingEnvironment _env,
         IAppDbContext _dbContext,
-        ILogger _logger) : IAuthenticationService
+        ILogger<AuthenticationService> _logger) : IAuthenticationService
     {
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
         public async Task<UserDTO?> LoginAsync(LoginDTO loginDTO)
@@ -63,6 +63,7 @@ namespace Application.Services.Auth
 
             var roles = await _userManager.GetRolesAsync(user);
             _logger.LogInformation("User with Id {userId} logged in successfully with roles: {Roles}", user.Id, string.Join(", ", roles));
+            _logger.LogInformation("User authenticated successfully. UserId: {UserId}, Roles: {Roles}", user.Id, roles);
             return new UserDTO
             {
                 email = user.Email,
@@ -92,8 +93,10 @@ namespace Application.Services.Auth
             // Rotation: the old token is revoked and a brand new one issued.
 
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
+            _logger.LogInformation("User logged out and refresh token revoked. UserId: {UserId}", await ResolveUserIdForLogAsync(refreshRequestDto.RefreshToken));
             var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
             var newAccessToken = await _tokenService.GenerateToken(user);
+            _logger.LogInformation("Access and refresh tokens renewed. UserId: {UserId}", user.Id);
 
             return new UserDTO
             {
@@ -198,6 +201,7 @@ namespace Application.Services.Auth
 
                 // Commit transaction
                 await transaction.CommitAsync();
+                _logger.LogInformation("User registered successfully. UserId: {UserId}, BusinessId: {BusinessId}", user.Id, business.Id);
 
                 int businessId = user.BusinessId ?? throw new InvalidOperationException("User does not have an associated business.");
 
@@ -232,6 +236,7 @@ namespace Application.Services.Auth
                 throw new InvalidOldPasswordException();
             }
             await _userManager.ChangePasswordAsync(user, changePasswordDTO.password, changePasswordDTO.newPassword);
+            _logger.LogInformation("Password changed successfully. UserId: {UserId}", user.Id);
             return "Password changed successfully";
 
         }
@@ -242,6 +247,7 @@ namespace Application.Services.Auth
             var otp = await _oTPService.GenerateOTP(email);
             
             await _emailService.SendEmailAsync(email, "Password Reset OTP", $"Your OTP is: {otp}");
+            _logger.LogInformation("Password reset OTP email sent. UserId: {UserId}", user.Id);
             return "OTP sent to email";
         }
 
@@ -267,6 +273,7 @@ namespace Application.Services.Auth
             {
                 throw new ResetPasswordBadRequestException(result.Errors.Select(e => e.Description));
             }
+            _logger.LogInformation("Password reset completed successfully. UserId: {UserId}", user.Id);
             return "Password reset successfully";
         }
 
