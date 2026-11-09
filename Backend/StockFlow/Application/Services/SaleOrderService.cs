@@ -10,11 +10,12 @@ using Domain.Entities;
 using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.SalesOrderDtos;
 
 namespace Application.Services
 {
-    public class SaleOrderService(IAppDbContext _context,ICurrentUserService _currentUserService) : ISalesOrderService
+    public class SaleOrderService(IAppDbContext _context,ICurrentUserService _currentUserService, ILogger<SaleOrderService> _logger) : ISalesOrderService
     {
         private readonly IAppDbContext _context = _context;
 
@@ -44,12 +45,14 @@ namespace Application.Services
 
         public async Task<IReadOnlyCollection<SalesResponse>> GetAllOrdersAsync(int count = 20)
         {
-            return await SalesOrders
+            var orders = await SalesOrders
                 .AsNoTracking()
                 .OrderByDescending(so => so.OrderDate)
                 .Take(count)
                 .Select(ToSalesResponse)
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} sales orders", orders.Count);
+            return orders;
         }
 
         public async Task<SalesResponse?> GetOrderByIdAsync(int id)
@@ -63,6 +66,7 @@ namespace Application.Services
             {
                 throw new OrderNotFoundException();
             }
+            _logger.LogDebug("Sales order retrieved. SalesOrderId: {SalesOrderId}", result.Id);
             return result;
         }
 
@@ -123,6 +127,7 @@ namespace Application.Services
             SalesOrders.Add(salesOrder);
             await _context.SaveChangesAsync(CancellationToken.None);
 
+            _logger.LogInformation("Sales order created. SalesOrderId: {SalesOrderId}, InvoiceNumber: {InvoiceNumber}, ItemCount: {ItemCount}, TotalAmount: {TotalAmount}", salesOrder.Id, salesOrder.InvoiceNumber, orderItems.Count, totalAmount);
             var createdOrder = await GetOrderByIdAsync(salesOrder.Id);
             return createdOrder ?? throw new InvalidOperationException("Failed to retrieve created sales order.");
         }
@@ -178,6 +183,7 @@ namespace Application.Services
 
             order.Status = OrderStatus.Completed;
             await _context.SaveChangesAsync(CancellationToken.None);
+            _logger.LogInformation("Sales order fulfilled. SalesOrderId: {SalesOrderId}, ItemCount: {ItemCount}", order.Id, order.Items.Count);
 
             return true;
         }
@@ -193,6 +199,7 @@ namespace Application.Services
 
             order.Status = OrderStatus.Cancelled;
             await _context.SaveChangesAsync(CancellationToken.None);
+            _logger.LogInformation("Sales order cancelled. SalesOrderId: {SalesOrderId}", order.Id);
 
             return true;
         }
