@@ -9,11 +9,12 @@ using Domain.Entities;
 using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.StockMovementDtos;
 
 namespace Application.Services
 {
-    public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService, IEmailService emailService) : IStockMovementService
+    public class StockMovementService(IAppDbContext _context,ICurrentUserService currentUserService, IEmailService emailService, ILogger<StockMovementService> _logger) : IStockMovementService
     {
         private DbSet<StockMovement> stockMovements => _context.StockMovements;
         private DbSet<InventoryItem> InventoryItems => _context.InventoryItems;
@@ -76,6 +77,7 @@ namespace Application.Services
                 // 4. Save changes and commit transaction
                 await _context.SaveChangesAsync(CancellationToken.None);
                 await transaction.CommitAsync(CancellationToken.None);
+                _logger.LogInformation("Stock adjustment recorded. StockMovementId: {StockMovementId}, ProductId: {ProductId}, WarehouseId: {WarehouseId}, QuantityChanged: {QuantityChanged}, Reason: {Reason}", movement.Id, request.ProductId, request.WarehouseId, request.QuantityChanged, request.Reason);
 
                 // Notify the business owner when an adjustment leaves stock at/below its reorder point.
                 try
@@ -109,8 +111,9 @@ namespace Application.Services
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogWarning(ex, "Low-stock notification email failed after stock adjustment. ProductId: {ProductId}, WarehouseId: {WarehouseId}", request.ProductId, request.WarehouseId);
                     // Email delivery must not undo a successfully committed stock adjustment.
                 }
 
@@ -126,7 +129,7 @@ namespace Application.Services
 
         public async Task<IReadOnlyCollection<StockMovementResponse>> GetMovementsByProductAsync(int productId)
         {
-            return await stockMovements
+            var movements = await stockMovements
                  .AsNoTracking()
                  .Where(m => m.ProductId == productId)
                  .OrderByDescending(m => m.CreatedAtUtc)
@@ -144,11 +147,13 @@ namespace Application.Services
                      m.ExecutedByUserName
                  ))
                  .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} stock movements for ProductId: {ProductId}", movements.Count, productId);
+            return movements;
         }
 
         public async Task<IReadOnlyCollection<StockMovementResponse>> GetMovementsByWarehouseAsync(int warehouseId)
         {
-            return await stockMovements
+            var movements = await stockMovements
                 .AsNoTracking()
                 .Where(m => m.WarehouseId == warehouseId)
                 .OrderByDescending(m => m.CreatedAtUtc)
@@ -166,11 +171,13 @@ namespace Application.Services
                     m.ExecutedByUserName
                 ))
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} stock movements for WarehouseId: {WarehouseId}", movements.Count, warehouseId);
+            return movements;
         }
 
         public async Task<IReadOnlyCollection<StockMovementResponse>> GetRecentMovementsAsync(int count = 20)
         {
-            return await stockMovements
+            var movements = await stockMovements
                 .AsNoTracking()
                 .OrderByDescending(m => m.CreatedAtUtc)
                 .Take(count)
@@ -188,6 +195,8 @@ namespace Application.Services
                     m.ExecutedByUserName
                 ))
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} recent stock movements", movements.Count);
+            return movements;
         }
 
         #region Old Code You Want To See The Generated Sql Query From It
@@ -244,6 +253,7 @@ namespace Application.Services
 
             if(resultfrom && resultTo)
             {
+                _logger.LogInformation("Product transferred between warehouses. ProductId: {ProductId}, SourceWarehouseId: {SourceWarehouseId}, DestinationWarehouseId: {DestinationWarehouseId}, Quantity: {Quantity}", request.ProductId, request.FromId, request.ToId, request.Quantity);
                 return $"Successfully transferred {request.Quantity} units of product '{product.Name}' from warehouse '{fromWarehouse.Name}' to warehouse '{toWarehouse?.Name ?? "Unknown"}'.";
             }
             else
