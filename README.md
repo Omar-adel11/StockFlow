@@ -1,96 +1,232 @@
 # StockFlow
 
-**StockFlow** is a web-based inventory and business management application that helps businesses organize products, stock, warehouses, customers, suppliers, and orders from one place.
+**StockFlow** is a multi-tenant inventory and business management SaaS application built with ASP.NET Core and SQL Server. It helps businesses manage products, categories, warehouses, inventory, suppliers, customers, purchase orders, sales orders, and team access from one platform.
 
-🌐 **Try the live application:** [http://stockflow.runasp.net/index.html](http://stockflow.runasp.net/index.html)  
-💻 **Source code:** [GitHub repository](https://github.com/Omar-adel11/StockFlow)
+<p align="center">
+  <a href="http://stockflow.runasp.net/index.html">
+    <img src="landingPage.png" alt="StockFlow landing page" width="900">
+  </a>
+</p>
 
-> Open the live link to explore the deployed application. Some features may require creating an account and signing in.
+<p align="center">
+  <a href="http://stockflow.runasp.net/index.html">Live application</a> ·
+  <a href="https://github.com/Omar-adel11/StockFlow">Source code</a>
+</p>
+
+> The live application may require registration and sign-in. Available functionality depends on the account role and subscription status.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [Engineering Highlights](#engineering-highlights)
+- [Getting Started](#getting-started)
+- [Configuration and Secrets](#configuration-and-secrets)
+- [API and Application Usage](#api-and-application-usage)
+- [Repository Structure](#repository-structure)
+- [Security Notes](#security-notes)
+- [Roadmap](#roadmap)
+- [Author](#author)
+
+## Overview
+
+StockFlow is designed around the needs of businesses that need a central place to manage inventory and day-to-day operations. The platform supports multiple businesses while separating their data and permissions.
+
+The application includes business-facing workflows as well as platform-level SaaS administration, subscription plans, and payment checkout.
 
 ## Features
 
-- **Dashboard** — a central view for business operations.
-- **Product and category management** — organize products and their categories.
-- **Inventory and warehouses** — manage stock and warehouse-related operations, including stock adjustments and transfers.
-- **Customers and suppliers** — maintain business contacts and customer addresses.
-- **Purchase and sales orders** — manage purchasing and sales workflows.
-- **Team management** — invite and manage team members.
-- **Multi-tenant access** — separate business data and access by tenant.
-- **Subscription plans** — plan management, free-trial support, and subscription checkout.
-- **SaaS administration** — manage business owners and platform plans.
-- **Authentication and authorization** — token-based authentication and role-aware access.
-- **Responsive interface** — layouts for desktop, tablet, and mobile screens.
+### Business Operations
+
+- **Dashboard:** overview of business operations.
+- **Products and categories:** organize products and their classifications.
+- **Inventory:** view and manage stock levels and inventory adjustments.
+- **Warehouses:** manage multiple warehouses and transfer products between them.
+- **Purchase orders:** manage purchasing workflows.
+- **Sales orders:** manage sales workflows.
+- **Customers and suppliers:** maintain business contacts.
+- **Team management:** invite team members and manage their roles.
+
+### SaaS Capabilities
+
+- Multi-tenant business data separation.
+- Role-aware access for platform administrators, business owners, managers, and staff.
+- Subscription plans and free-trial support.
+- Subscription checkout through Paymob.
+- SaaS administration for business owners and plans.
+
+### Platform Capabilities
+
+- JWT-based authentication and authorization.
+- Refresh-token lifecycle management.
+- Redis-backed caching.
+- Centralized application logging with Serilog.
+- Responsive web interface.
 
 ## Technology Stack
 
-- **Backend:** ASP.NET Core Web API (.NET 8), C#
-- **Architecture:** separated application, domain, persistence, and presentation projects
-- **Database:** Microsoft SQL Server with Entity Framework Core
-- **Caching:** Redis
-- **Frontend:** HTML, CSS, and JavaScript
-- **Payments:** Paymob integration for subscription checkout
+| Area | Technologies |
+|---|---|
+| Backend | C#, ASP.NET Core Web API (.NET 8) |
+| Architecture | Separated Domain, Application, Persistence, and Presentation projects |
+| Database | Microsoft SQL Server |
+| ORM | Entity Framework Core |
+| Caching and token state | Redis |
+| Authentication | JWT |
+| Payments | Paymob |
+| Logging | Serilog |
+| Frontend | HTML, CSS, JavaScript |
 
-## Try StockFlow
+## Architecture
 
-Visit **[http://stockflow.runasp.net/index.html](http://stockflow.runasp.net/index.html)** to open the deployed application.
+The backend is organized into separate projects to keep core business concepts, application workflows, persistence concerns, and HTTP presentation responsibilities distinct.
 
-For authenticated features, sign in or register through the application. Access to some areas depends on your role and subscription status.
+```mermaid
+flowchart TB
+    Client[Web Client] --> API[ASP.NET Core Host / API]
+    API --> Presentation[Presentation]
+    Presentation --> Application[Application Services]
+    Application --> Domain[Domain]
+    Application --> Persistence[Persistence]
+    Persistence --> SQL[(SQL Server)]
+    API --> Redis[(Redis)]
+    API --> Paymob[Paymob Payment Gateway]
+```
 
-## Run Locally
+The diagram is a high-level conceptual view of the main components and integrations.
+
+## Engineering Highlights
+
+### Multi-Tenant Data Isolation
+
+StockFlow supports multiple businesses in the same application. Tenant context is associated with the authenticated user, and tenant-aware data access is used to keep business records separated.
+
+### Authentication and Refresh Tokens
+
+The application uses JWT-based authentication and role-aware authorization. Refresh-token state is managed separately from short-lived access tokens, with Redis used as part of the refresh-token lifecycle.
+
+### Caching
+
+Redis is used for application caching. Cache expiration and invalidation are important parts of keeping cached data consistent with changes made through business workflows.
+
+### Subscription and Payment Workflow
+
+The platform includes subscription-plan management and Paymob checkout integration. Payment-provider callbacks are part of the subscription workflow.
+
+### Centralized Logging
+
+Serilog is used to provide structured application logging, helping make application behavior and failures easier to investigate.
+
+## Getting Started
 
 ### Prerequisites
 
 - .NET 8 SDK
 - Microsoft SQL Server
-- Redis, if using the configured Redis-backed features
+- Redis (for Redis-backed features)
 - Git
 
-### Setup
+### Clone the Repository
 
-1. Clone the repository:
+```bash
+git clone https://github.com/Omar-adel11/StockFlow.git
+cd StockFlow
+```
 
-   ```bash
-   git clone https://github.com/Omar-adel11/StockFlow.git
-   cd StockFlow
-   ```
+### Configure the Application
 
-2. Open the solution in Visual Studio, or navigate to the backend project:
+Locate the ASP.NET Core host project under:
 
-   ```bash
-   cd Backend/StockFlow/StockFlow
-   ```
+```text
+Backend/StockFlow/StockFlow
+```
 
-3. Configure the application settings for your local environment. Set the SQL Server connection string and Redis connection string using local configuration or environment variables. Configure any required authentication, email, and payment-provider credentials through your local secrets or environment variables.
+Configure the database connection string and Redis connection string for your local environment. Add any required authentication, email, and payment-provider settings through .NET User Secrets or environment variables.
 
-4. Apply the Entity Framework Core migrations using the migration setup for the project. Ensure the database is created and reachable before starting the API.
+### Apply Database Migrations
 
-5. Run the application:
+Run the Entity Framework Core migration command from the appropriate startup-project and migrations context for the solution:
 
-   ```bash
-   dotnet restore
-   dotnet run
-   ```
+```bash
+dotnet ef database update
+```
 
-   The ASP.NET Core application serves the frontend files from its `wwwroot` directory.
+If the solution contains multiple projects, specify the relevant project and startup project using the Entity Framework Core CLI options.
 
-> **Configuration and security:** Do not commit real connection strings, JWT secrets, email credentials, or payment-provider keys. Use local user secrets or environment variables for sensitive values.
+### Run the Application
+
+From the ASP.NET Core host project:
+
+```bash
+dotnet restore
+dotnet run
+```
+
+The ASP.NET Core application serves the frontend assets from its `wwwroot` directory.
+
+## Configuration and Secrets
+
+The application depends on environment-specific configuration. Before running locally, configure the values required by your environment, including:
+
+- SQL Server connection string.
+- Redis connection string.
+- JWT signing configuration.
+- Email provider settings, if using email workflows.
+- Paymob credentials and webhook configuration, if testing payment workflows.
+
+**Never commit real credentials, connection strings, signing keys, or payment-provider secrets.** Use local development secrets or environment variables.
+
+## API and Application Usage
+
+The live application is available at:
+
+**[Open StockFlow](http://stockflow.runasp.net/index.html)**
+
+After registering or signing in, the available workflows depend on the user's role and the business subscription.
+
+The main API capabilities correspond to the business modules listed in [Features](#features). For endpoint-level documentation, use the API's configured OpenAPI/Swagger endpoint when running the backend, if enabled in the current environment.
 
 ## Repository Structure
 
-The backend is organized into separate projects:
+The repository contains the backend solution and the web client assets. The backend is divided into the following responsibilities:
 
-- **Domain** — core business entities and domain logic.
-- **Application** — application services, DTOs, and use-case logic.
-- **Persistence** — database access and persistence concerns.
-- **Presentation** — API endpoints and presentation concerns.
-- **StockFlow** — ASP.NET Core host and the frontend assets in `wwwroot`.
+| Project / Area | Responsibility |
+|---|---|
+| Domain | Core business entities and domain concepts |
+| Application | Application services, DTOs, and use-case logic |
+| Persistence | Database access and persistence implementation |
+| Presentation | API endpoints and HTTP presentation concerns |
+| ASP.NET Core host | Application startup, configuration, middleware, and frontend hosting |
+| Frontend assets | HTML, CSS, and JavaScript user interface |
 
-## Contributing
+## Security Notes
 
-1. Create a feature branch from `main`.
-2. Make focused changes and test the affected workflows.
-3. Open a pull request describing the changes.
+- Keep secrets outside source control.
+- Use role-aware authorization for protected operations.
+- Preserve tenant boundaries when adding or modifying data-access workflows.
+- Validate external payment callbacks according to the payment provider's security requirements.
+- Do not use production credentials in local development or public examples.
 
-## License
+## Roadmap
 
-No license file is currently specified in this repository. Unless a license is added, reuse and redistribution are not automatically granted.
+Potential areas for continued improvement:
+
+- Expand automated unit and integration test coverage.
+- Document key API request and response examples.
+- Add architecture and database diagrams based on the current implementation.
+- Document deployment and operational procedures.
+- Add continuous integration checks for restore, build, and tests.
+
+## Author
+
+**Omar Adel**
+
+- GitHub: [Omar-adel11](https://github.com/Omar-adel11)
+
+---
+
+If you find an issue or have a suggestion, feel free to open a GitHub issue.
