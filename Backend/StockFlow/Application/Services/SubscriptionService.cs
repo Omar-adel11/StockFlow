@@ -10,6 +10,7 @@ using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.Payment.Paymentdtos;
 using static Application.DTOs.Subscriptions.Subscriptiondtos;
 
@@ -18,10 +19,12 @@ namespace Application.Services
     public class SubscriptionService : ISubscriptionService
     {
         private readonly IAppDbContext _dbContext;
+        private readonly ILogger<SubscriptionService> _logger;
 
-        public SubscriptionService( IAppDbContext dbContext)
+        public SubscriptionService( IAppDbContext dbContext,ILogger<SubscriptionService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         
@@ -106,11 +109,12 @@ namespace Application.Services
             {
                 throw new SubscriptionNotFoundException();
             }
+            _logger.LogDebug("Current subscription retrieved. SubscriptionId: {SubscriptionId}, PlanId: {PlanId}, Status: {Status}", subs.Id, subs.PlanId, subs.Status);
             return subs;
         }
 
         //add tenant subscription
-        public async Task<bool> ActivateSubscription(int businessId,int planId,int days)
+        public async Task<bool> ActivateSubscription(int businessId,int planId,int days, CancellationToken ct = default)
         {
             var business = await _dbContext.Business
                                 .IgnoreQueryFilters()
@@ -169,7 +173,13 @@ namespace Application.Services
             business.PlanId = plan.Id;
             business.IsActive = true;
 
-            return await _dbContext.SaveChangesAsync() > 0;
+            var result =  await _dbContext.SaveChangesAsync();
+            if (result > 0)
+            {
+                _logger.LogInformation("Subscription activated successfully. SubscriptionId: {SubscriptionId}, PlanId: {PlanId}, DurationDays: {DurationDays}", newSubscription.Id, plan.Id,days);
+                return true;
+            }
+            else return false;
         }
 
         //Remove Subscription
@@ -202,7 +212,13 @@ namespace Application.Services
             business.IsActive = false;
             business.PlanId = null;
 
-            return await _dbContext.SaveChangesAsync() > 0;
+            var result = await _dbContext.SaveChangesAsync();
+            if (result > 0)
+            {
+                _logger.LogInformation("Subscription deactivated successfully. SubscriptionId: {SubscriptionId}, PlanId: {PlanId}",subscription.Id, planId);
+                return true;
+            }
+            else return false;
         }
     }
 }

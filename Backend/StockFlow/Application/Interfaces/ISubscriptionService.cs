@@ -21,7 +21,7 @@ namespace Application.Interfaces
         CancellationToken ct = default);
 
         Task<bool> DeactivateSubscription(int businessId, int planId);
-        Task<bool> ActivateSubscription(int businessId, int planId,int days);
+        Task<bool> ActivateSubscription(int businessId, int planId,int days, CancellationToken ct = default);
     }   
 }
 

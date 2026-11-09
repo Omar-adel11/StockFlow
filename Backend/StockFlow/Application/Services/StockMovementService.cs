@@ -25,6 +25,10 @@ namespace Application.Services
 
             try
             {
+                if (request.QuantityChanged <= 0)
+                {
+                    throw new InvalidOperationException("Transfer quantity must be greater than zero.");
+                }
                 // 1. Fetch or create the inventory item for this product/warehouse combination
                 var inventoryItem = await _context.InventoryItems
                     .FirstOrDefaultAsync(i => i.ProductId == request.ProductId && i.WarehouseId == request.WarehouseId);
@@ -233,7 +237,7 @@ namespace Application.Services
             {
                 throw new InvalidOperationException($"Insufficient stock of product '{product.Name}' in warehouse '{fromWarehouse.Name}'. Available: {inventoryItem.QuantityOnHand}, Requested: {request.Quantity}.");
             }
-            var manualAdjustmentRequestFrom = new ManualAdjustmentRequest(request.ProductId, request.FromId, -request.Quantity, StockMovementReason.Transfer, null);
+            var manualAdjustmentRequestFrom = new ManualAdjustmentRequest(request.ProductId, request.FromId, request.Quantity, StockMovementReason.Transfer, null);
             var resultfrom = await CreateManualAdjustmentAsync(manualAdjustmentRequestFrom, businessId);
             var manualAdjustmentRequestTo = new ManualAdjustmentRequest(request.ProductId, request.ToId, request.Quantity, StockMovementReason.Transfer, null);
             var resultTo = await CreateManualAdjustmentAsync(manualAdjustmentRequestTo, businessId);

@@ -32,7 +32,7 @@
 
       <div class="navbar-actions" id="home-navbar-actions">
         <a href="./Login.html" class="link-btn" id="home-auth-btn">Log In</a>
-        <a href="plans.html?trial=1&autostart=1#plans-list" class="btn btn-primary">Start Free Trial</a>
+        <a href="plans.html?trial=1&autostart=1#plans-list" class="btn btn-primary" id="home-primary-cta">Start Free Trial</a>
       </div>
 
     </div>
@@ -130,14 +130,41 @@
   <script type="module">
     import { getAccessToken } from './src/sessions/session.js';
     import * as authService from './src/services/authService.js';
+    import { getMySubscription } from './src/services/planService.js';
+
     const authButton = document.getElementById('home-auth-btn');
-    if (authButton && getAccessToken()) {
+    const primaryCta = document.getElementById('home-primary-cta');
+    const token = getAccessToken();
+
+    if (authButton && token) {
       authButton.textContent = 'Log Out';
       authButton.href = '#';
       authButton.addEventListener('click', event => {
         event.preventDefault();
         authService.logout();
       });
+    }
+
+    // Only direct signed-in users with an active subscription to the dashboard.
+    if (primaryCta && token) {
+      try {
+        const subscription = await getMySubscription();
+        const status = String(subscription?.status ?? subscription?.subscriptionStatus ?? '').toLowerCase();
+        const hasActiveStatus = subscription?.isActive === true ||
+          ['active', 'trialing', 'trial'].includes(status);
+        const endValue = subscription?.endDate ?? subscription?.expiresAt ??
+          subscription?.currentPeriodEnd ?? subscription?.expirationDate;
+        const notExpired = !endValue || new Date(endValue).getTime() > Date.now();
+
+        if (subscription && hasActiveStatus && notExpired) {
+          primaryCta.textContent = 'Dashboard';
+          primaryCta.href = 'dashboard.html';
+          primaryCta.removeAttribute('target');
+        }
+      } catch (error) {
+        // If subscription status cannot be confirmed, keep the safe default CTA.
+        console.warn('Could not determine active subscription; showing trial CTA.', error);
+      }
     }
   </script>
 </body>
