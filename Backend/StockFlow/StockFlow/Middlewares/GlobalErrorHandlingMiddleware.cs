@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Security.Claims;
+using System.Text.Json;
 using Domain.Exceptions;
 using Domain.Exceptions.BadRequest;
 using Domain.Exceptions.NotFound;
 using Domain.Exceptions.Unauthorized;
+using Serilog.Context;
 
 namespace StockFlow.Middlewares
 {
@@ -28,9 +30,27 @@ namespace StockFlow.Middlewares
             }
             catch (Exception ex)
             {
-                //Log the exception (you can use any logging framework here)
-                _logger.LogError(ex, ex.Message);
-                await HandleExceptionAsync(context, ex);
+                var userId = context.User
+                    .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var businessId = context.User
+                    .FindFirst("business_id")?.Value;
+
+                using (LogContext.PushProperty("UserId", userId ?? "Anonymous"))
+                using (LogContext.PushProperty("BusinessId", businessId ?? "None"))
+                {
+
+                    if (context.Response.HasStarted)
+                    {
+                        _logger.LogWarning(
+                            "The response has already started. The exception response cannot be written.");
+
+                        throw;
+                    }
+
+                    //Log the exception (you can use any logging framework here)
+                    await HandleExceptionAsync(context, ex);
+                }
             }
         }
 
@@ -38,43 +58,54 @@ namespace StockFlow.Middlewares
     HttpContext context,
     Exception exception)
         {
-            _logger.LogError(
-                exception,
-                "An unhandled exception occurred.");
-
-            context.Response.ContentType = "application/json";
-
-
-            var respone = new ErrorDetails()
+            var statusCode = exception switch
             {
-                StatusCode = exception switch
-                {
-                    UnauthorizedException => StatusCodes.Status401Unauthorized,
-                    NotFoundException => StatusCodes.Status404NotFound,
-                    BadRequestException => StatusCodes.Status400BadRequest,
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
+                NotFoundException => StatusCodes.Status404NotFound,
+                BadRequestException => StatusCodes.Status400BadRequest,
+                InvalidOperationException => StatusCodes.Status400BadRequest,
+                _ => StatusCodes.Status500InternalServerError
+            };
 
+            if (statusCode == StatusCodes.Status500InternalServerError)
+            {
+                _logger.LogError(
+                    exception,
+                    "An unexpected exception occurred. StatusCode: {StatusCode}, Method: {RequestMethod}, Path: {RequestPath}",
+                    statusCode,
+                    context.Request.Method,
+                    context.Request.Path);
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Request failed with status {StatusCode}: {ExceptionMessage}",
+                    statusCode,
+                    exception.Message);
+            }
 
-                    InvalidOperationException => StatusCodes.Status400BadRequest,
-
-                    _ =>
-                    StatusCodes.Status500InternalServerError
-                },
+            var response = new ErrorDetails
+            {
+                StatusCode = statusCode,
                 ErrorMessage = exception switch
                 {
                     UnauthorizedException or
                     NotFoundException or
                     BadRequestException or
-                    RegisterationBadRequestException => exception.Message,
+                    RegisterationBadRequestException or
                     InvalidOperationException => exception.Message,
+
                     _ => "Internal Server Error. Please try again later."
                 }
             };
 
-            context.Response.StatusCode = respone.StatusCode;
-            var json = JsonSerializer.Serialize(respone);
-            await context.Response.WriteAsync(json);
-        }
+            context.Response.Clear();
+            context.Response.StatusCode = response.StatusCode;
+            context.Response.ContentType = "application/json";
 
+            await context.Response.WriteAsync(
+                JsonSerializer.Serialize(response));
+        }
 
         private static async Task HandlingNotFoundErrorAsync(HttpContext context)
         {
