@@ -92,7 +92,7 @@ namespace Application.Services.Auth
             // Rotation: the old token is revoked and a brand new one issued.
 
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
-            _logger.LogInformation("User logged out and refresh token revoked.");
+            _logger.LogInformation("Previous refresh token revoked during rotation. UserId: {UserId}", user.Id);
             var newRefreshToken = await _refreshTokenService.GenerateAndStoreAsync(user.Id, businessId, RefreshTokenLifetime);
             var newAccessToken = await _tokenService.GenerateToken(user);
             _logger.LogInformation("Access and refresh tokens renewed. UserId: {UserId}", user.Id);
@@ -279,11 +279,13 @@ namespace Application.Services.Auth
         public async Task logout(RefreshRequestDto refreshRequestDto)
         {
             await _refreshTokenService.RevokeAsync(refreshRequestDto.RefreshToken);
+            _logger.LogInformation("User logged out and refresh token revoked.");
         }
 
         public async Task logout(string RefreshToken)
         {
             await _refreshTokenService.RevokeAsync(RefreshToken);
+            _logger.LogInformation("User logged out and refresh token revoked.");
         }
 
         private async Task<User?> CheckEmailExistence(string email)
