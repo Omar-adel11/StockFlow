@@ -9,11 +9,12 @@ using Domain.Entities;
 using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.PurchaseOrderDtos;
 
 namespace Application.Services
 {
-    public class PurchaseOrderService(IAppDbContext _context, ICurrentUserService _currentUserService) : IPurchaseOrderService
+    public class PurchaseOrderService(IAppDbContext _context, ICurrentUserService _currentUserService, ILogger<PurchaseOrderService> _logger) : IPurchaseOrderService
     {
         private readonly IAppDbContext _context = _context;
 
@@ -43,12 +44,14 @@ namespace Application.Services
 
         public async Task<IReadOnlyCollection<PurchaseResponse>> GetAllOrdersAsync(int count = 20)
         {
-            return await PurchaseOrders
+            var orders = await PurchaseOrders
                 .AsNoTracking()
                 .OrderByDescending(po => po.OrderDate)
                 .Take(count)
                 .Select(ToPurchaseResponse)
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} purchase orders", orders.Count);
+            return orders;
         }
 
         public async Task<PurchaseResponse?> GetOrderByIdAsync(int id)
@@ -62,6 +65,7 @@ namespace Application.Services
             {
                 throw new OrderNotFoundException();
             }
+            _logger.LogDebug("Purchase order retrieved. PurchaseOrderId: {PurchaseOrderId}", result.Id);
             return result;
         }
 
@@ -96,6 +100,7 @@ namespace Application.Services
             PurchaseOrders.Add(purchaseOrder);
             await _context.SaveChangesAsync(CancellationToken.None);
 
+            _logger.LogInformation("Purchase order created. PurchaseOrderId: {PurchaseOrderId}, PONumber: {PONumber}, ItemCount: {ItemCount}, TotalAmount: {TotalAmount}", purchaseOrder.Id, purchaseOrder.PONumber, orderItems.Count, totalAmount);
             var createdOrder = await GetOrderByIdAsync(purchaseOrder.Id);
             return createdOrder ?? throw new InvalidOperationException("Failed to retrieve created purchase order.");
         }
@@ -154,6 +159,7 @@ namespace Application.Services
 
             order.Status = OrderStatus.Completed;
             await _context.SaveChangesAsync(CancellationToken.None);
+            _logger.LogInformation("Purchase order received. PurchaseOrderId: {PurchaseOrderId}, ItemCount: {ItemCount}", order.Id, order.Items.Count);
 
             return true;
         }
@@ -169,6 +175,7 @@ namespace Application.Services
 
             order.Status = OrderStatus.Cancelled;
             await _context.SaveChangesAsync(CancellationToken.None);
+            _logger.LogInformation("Purchase order cancelled. PurchaseOrderId: {PurchaseOrderId}", order.Id);
 
             return true;
         }
