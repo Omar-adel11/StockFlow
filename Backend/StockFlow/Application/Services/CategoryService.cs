@@ -9,10 +9,11 @@ using Application.Services.Helper;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class CategoryService(IAppDbContext _context) : ICategoryService
+    public class CategoryService(IAppDbContext _context, ILogger<CategoryService> _logger) : ICategoryService
     {
         private DbSet<Category> CategorySet => _context.Categories;
         public async Task<CategoryDtos.Response> CreateCategoryAsync(CategoryDtos.CreateRequest createRequest,int BusinessId)
@@ -24,8 +25,10 @@ namespace Application.Services
                 IsActive = true,
                 BusinessId = BusinessId,
             };
+
             await CategorySet.AddAsync(category);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Category created: {CategoryId} - {CategoryName}", category.Id, category.Name);
             return new CategoryDtos.Response(category.Id, category.Name, category.Description);
         }
 
@@ -40,7 +43,13 @@ namespace Application.Services
                 throw new InvalidOperationException($"Cannot deactivate or delete category '{category.Name}' because active products belong to it.");
             }
             CategorySet.Remove(category);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                _logger.LogInformation("Category deleted: {CategoryId} - {CategoryName}", category.Id, category.Name);
+                return true;
+            }
+            else return false;
         }
 
         public async Task<IReadOnlyCollection<CategoryDtos.Response>> GetAllCategoriesAsync(string? search,int businessId)
@@ -54,6 +63,7 @@ namespace Application.Services
             }
 
             var categories =  await query.Select(c => new CategoryDtos.Response(c.Id, c.Name, c.Description)).ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} categories. SearchApplied: {SearchApplied}",categories.Count,!string.IsNullOrWhiteSpace(search));
             return categories;
 
         }
@@ -61,6 +71,7 @@ namespace Application.Services
         public async Task<CategoryDtos.Response?> GetCategoryAsync(int id)
         {
             var category = await GetCategory(id);
+            _logger.LogDebug("Category retrieved: {CategoryId} - {CategoryName}",category.Id,category.Name);
             var response = new CategoryDtos.Response(category.Id, category.Name, category.Description);
             return response;
         }
@@ -73,6 +84,7 @@ namespace Application.Services
             category.Description = updateRequest.Description;
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Category updated: {CategoryId} - {CategoryName}", category.Id, category.Name);
             return new CategoryDtos.Response(category.Id,category.Name,category.Description);
         }
 

@@ -237,7 +237,7 @@ namespace Application.Services
             {
                 throw new InvalidOperationException($"Insufficient stock of product '{product.Name}' in warehouse '{fromWarehouse.Name}'. Available: {inventoryItem.QuantityOnHand}, Requested: {request.Quantity}.");
             }
-            var manualAdjustmentRequestFrom = new ManualAdjustmentRequest(request.ProductId, request.FromId, -request.Quantity, StockMovementReason.Transfer, null);
+            var manualAdjustmentRequestFrom = new ManualAdjustmentRequest(request.ProductId, request.FromId, request.Quantity, StockMovementReason.Transfer, null);
             var resultfrom = await CreateManualAdjustmentAsync(manualAdjustmentRequestFrom, businessId);
             var manualAdjustmentRequestTo = new ManualAdjustmentRequest(request.ProductId, request.ToId, request.Quantity, StockMovementReason.Transfer, null);
             var resultTo = await CreateManualAdjustmentAsync(manualAdjustmentRequestTo, businessId);

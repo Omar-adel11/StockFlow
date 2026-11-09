@@ -13,6 +13,7 @@ using Persistence;
 using Persistence.Interceptors;
 using Persistence.Seed;
 using Serilog;
+using Serilog.Events;
 using StockFlow.Middlewares;
 
 
@@ -156,13 +157,21 @@ namespace StockFlow
                     app.UseSwaggerUI();
                 }
 
-                app.UseSerilogRequestLogging();
+                app.UseSerilogRequestLogging(options =>
+                {
+                    options.GetLevel = (httpContext, elapsed, ex) =>
+                        httpContext.Request.Method == "OPTIONS"
+                            ? LogEventLevel.Verbose
+                            : LogEventLevel.Information;
+                });
                 app.UseMiddleware<GlobalErrorHandlingMiddleware>();
+
                 app.UseCors(FrontendCorsPolicy);
                 app.UseHttpsRedirection();
                 app.UseStaticFiles();
                 app.UseRateLimiter();
                 app.UseAuthentication();
+                app.UseMiddleware<SerilogContextMiddleware>();
                 app.UseAuthorization();
                 app.MapControllers();
                 app.Run();
@@ -178,3 +187,137 @@ namespace StockFlow
         }
     }
 }
+
+
+/*
+ * 
+ * 
+ * 14. Authentication and Authorization
+
+Important events:
+
+Successful authentication.
+Failed authentication.
+Account deactivation.
+Unauthorized access attempts.
+Permission failures.
+Refresh token failures.
+
+Security warning:
+
+Never log:
+
+Passwords.
+JWT access tokens.
+Refresh tokens.
+Authentication cookies.
+OTP values.
+
+You can log the UserId and relevant operation information when appropriate.
+
+15. Multi-Tenancy
+
+This is particularly important in StockFlow.
+
+You have tenant isolation through BusinessId claims and global query filters.
+
+Your logs should provide enough context to investigate tenant-related issues.
+
+For example:
+
+A product operation fails.
+
+You should be able to identify:
+
+UserId.
+BusinessId.
+ProductId.
+Operation.
+
+This helps investigate tenant isolation and authorization issues.
+
+However, be careful not to log sensitive customer information.
+
+16. Inventory Management
+
+Important events:
+
+Stock adjustment.
+Warehouse transfer.
+Inventory update failures.
+Insufficient stock.
+Failed stock reservation.
+
+For example, when transferring products between warehouses, useful contextual properties include:
+
+BusinessId.
+ProductId.
+SourceWarehouseId.
+DestinationWarehouseId.
+Quantity.
+
+This makes investigating inventory discrepancies much easier.
+
+17. Subscription Management
+
+Your subscription module has important business operations.
+
+Log events such as:
+
+Subscription created.
+Subscription deactivated.
+Plan changed.
+Subscription activation failed.
+Free trial activated.
+
+Useful properties:
+
+BusinessId.
+SubscriptionId.
+PlanId.
+Operation type.
+18. Paymob Payments
+
+This module deserves special attention.
+
+Important events:
+
+Payment initiation.
+Payment verification.
+Webhook received.
+Webhook signature validation failed.
+Subscription activation after successful payment.
+Payment processing exception.
+
+You should record transaction identifiers and relevant processing outcomes.
+
+Never log:
+
+Secret keys.
+API credentials.
+Payment authentication tokens.
+Sensitive payment details.
+Full webhook signatures.
+
+Remember that webhook endpoints can receive repeated notifications.
+
+Structured logs help you investigate duplicate processing and idempotency problems.
+
+19. Redis
+
+You use Redis for caching and refresh-token management.
+
+Useful events:
+
+Cache miss.
+Cache invalidation.
+Redis connection failure.
+Refresh token revoked.
+Cache operation failure.
+
+However, don't log every cache hit.
+
+That can create enormous amounts of unnecessary logging.
+
+Prefer logging meaningful events, failures, and selected diagnostic information.
+ */
