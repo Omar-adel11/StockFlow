@@ -8,21 +8,25 @@ using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
     public class PlanService : IPlanService
     {
         private readonly IPlanRepository _planRepository;
+        private readonly ILogger<PlanService> _logger;
 
-        public PlanService(IPlanRepository planRepository)
+        public PlanService(IPlanRepository planRepository, ILogger<PlanService> logger)
         {
             _planRepository = planRepository;
+            _logger = logger;
         }
 
         public async Task<List<PlanResponseDto>> GetAllPlansAsync()
         {
             var plans = await _planRepository.GetAllAsync();
+            _logger.LogDebug("Retrieved {ResultCount} plans", plans.Count);
             return plans.Select(MapToResponse).ToList();
         }
 
@@ -31,6 +35,8 @@ namespace Application.Services
         public async Task<PlanResponseDto?> GetPlanByIdAsync(int id)
         {
             var plan = await _planRepository.GetByIdAsync(id);
+            if (plan is not null)
+                _logger.LogDebug("Plan retrieved. PlanId: {PlanId}", plan.Id);
             return plan is null ? null : MapToResponse(plan);
         }
 
@@ -68,6 +74,7 @@ namespace Application.Services
 
             await _planRepository.AddAsync(plan);
             await _planRepository.SaveChangesAsync();
+            _logger.LogInformation("Plan created. PlanId: {PlanId}, IsFreeTrial: {IsFreeTrial}", plan.Id, plan.IsFreeTrial);
 
             return MapToResponse(plan);
         }
@@ -95,6 +102,7 @@ namespace Application.Services
 
             _planRepository.Update(plan);
             await _planRepository.SaveChangesAsync();
+            _logger.LogInformation("Plan updated. PlanId: {PlanId}", plan.Id);
 
             return MapToResponse(plan);
         }
@@ -109,6 +117,7 @@ namespace Application.Services
 
             _planRepository.Delete(plan);
             await _planRepository.SaveChangesAsync();
+            _logger.LogInformation("Plan deleted. PlanId: {PlanId}", plan.Id);
             return true;
         }
 
