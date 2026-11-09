@@ -6,10 +6,11 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class CustomerService(IAppDbContext _context) : ICustomerService
+    public class CustomerService(IAppDbContext _context, ILogger<CustomerService> _logger) : ICustomerService
     {
         private DbSet<Customer> CustomerSet => _context.Customers;
         private DbSet<CustomerAddress> AddressSet => _context.CustomerAddresses;
@@ -37,6 +38,7 @@ namespace Application.Services
 
             await CustomerSet.AddAsync(customer);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Customer created. CustomerId: {CustomerId}", customer.Id);
 
             return MapToResponse(customer);
         }
@@ -50,7 +52,9 @@ namespace Application.Services
             }
 
             CustomerSet.Remove(customer);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync();
+            if (result > 0) _logger.LogInformation("Customer deleted. CustomerId: {CustomerId}", customer.Id);
+            return result > 0;
         }
 
         public async Task<IReadOnlyCollection<CustomerDtos.CustomerResponse>> GetAllCustomersAsync(string? search, int businessId)
@@ -67,12 +71,14 @@ namespace Application.Services
                 .Include(c => c.Addresses)
                 .ToListAsync();
 
+            _logger.LogDebug("Retrieved {ResultCount} customers. SearchApplied: {SearchApplied}", customers.Count, !string.IsNullOrWhiteSpace(search));
             return customers.Select(MapToResponse).ToList();
         }
 
         public async Task<CustomerDtos.CustomerResponse?> GetCustomerAsync(int id)
         {
             var customer = await GetCustomerEntityAsync(id);
+            _logger.LogDebug("Customer retrieved. CustomerId: {CustomerId}", customer.Id);
             return MapToResponse(customer);
         }
 
@@ -86,6 +92,7 @@ namespace Application.Services
             
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Customer updated. CustomerId: {CustomerId}", customer.Id);
 
             return MapToResponse(customer);
         }
@@ -114,6 +121,7 @@ namespace Application.Services
             });
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Customer address added. CustomerId: {CustomerId}", customerId);
             return MapToResponse(customer);
         }
 
@@ -139,7 +147,9 @@ namespace Application.Services
             address.Country = request.Country;
             address.IsDefault = request.IsDefault;
 
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync() > 0;
+            if (result) _logger.LogInformation("Customer address updated. CustomerId: {CustomerId}, AddressId: {AddressId}", customerId, addressId);
+            return result;
         }
 
         public async Task<bool> DeleteAddressAsync(int customerId, int addressId,int businessId)
@@ -151,7 +161,9 @@ namespace Application.Services
             }
 
             AddressSet.Remove(address);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync() > 0;
+            if (result) _logger.LogInformation("Customer address deleted. CustomerId: {CustomerId}, AddressId: {AddressId}", customerId, addressId);
+            return result;
         }
 
         #endregion

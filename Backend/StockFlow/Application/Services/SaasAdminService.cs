@@ -11,12 +11,13 @@ using Domain.Exceptions.NotFound;
 using Domain.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.businessOwner.BusinessOwnerDto;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services
 {
-    public class SaaSAdminService(IAppDbContext _context, UserManager<User> _userManager,ISubscriptionService subscriptionService) : ISaaSAdminService
+    public class SaaSAdminService(IAppDbContext _context, UserManager<User> _userManager,ISubscriptionService subscriptionService, ILogger<SaaSAdminService> _logger) : ISaaSAdminService
     {
 
 
@@ -42,7 +43,7 @@ namespace Application.Services
             }
 
 
-                return await query.Select(u => new BusinessOwnerResponseDto
+                var owners = await query.Select(u => new BusinessOwnerResponseDto
                  {
                      Id = u.Id,
                      FullName = u.Name,
@@ -56,6 +57,8 @@ namespace Application.Services
                         : null
                  })
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} business owners. SearchApplied: {SearchApplied}", owners.Count, !string.IsNullOrWhiteSpace(search));
+            return owners;
         }
 
         public async Task<bool> UpdateBusinessOwnerStatusAsync(int ownerId, UpdateOwnerStatusRequest request)
@@ -90,6 +93,7 @@ namespace Application.Services
                 business.IsActive = true;
                 return await subscriptionService.ActivateSubscription(
                     business.Id, plan.Id, plan.BillingCycle == 0 ? 30 : 365);
+                _logger.LogInformation("Business owner activated and plan assigned. OwnerUserId: {OwnerUserId}, BusinessId: {BusinessId}, PlanId: {PlanId}", ownerId, business.Id, plan.Id);
             }
 
             // Deactivation must work even if the UI sends a null planId.
@@ -106,6 +110,7 @@ namespace Application.Services
             business.IsActive = false;
             business.PlanId = null;
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Business owner deactivated. OwnerUserId: {OwnerUserId}, BusinessId: {BusinessId}", ownerId, business.Id);
             return true;
 
            

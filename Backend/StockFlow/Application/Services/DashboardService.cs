@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.Interfaces;
 using Domain.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.Dashboarddtos.Dashboarddtos;
 
 namespace Application.Services
@@ -13,10 +14,12 @@ namespace Application.Services
     public class DashboardService : IDashboardService
     {
         private readonly IAppDbContext _dbContext;
+        private readonly ILogger<DashboardService> _logger;
 
-        public DashboardService(IAppDbContext dbContext)
+        public DashboardService(IAppDbContext dbContext, ILogger<DashboardService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<DashboardSummaryDto> GetDashboardSummaryAsync()
@@ -179,6 +182,7 @@ namespace Application.Services
             // -------------------------------------------------------------
             // Return DTO
             // -------------------------------------------------------------
+            _logger.LogDebug("Dashboard summary generated. TotalProducts: {TotalProducts}, TotalOrders: {TotalOrders}, LowStockItems: {LowStockItems}", totalProducts, totalOrders, lowStockItems.Count);
             return new DashboardSummaryDto
             {
                 TotalProducts = totalProducts,

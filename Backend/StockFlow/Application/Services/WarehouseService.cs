@@ -10,10 +10,11 @@ using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class WarehouseService(IAppDbContext _context,IFeatureService _featureService) : IWarehouseService
+    public class WarehouseService(IAppDbContext _context,IFeatureService _featureService, ILogger<WarehouseService> _logger) : IWarehouseService
     {
         private DbSet<Warehouse> WarehouseSet => _context.Warehouses;
 
@@ -35,12 +36,15 @@ namespace Application.Services
                 query = query.Where(w => w.Name.Contains(search));
             }
 
-               return await query.Select(MapToResponseExpression).ToListAsync();
+               var warehouses = await query.Select(MapToResponseExpression).ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} warehouses. SearchApplied: {SearchApplied}", warehouses.Count, !string.IsNullOrWhiteSpace(search));
+            return warehouses;
         }
 
         public async Task<WarehouseDtos.WarehouseResponse?> GetWarehouseAsync(int id)
         {
             var warehouse = await GetWarehouseEntityAsync(id);
+            _logger.LogDebug("Warehouse retrieved. WarehouseId: {WarehouseId}", warehouse.Id);
             return MapToResponse(warehouse);
         }
 
@@ -70,6 +74,7 @@ namespace Application.Services
 
             await WarehouseSet.AddAsync(warehouse);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Warehouse created. WarehouseId: {WarehouseId}", warehouse.Id);
 
             return MapToResponse(warehouse);
         }
@@ -89,6 +94,7 @@ namespace Application.Services
             warehouse.IsActive = updateRequest.IsActive;
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Warehouse updated. WarehouseId: {WarehouseId}", warehouse.Id);
 
             return MapToResponse(warehouse);
         }
@@ -101,7 +107,9 @@ namespace Application.Services
             await ValidateNoActiveStockAsync(warehouse.Id, warehouse.Name);
 
             _context.Warehouses.Remove(warehouse);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync() > 0;
+            if (result) _logger.LogInformation("Warehouse deleted. WarehouseId: {WarehouseId}", warehouse.Id);
+            return result;
         }
 
         #region Helper Methods

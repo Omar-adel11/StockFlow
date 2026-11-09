@@ -81,7 +81,7 @@ namespace Application.Services
 
             _dbContext.PaymentTransactions.Add(pendingTransaction);
             await _dbContext.SaveChangesAsync(ct);
-
+            _logger.LogInformation("Checkout payment transaction created. PaymentTransactionId: {PaymentTransactionId}, PlanId: {PlanId}, Provider: {Provider}", pendingTransaction.Id, plan.Id, request.Provider);
 
             int extensionDays = plan.BillingCycle == 0 ? 30 : 365;
 
@@ -98,7 +98,7 @@ namespace Application.Services
 
             var gateway = _gatewayFactory.GetProvider(request.Provider);
 
-            return await gateway.CreateCheckoutSessionAsync(
+            var checkoutSession = await gateway.CreateCheckoutSessionAsync(
                     checkoutSubscription,
                     plan.Price,
                     plan.Currency,
@@ -106,6 +106,8 @@ namespace Application.Services
                     request.SuccessUrl,
                     request.CancelUrl,
                     ct);
+            _logger.LogInformation("Checkout session created. PaymentTransactionId: {PaymentTransactionId}, PlanId: {PlanId}, Provider: {Provider}", pendingTransaction.Id, plan.Id, request.Provider);
+            return checkoutSession;
 
         }
 
@@ -168,6 +170,7 @@ namespace Application.Services
                 }
 
                 await _dbContext.SaveChangesAsync(ct);
+                _logger.LogInformation("Payment processed successfully and subscription activated. PaymentTransactionId: {PaymentTransactionId}, PlanId: {PlanId}", pendingTransaction?.Id, plan.Id);
 
               
                 }

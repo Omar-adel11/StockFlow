@@ -7,16 +7,19 @@ using Application.Interfaces;
 using Domain.common.Extensions;
 using Domain.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
     public class FeatureService : IFeatureService
     {
         private readonly IAppDbContext _dbContext;
+        private readonly ILogger<FeatureService> _logger;
 
-        public FeatureService(IAppDbContext dbContext)
+        public FeatureService(IAppDbContext dbContext, ILogger<FeatureService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<bool> CanCreateEntityAsync(int businessId, FeatureType featureKey, int currentCount, CancellationToken ct = default)
@@ -54,14 +57,18 @@ namespace Application.Services
             // 3. Evaluate value rule ("Unlimited", numeric limit, etc.)
             if (string.Equals(feature.Value, "Unlimited", StringComparison.OrdinalIgnoreCase))
             {
+                _logger.LogDebug("Feature limit checked. Feature: {FeatureKey}, CurrentCount: {CurrentCount}, Limit: Unlimited", featureKey, currentCount);
                 return true;
             }
 
             if (int.TryParse(feature.Value, out int maxAllowed))
             {
-                return currentCount < maxAllowed;
+                var canCreate = currentCount < maxAllowed;
+                _logger.LogDebug("Feature limit checked. Feature: {FeatureKey}, CurrentCount: {CurrentCount}, MaxAllowed: {MaxAllowed}, CanCreate: {CanCreate}", featureKey, currentCount, maxAllowed, canCreate);
+                return canCreate;
             }
 
+            _logger.LogWarning("Feature limit has an unsupported value. Feature: {FeatureKey}", featureKey);
             return false;
         }
     }

@@ -20,6 +20,7 @@ using Domain.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services
@@ -35,6 +36,7 @@ namespace Application.Services
         private readonly IFeatureService _featureService;
         private readonly IEmailService _emailService; // Assuming you have an IEmailService
         private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly ILogger<TeamService> _logger;
 
         public TeamService(
             IAppDbContext dbContext,
@@ -44,7 +46,8 @@ namespace Application.Services
             IRefreshTokenService refreshTokenService,
             IHostingEnvironment env,
             RoleManager<IdentityRole<int>> roleManager,
-            IFeatureService featureService
+            IFeatureService featureService,
+            ILogger<TeamService> logger
             )
         {
             _dbContext = dbContext;
@@ -55,6 +58,7 @@ namespace Application.Services
             _env = env;
             _roleManager = roleManager; 
             _featureService = featureService;
+            _logger = logger;
         }
         private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(7);
         public async Task SendInviteAsync(SendInviteRequest request, int currentUserId, int currentBusinessId)
@@ -125,6 +129,7 @@ namespace Application.Services
                 $"<p>You have been invited to join <strong>{business?.Name}</strong> as a <strong>{request.Role}</strong>.</p>" +
                 $"<p>Click <a href='{inviteLink}'>here</a> to accept your invitation and set up your account.</p>"
             );
+            _logger.LogInformation("Team invitation created. InvitationId: {InvitationId}, Role: {Role}", invitation.Id, invitation.Role);
         }
 
         public async Task<InviteDetailsResponse> GetInviteDetailsAsync(string token)
@@ -224,6 +229,7 @@ namespace Application.Services
 
             // 7. Commit transaction
             await transaction.CommitAsync();
+            _logger.LogInformation("Team invitation accepted. UserId: {UserId}, BusinessId: {BusinessId}, Role: {Role}", user.Id, businessId, invite.Role);
 
             // 8. Generate JWT & Refresh Tokens
             var token = await _tokenService.GenerateToken(user);
@@ -255,12 +261,13 @@ namespace Application.Services
             {
                 invite.RevokedAtUtc = DateTime.UtcNow;
                 await _dbContext.SaveChangesAsync();
+                _logger.LogInformation("Team invitation revoked. InvitationId: {InvitationId}", invite.Id);
             }
         }
 
         public async Task<List<TeamInvitationDto>> GetPendingInvitesAsync(int currentBusinessId)
         {
-            return await _dbContext.TeamInvitations
+            var invitations = await _dbContext.TeamInvitations
                 .Where(ti => ti.BusinessId == currentBusinessId && ti.AcceptedAtUtc == null && ti.RevokedAtUtc == null && ti.ExpiresAtUtc > DateTime.UtcNow)
                 .Select(ti => new TeamInvitationDto
                 {
@@ -271,6 +278,8 @@ namespace Application.Services
                     ExpiresAtUtc = ti.ExpiresAtUtc
                 })
                 .ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} pending team invitations", invitations.Count);
+            return invitations;
         }
 
         public async Task<IEnumerable<TeamMemberDto>> GetTeamMembersAsync(int businessId,string? search)
@@ -360,6 +369,7 @@ namespace Application.Services
              */
             await _userManager.UpdateAsync(user);
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Team member removed. UserId: {UserId}", memberId);
         }
 
         public async Task UpdateMemberRoleAsync(int memberId, string newRole, int businessId)
@@ -395,6 +405,7 @@ namespace Application.Services
             var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRoleAsync(user, newRole);
+            _logger.LogInformation("Team member role updated. UserId: {UserId}, NewRole: {NewRole}", memberId, newRole);
         }
     }
 }

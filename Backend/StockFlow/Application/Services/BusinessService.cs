@@ -8,6 +8,7 @@ using Domain.Entities;
 using Domain.Entities.Enum;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
@@ -16,15 +17,18 @@ namespace Application.Services
         private readonly IBusinessRepository _businessRepository;
         private readonly IPlanRepository _planRepository;
         private readonly IAppDbContext _dbContext;
+        private readonly ILogger<BusinessService> _logger;
 
         public BusinessService(
             IBusinessRepository businessRepository,
             IPlanRepository planRepository,
-            IAppDbContext dbContext)
+            IAppDbContext dbContext,
+            ILogger<BusinessService> logger)
         {
             _businessRepository = businessRepository;
             _planRepository = planRepository;
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<bool> AssignPlanAsync(int businessId, int planId)
@@ -79,6 +83,7 @@ namespace Application.Services
 
             // 6. Save changes atomically
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Plan assigned to business. BusinessId: {BusinessId}, PlanId: {PlanId}, SubscriptionId: {SubscriptionId}", businessId, plan.Id, newSubscription.Id);
 
             return true;
         }

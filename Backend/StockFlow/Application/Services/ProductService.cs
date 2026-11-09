@@ -9,11 +9,12 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.DTOs.ProductDtos;
 
 namespace Application.Services
 {
-    public class ProductService(IAppDbContext _context) : IProductService
+    public class ProductService(IAppDbContext _context, ILogger<ProductService> _logger) : IProductService
     {
         private  DbSet<Product> _productSet => _context.Products;
         public async Task<ProductResponse> CreateProductAsync(ProductCreateRequest createRequest, int businessId)
@@ -32,6 +33,7 @@ namespace Application.Services
             };
             await _productSet.AddAsync(product);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Product created. ProductId: {ProductId}, SKU: {SKU}", product.Id, product.SKU);
             var p = await GetProductEntityAsync(product.Id);
             return MapToResponse(p);
         }
@@ -45,7 +47,9 @@ namespace Application.Services
                 throw new InvalidOperationException($"Cannot delete Product '{product.Name}' because it currently holds active stock.");
             }
             _context.Products.Remove(product);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync();
+            if (result > 0) _logger.LogInformation("Product deleted. ProductId: {ProductId}", product.Id);
+            return result > 0;
         }
 
         public async Task<IReadOnlyCollection<ProductResponse>>GetAllProductsAsync(string? search, int businessId)
@@ -64,6 +68,7 @@ namespace Application.Services
                 .Include(p => p.PreferredSupplier)
                 .ToListAsync();
 
+            _logger.LogDebug("Retrieved {ResultCount} products. SearchApplied: {SearchApplied}", products.Count, !string.IsNullOrWhiteSpace(search));
             return products
                 .Select(MapToResponse)
                 .ToList();
@@ -75,6 +80,7 @@ namespace Application.Services
             {
                 throw new ProductNotFoundException();
             }
+            _logger.LogDebug("Product retrieved. ProductId: {ProductId}", product.Id);
             return MapToResponse(product);
         }
 
@@ -85,6 +91,7 @@ namespace Application.Services
             {
                 throw new ProductNotFoundException();
             }
+            _logger.LogDebug("Product retrieved by SKU. ProductId: {ProductId}", product.Id);
             return MapToResponse(product);
         }
 
@@ -108,6 +115,7 @@ namespace Application.Services
                 product.IsActive = updateRequest.IsActive;
             }
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Product updated. ProductId: {ProductId}", product.Id);
             return MapToResponse(product);
         }
    

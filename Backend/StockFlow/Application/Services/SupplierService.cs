@@ -7,10 +7,11 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
-    public class SupplierService(IAppDbContext _context) : ISupplierService
+    public class SupplierService(IAppDbContext _context, ILogger<SupplierService> _logger) : ISupplierService
     {
         private DbSet<Supplier> SupplierSet => _context.Suppliers;
 
@@ -28,6 +29,7 @@ namespace Application.Services
 
             await SupplierSet.AddAsync(supplier);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Supplier created. SupplierId: {SupplierId}", supplier.Id);
 
             return MapToResponse(supplier);
         }
@@ -40,7 +42,9 @@ namespace Application.Services
             await ValidateNoAssociatedActiveProductsAsync(supplier.Id, supplier.Name);
 
             _context.Suppliers.Remove(supplier);
-            return await _context.SaveChangesAsync() > 0;
+            var result = await _context.SaveChangesAsync();
+            if (result > 0) _logger.LogInformation("Supplier deleted. SupplierId: {SupplierId}", supplier.Id);
+            return result > 0;
         }
 
         public async Task<IReadOnlyCollection<SuppliersDtos.SupplierResponse>> GetAllSuppliersAsync(string? search, int businessId)
@@ -53,12 +57,14 @@ namespace Application.Services
                 query = query.Where(c => c.Name.Contains(search) || c.ContactEmail.Contains(search));
             }
             var suppliers = await query.ToListAsync();
+            _logger.LogDebug("Retrieved {ResultCount} suppliers. SearchApplied: {SearchApplied}", suppliers.Count, !string.IsNullOrWhiteSpace(search));
             return suppliers.Select(MapToResponse).ToList();
         }
 
         public async Task<SuppliersDtos.SupplierResponse?> GetSupplierAsync(int id)
         {
             var supplier = await GetSupplierEntityAsync(id);
+            _logger.LogDebug("Supplier retrieved. SupplierId: {SupplierId}", supplier.Id);
             return MapToResponse(supplier);
         }
 
@@ -79,6 +85,7 @@ namespace Application.Services
             supplier.IsActive = updateRequest.IsActive;
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Supplier updated. SupplierId: {SupplierId}", supplier.Id);
 
             return MapToResponse(supplier);
         }

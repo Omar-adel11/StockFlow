@@ -7,12 +7,14 @@ using Application.Interfaces;
 using Application.Interfaces.AuthInterfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Auth
 {
     public class RefreshTokenService(
         ICacheService cacheService,
-        IAppDbContext context) : IRefreshTokenService
+        IAppDbContext context,
+        ILogger<RefreshTokenService> logger) : IRefreshTokenService
     {
         private static string BuildKey(string token) => $"refresh_token:{token}";
 
@@ -36,6 +38,7 @@ namespace Application.Services.Auth
 
             // 2. Secondary Fast Store: Save in Redis Cache (Safe against Redis down)
             await cacheService.SetCacheValueAsync(BuildKey(token), userId, lifetime);
+            logger.LogInformation("Refresh token issued. UserId: {UserId}, ExpiresAtUtc: {ExpiresAtUtc}", userId, expiresAt);
 
             return token;
         }
@@ -64,6 +67,7 @@ namespace Application.Services.Auth
             // Validate token exists, isn't revoked, and hasn't expired
             if (tokenEntity is null || !tokenEntity.IsActive)
             {
+                logger.LogWarning("Refresh token validation failed: token missing, revoked, or expired.");
                 return null;
             }
 
@@ -93,6 +97,8 @@ namespace Application.Services.Auth
 
             // 2. Remove from Redis Cache
             await cacheService.RemoveAsync(BuildKey(refreshToken));
+            if (tokenEntity is not null)
+                logger.LogInformation("Refresh token revoked. UserId: {UserId}", tokenEntity.UserId);
         }
 
         private static string GenerateSecureToken()

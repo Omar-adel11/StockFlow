@@ -8,10 +8,11 @@ using Application.Interfaces.AuthInterfaces;
 using Domain.Entities;
 using Domain.Exceptions.Unauthorized;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Auth
 {
-    public class OTPService(UserManager<User> _userManager) : IOTPService
+    public class OTPService(UserManager<User> _userManager, ILogger<OTPService> _logger) : IOTPService
     {
         public async Task<string> GenerateOTP(string email)
         {
@@ -21,6 +22,7 @@ namespace Application.Services.Auth
                 throw new Exception("User not found");
             }
             var otp = await _userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider);
+            _logger.LogInformation("Password reset OTP generated. UserId: {UserId}", user.Id);
             return otp;
         }
 
@@ -34,10 +36,12 @@ namespace Application.Services.Auth
             var isValid = await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, oTPDTO.otp);
             if (isValid)
             {
+                _logger.LogInformation("Password reset OTP verified successfully. UserId: {UserId}", user.Id);
                 return await _userManager.GeneratePasswordResetTokenAsync(user);
             }
             else
             {
+                _logger.LogWarning("Password reset OTP verification failed. UserId: {UserId}", user.Id);
                 throw new InvalidOtpException();
             }
 
